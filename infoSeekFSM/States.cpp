@@ -2,7 +2,7 @@
 #include "Arduino.h"
 
 
-//// INTER_TRIAL_INTERVAL
+//// INTER_TRIAL_INTERVAL 15
 void StateInterTrialInterval::s_setup()
 {
   Serial.println("ITI");
@@ -16,7 +16,7 @@ void StateInterTrialInterval::s_finish()
   next_state = WAIT_FOR_TRIAL;   
 }
 
-//// WAIT_FOR_TRIAL
+//// WAIT_FOR_TRIAL 0
 void StateWaitForTrial::s_setup()
 {
   Serial.println("WAIT_FOR_TRIAL");
@@ -34,7 +34,7 @@ void StateWaitForTrial::s_finish()
 }
 
 
-//// START_TRIAL_DELAY
+//// START_TRIAL_DELAY 2
 void StateStartTrialDelay::s_setup()
 {
   Serial.println("DELAY for beep");
@@ -48,7 +48,7 @@ void StateStartTrialDelay::s_finish()
 }
 
 
-//// CENTER_DELAY
+//// CENTER_DELAY 4
 void StateCenterDelay::s_setup()
 {
   Serial.println("CENTER_DELAY");
@@ -59,6 +59,7 @@ void StateCenterDelay::loop()
 {
   if (centerFlag == 0){
     Serial.println("WAIT_FOR_CENTER");
+    timer = 0;
     next_state = WAIT_FOR_CENTER;
   }
 }
@@ -69,7 +70,7 @@ void StateCenterDelay::s_finish()
   next_state = CENTER_ODOR;
 }
 
-//// CENTER_ODOR
+//// CENTER_ODOR 5
 void StateCenterOdor::s_setup()
 {
   centerOdorOn(centerOdor);
@@ -82,6 +83,7 @@ void StateCenterOdor::loop()
     if (centerOdorValveOpen == 1){   
       centerOdorOff(centerOdor);
     }
+    timer = 0;
     next_state = WAIT_FOR_CENTER;
   }
 }
@@ -104,6 +106,7 @@ void StateCenterPostOdorDelay::loop()
 {
   if (centerFlag == 0){
     Serial.println("WAIT_FOR_CENTER");
+    timer = 0;
     next_state = WAIT_FOR_CENTER;
   }
 }
