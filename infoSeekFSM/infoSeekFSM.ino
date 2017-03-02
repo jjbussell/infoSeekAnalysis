@@ -394,9 +394,14 @@ void loop() {
         if (beamBreak(centerPort) == 1){ // is being broken
 //        if (digitalRead(53) == LOW){ // TOUCHING
           if (centerFlag == 0){ // if not currently broken
-          Serial.println("Enter center");
-          centerFlag = 1;
-          printer(2, centerPort, 0);
+            Serial.println("Enter center");
+            centerFlag = 1;
+            if (current_state = WAIT_FOR_CENTER){
+              printer(2,centerPort,1);
+            }
+            else {
+              printer(2, centerPort, 0);
+            }
           }   
         }
         else if (centerFlag == 1){
@@ -408,10 +413,15 @@ void loop() {
 
         if (beamBreak(infoPort) == 1){ // is being broken
 //        if (digitalRead(47) == LOW){
-          if (infoFlag == 0){ // if not currently broken
-          Serial.println("Enter info");
-          infoFlag = 1;
-          printer(2, infoPort, 0);
+            if (infoFlag == 0){ // if not currently broken
+            Serial.println("Enter info");
+            infoFlag = 1;
+            if (current_state = RESPONSE){
+              printer(2,infoPort,1);
+            }
+            else {
+              printer(2, infoPort, 0);
+            }
           }   
         }
         else if (infoFlag == 1){
@@ -423,10 +433,15 @@ void loop() {
 
         if (beamBreak(randPort) == 1){ // is being broken
 //        if (digitalRead(49) == LOW){
-          if (randFlag == 0){ // if not currently broken
-          Serial.println("Enter random");
-          randFlag = 1;
-          printer(2, randPort, 0);
+            if (randFlag == 0){ // if not currently broken
+            Serial.println("Enter random");
+            randFlag = 1;
+            if (current_state = RESPONSE){
+              printer(2, randPort, 1);
+            }
+            else {
+              printer(2, randPort, 0);            
+            }
           }   
         }
         else if (randFlag == 1){
