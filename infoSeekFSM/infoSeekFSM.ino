@@ -3,7 +3,9 @@
  * this version for downstairs!! fix ports!
  * --make com port and "box" based of a box variable!! in addition to touch sensors!
  * 
-TOO MANY CENTER ENTRIES?!?
+
+PROBLEM WITH MARKING REWARD WHEN NOT IN PORT?--no?
+FIXED Licked so ONLY PRINTS AT ONSET
 
 IMPROVEMENTS
 
@@ -380,10 +382,12 @@ void loop() {
               licked = 2; //left
             }
             else licked = 0;
-            Serial.print("licked ");
-            Serial.println(licked);
-            printer(4, licked, 0);
-            licked = 0;
+            if (licked > 0){
+              Serial.print("licked ");
+              Serial.println(licked);
+              printer(4, licked, 0);
+              licked = 0;
+            }
           } 
 
         //// CHECK FOR IMAGING /////////////////////
@@ -391,8 +395,8 @@ void loop() {
 
         //// WATCH PORTS
         //// MOVE TO FUNCTIONS/LIBRARY
-//        if (beamBreak(centerPort) == 1){ // is being broken
-        if (digitalRead(53) == LOW){ // TOUCHING
+        if (beamBreak(centerPort) == 1){ // is being broken
+//        if (digitalRead(53) == LOW){ // TOUCHING
           if (centerFlag == 0){ // if not currently broken
             Serial.println("Enter center");
             centerFlag = 1;
@@ -411,8 +415,8 @@ void loop() {
         }
 
 
-//        if (beamBreak(infoPort) == 1){ // is being broken
-        if (digitalRead(47) == LOW){
+        if (beamBreak(infoPort) == 1){ // is being broken
+//        if (digitalRead(47) == LOW){
             if (infoFlag == 0){ // if not currently broken
             Serial.println("Enter info");
             infoFlag = 1;
@@ -431,8 +435,8 @@ void loop() {
         }
 
 
-//        if (beamBreak(randPort) == 1){ // is being broken
-        if (digitalRead(49) == LOW){
+        if (beamBreak(randPort) == 1){ // is being broken
+//        if (digitalRead(49) == LOW){
             if (randFlag == 0){ // if not currently broken
             Serial.println("Enter random");
             randFlag = 1;

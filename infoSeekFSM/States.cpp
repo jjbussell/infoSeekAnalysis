@@ -314,7 +314,7 @@ void StateRewardDelay::s_finish()
 //// REWARD
 void StateReward::s_setup()
 {
-  int port;
+  int port = 5;
   
   Serial.println("REWARD");
 
@@ -324,7 +324,7 @@ void StateReward::s_setup()
 //  Serial.print("current reward time ");
 //  Serial.println(currentRewardTime);
   
-  if (choice <2){
+  if (choice < 2){
     if (infoFlag == 1){
       Serial.println("in info port");
       port = 1;
@@ -333,6 +333,7 @@ void StateReward::s_setup()
       Serial.println("in rand port");
       port = 0;
     }
+    else port = 5;
 
     if (port == choice){
       if (currentRewardTime > 0){
