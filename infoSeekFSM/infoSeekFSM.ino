@@ -319,8 +319,6 @@ void loop() {
 
       printer(0, 0, 0);
 
-      printer(12,random(1,1000),random(1,1000));
-
       digitalWrite(arduScope, LOW); //start imaging
 
 //      Serial.println("session start");

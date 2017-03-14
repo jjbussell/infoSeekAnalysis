@@ -96,7 +96,7 @@ void StateCenterOdor::s_finish()
   next_state = CENTER_POSTODOR_DELAY;
 }
 
-//// CENTER_POSTODOR_DELAY
+//// CENTER_POSTODOR_DELAY 6
 void StateCenterPostOdorDelay::s_setup()
 {
   Serial.println("CENTER_POSTODOR_DELAY");
@@ -118,7 +118,7 @@ void StateCenterPostOdorDelay::s_finish()
 }
 
 
-//// GO_CUE_DELAY
+//// GO_CUE_DELAY 8
 void StateGoCueDelay::s_setup()
 {
   Serial.println("DELAY for beep");
@@ -131,7 +131,7 @@ void StateGoCueDelay::s_finish()
 }
 
 
-//// RESPONSE
+//// RESPONSE 9
 void StateResponse::s_setup()
 {
   choiceStart = millis()-startTime;
@@ -168,20 +168,13 @@ void StateResponse::loop()
     rxn = millis() - startTime;
     newTrial = 1;
     flag_stop = 1;
-//s
 //    next_state = WAIT_FOR_ODOR;   
   }
 }
 
 void StateResponse::s_finish()
 {
-  if (choice == 2){
-    Serial.println("end RESPONSE, move to GRACE");
     next_state = GRACE_PERIOD;
-  }
-  else {
-    next_state = WAIT_FOR_ODOR;
-  }
 }
 
 
