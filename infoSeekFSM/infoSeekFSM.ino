@@ -1,7 +1,10 @@
 /*
+ * FIXING GRACE PERIOD!!
+ * 
  * --mouse can't lick both at once?
- * this version for downstairs!! fix ports!
  * --make com port and "box" based of a box variable!! in addition to touch sensors!
+ * 
+ * GRACE PERIOD IS JUST AN ADDITIONAL DELAY!
  * 
 
 PROBLEM WITH MARKING REWARD WHEN NOT IN PORT?--no?

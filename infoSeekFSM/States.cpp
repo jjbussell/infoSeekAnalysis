@@ -252,7 +252,13 @@ void StateWaitForOdor::s_setup()
 //  Serial.println(odorDelay + gracePeriod);
 //  Serial.print("time should be ");
 //  Serial.println((odorDelay + gracePeriod) - (test));
-  set_duration((odorDelay + gracePeriod) - (rxn - choiceStart));
+  if ((rxn - choiceStart) > odorDelay) {
+    set_duration(1);
+  }
+  else{
+    set_duration(odorDelay - (rxn - choiceStart));      
+  }
+  
 }
 
 void StateWaitForOdor::s_finish()
