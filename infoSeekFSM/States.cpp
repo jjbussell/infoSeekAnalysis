@@ -8,6 +8,18 @@ void StateInterTrialInterval::s_setup()
   Serial.println("ITI");
 //  Serial.println("setting duration");
   set_duration(interval + random(1,1000));
+  Serial.print("Completed Trials: ");
+  Serial.println(cTCount);
+  Serial.print("Forced Info Trials: ");
+  Serial.print(infoFCt);
+  Serial.print("   Forced Rand Trials: ");
+  Serial.println(randFCt);
+  Serial.print("Choice Info Trials: ");
+  Serial.print(infoCCt);
+  Serial.print("   Choice Rand Trials: ");
+  Serial.println(randCCt);
+  Serial.print("Reward Amount: ");
+  Serial.println(rewardAmt);
 }
 
 void StateInterTrialInterval::s_finish()
@@ -412,6 +424,19 @@ void StateReward::s_finish()
   }
   Serial.println("TRIAL COMPLETE");
   printer(18,trialType,choice);
+  if (trialType == 1 && choice == 0){
+    randCCt++;
+  }
+  else if (trialType == 1 && choice == 1){
+    infoCCt++;
+  }
+  else if (trialType == 2 && choice == 1){
+    infoFCt++;
+  }
+  else if (trialType == 3 && choice == 0){
+    randFCt++;
+  }
+  cTCount = randCCt + infoCCt + infoFCt + randFCt;
 //  Serial.println("end reward, move to ITI");
   next_state = INTER_TRIAL_INTERVAL;
 }

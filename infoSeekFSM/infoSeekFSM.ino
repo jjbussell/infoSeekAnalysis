@@ -1,17 +1,14 @@
 /*
- * FIXING GRACE PERIOD!!
  * 
  * --mouse can't lick both at once?
- * --make com port and "box" based of a box variable!! in addition to touch sensors!
  * 
- * GRACE PERIOD IS JUST AN ADDITIONAL DELAY!
  * 
 
 PROBLEM WITH MARKING REWARD WHEN NOT IN PORT?--no?
-FIXED Licked so ONLY PRINTS AT ONSET
 
 IMPROVEMENTS
 
+--make com port and "box" based of a box variable!! in addition to touch sensors!
 --parse trials and report: type, odors, time to start, center dwell, center entries, rxn, choice/timeout/correct, licks, dwell, reward 
 --GUI to plot choices, correct, and control params
 --chatter communications --> STOP BUTTON
@@ -106,6 +103,13 @@ int currentCenterOdor;
 int rewardCount;
 int rewardBigCount;
 int rewardSmallCount;
+
+int infoFCt;
+int infoCCt;
+int randFCt;
+int randCCt;
+int rewardAmt;
+int cTCount;
 
 //// WITHIN-TRIAL DATA
 int centerFlag;
