@@ -1,6 +1,8 @@
-/*
+/*]
+ * ]
+ * 
+ * --NEEd to enforCE finIsHING TRIAL AT QUIT
  * --mouse can't lick both at once?
- * this version for downstairs!! fix ports!
  * --make com port and "box" based of a box variable!! in addition to touch sensors!
  * 
 
