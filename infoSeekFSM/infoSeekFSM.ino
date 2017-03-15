@@ -3,6 +3,8 @@
  * --mouse can't lick both at once?
  * 
  * 
+ * 
+ * NEED TO CHANGE CHANNELS B/T 3,6 (bottom) and 4,8 (TOP) FOR LICKS!!!!!!!!!!!!!!!!!!
 
 PROBLEM WITH MARKING REWARD WHEN NOT IN PORT?--no?
 
@@ -380,10 +382,10 @@ void loop() {
 //            Serial.println(touched);
             sticky_touched = touched;
 
-            if (get_touched_channel(touched,3) == 1){
+            if (get_touched_channel(touched,4) == 1){
               licked = 1; //right
             }
-            else if (get_touched_channel(touched,6) == 1){
+            else if (get_touched_channel(touched,8) == 1){
               licked = 2; //left
             }
             else licked = 0;
@@ -400,8 +402,8 @@ void loop() {
 
         //// WATCH PORTS
         //// MOVE TO FUNCTIONS/LIBRARY
-//        if (beamBreak(centerPort) == 1){ // is being broken
-        if (digitalRead(53) == LOW){ // TOUCHING
+        if (beamBreak(centerPort) == 1){ // is being broken
+//        if (digitalRead(53) == LOW){ // TOUCHING
           if (centerFlag == 0){ // if not currently broken
             Serial.println("Enter center");
             centerFlag = 1;
@@ -420,8 +422,8 @@ void loop() {
         }
 
 
-//        if (beamBreak(infoPort) == 1){ // is being broken
-        if (digitalRead(47) == LOW){
+        if (beamBreak(infoPort) == 1){ // is being broken
+//        if (digitalRead(47) == LOW){
             if (infoFlag == 0){ // if not currently broken
             Serial.println("Enter info");
             infoFlag = 1;
@@ -440,8 +442,8 @@ void loop() {
         }
 
 
-//        if (beamBreak(randPort) == 1){ // is being broken
-        if (digitalRead(49) == LOW){
+        if (beamBreak(randPort) == 1){ // is being broken
+//        if (digitalRead(49) == LOW){
             if (randFlag == 0){ // if not currently broken
             Serial.println("Enter random");
             randFlag = 1;
