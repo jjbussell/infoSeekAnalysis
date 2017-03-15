@@ -1,9 +1,10 @@
-/*]
- * ]
+/*
+ * FIXING GRACE PERIOD!!
  * 
- * --NEEd to enforCE finIsHING TRIAL AT QUIT
  * --mouse can't lick both at once?
  * --make com port and "box" based of a box variable!! in addition to touch sensors!
+ * 
+ * GRACE PERIOD IS JUST AN ADDITIONAL DELAY!
  * 
 
 PROBLEM WITH MARKING REWARD WHEN NOT IN PORT?--no?
@@ -317,8 +318,6 @@ void loop() {
       startTime = millis(); // start the timer for this session
 
       printer(0, 0, 0);
-
-      printer(12,random(1,1000),random(1,1000));
 
       digitalWrite(arduScope, LOW); //start imaging
 

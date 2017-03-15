@@ -96,7 +96,7 @@ void StateCenterOdor::s_finish()
   next_state = CENTER_POSTODOR_DELAY;
 }
 
-//// CENTER_POSTODOR_DELAY
+//// CENTER_POSTODOR_DELAY 6
 void StateCenterPostOdorDelay::s_setup()
 {
   Serial.println("CENTER_POSTODOR_DELAY");
@@ -118,7 +118,7 @@ void StateCenterPostOdorDelay::s_finish()
 }
 
 
-//// GO_CUE_DELAY
+//// GO_CUE_DELAY 8
 void StateGoCueDelay::s_setup()
 {
   Serial.println("DELAY for beep");
@@ -131,7 +131,7 @@ void StateGoCueDelay::s_finish()
 }
 
 
-//// RESPONSE
+//// RESPONSE 9
 void StateResponse::s_setup()
 {
   choiceStart = millis()-startTime;
@@ -168,24 +168,17 @@ void StateResponse::loop()
     rxn = millis() - startTime;
     newTrial = 1;
     flag_stop = 1;
-//s
 //    next_state = WAIT_FOR_ODOR;   
   }
 }
 
 void StateResponse::s_finish()
 {
-  if (choice == 2){
-    Serial.println("end RESPONSE, move to GRACE");
     next_state = GRACE_PERIOD;
-  }
-  else {
-    next_state = WAIT_FOR_ODOR;
-  }
 }
 
 
-//// GRACE_PERIOD
+//// GRACE_PERIOD 10
 void StateGracePeriod::s_setup()
 {
   Serial.println("GRACE_PERIOD ");
@@ -239,7 +232,7 @@ void StateGracePeriod::s_finish()
 }
 
 
-//// WAIT FOR ODOR
+//// WAIT FOR ODOR 11
 void StateWaitForOdor::s_setup()
 {
   // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect
@@ -252,7 +245,13 @@ void StateWaitForOdor::s_setup()
 //  Serial.println(odorDelay + gracePeriod);
 //  Serial.print("time should be ");
 //  Serial.println((odorDelay + gracePeriod) - (test));
-  set_duration((odorDelay + gracePeriod) - (rxn - choiceStart));
+  if ((rxn - choiceStart) > odorDelay) {
+    set_duration(1);
+  }
+  else{
+    set_duration(odorDelay - (rxn - choiceStart));      
+  }
+  
 }
 
 void StateWaitForOdor::s_finish()
@@ -262,7 +261,7 @@ void StateWaitForOdor::s_finish()
 }
 
 
-//// SIDE_ODOR
+//// SIDE_ODOR 12
 void StateSideOdor::s_setup()
 {
   Serial.println("SIDE_ODOR");
@@ -299,7 +298,7 @@ void StateSideOdor::s_finish()
   next_state = REWARD_DELAY;
 }
 
-//// REWARD_DELAY
+//// REWARD_DELAY 13
 void StateRewardDelay::s_setup()
 {
   Serial.println("REWARD_DELAY");
@@ -311,7 +310,7 @@ void StateRewardDelay::s_finish()
   next_state = REWARD;
 }
 
-//// REWARD
+//// REWARD 14
 void StateReward::s_setup()
 {
   int port = 5;
@@ -390,6 +389,8 @@ void StateReward::s_finish()
   next_state = INTER_TRIAL_INTERVAL;
 }
 
+
+//// TIMEOUT 16
 void StateTimeout::s_setup(){
   printer(11,choice,0);
   Serial.println("TIMEOUT");
