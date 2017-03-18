@@ -8,6 +8,8 @@
 
 PROBLEM WITH MARKING REWARD WHEN NOT IN PORT?--no?
 
+NO CHOICE INDICATED WHEN CHOOSES IN GRACE PERIOD?!?!?
+
 IMPROVEMENTS
 
 --make com port and "box" based of a box variable!! in addition to touch sensors!
