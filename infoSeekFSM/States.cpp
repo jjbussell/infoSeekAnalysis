@@ -169,6 +169,8 @@ void StateResponse::loop()
     rxn = millis() - startTime;
 //    Serial.print("rxn = ");
 //    Serial.println(rxn);
+     // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
+    printer(11,choice,0);   
     newTrial = 1;
     flag_stop = 1;
 //    next_state = WAIT_FOR_ODOR;
@@ -185,7 +187,9 @@ void StateResponse::loop()
     }
     rxn = millis() - startTime;
 //    Serial.print("rxn = ");
-//    Serial.println(rxn);    
+//    Serial.println(rxn);
+     // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
+    printer(11,choice,0);       
     newTrial = 1;
     flag_stop = 1;
 //    next_state = WAIT_FOR_ODOR;   
@@ -194,7 +198,7 @@ void StateResponse::loop()
 
 void StateResponse::s_finish()
 {
-  if (choice <2){
+  if (choice <> 2){
     next_state = WAIT_FOR_ODOR;
   }
   else {
@@ -221,9 +225,11 @@ void StateGracePeriod::loop()
         choice = 3;
         Serial.println("INCORRECT");
       }
-      rxn = millis() - startTime;
+      rxn = millis() - startTime;   
   //    Serial.print("rxn = ");
-  //    Serial.println(rxn);      
+  //    Serial.println(rxn);
+       // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
+      printer(11,choice,0);          
       newTrial = 1;
       flag_stop = 1;
     }
@@ -238,7 +244,9 @@ void StateGracePeriod::loop()
       }
       rxn = millis() - startTime;
   //    Serial.print("rxn = ");
-  //    Serial.println(rxn);      
+  //    Serial.println(rxn);
+       // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
+      printer(11,choice,0);           
       newTrial = 1;
       flag_stop = 1;
     }
@@ -261,8 +269,6 @@ void StateGracePeriod::s_finish()
 //// WAIT FOR ODOR 11
 void StateWaitForOdor::s_setup()
 {
-  // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
-  printer(11,choice,0);
   Serial.println("WAIT FOR ODOR");
 //  Serial.print("Time is ");
 //  Serial.println(currentTime);
