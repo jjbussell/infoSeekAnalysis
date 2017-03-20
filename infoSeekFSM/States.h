@@ -19,8 +19,8 @@ enum STATE_TYPE{
   GO_CUE,
   GO_CUE_DELAY,
   RESPONSE,
-  WAIT_FOR_ODOR,
   GRACE_PERIOD,
+  WAIT_FOR_ODOR,
   SIDE_ODOR,
   REWARD_DELAY,
   REWARD,
@@ -35,6 +35,12 @@ extern int randFlag;
 extern int choice;
 extern int odor;
 extern int water;
+extern int cTCount;
+extern int infoFCt;
+extern int infoCCt;
+extern int randFCt;
+extern int randCCt;
+extern int rewardAmt;
 extern bool centerOdorValveOpen;
 extern bool odorValveOpen;
 extern bool waterValveOpen;
