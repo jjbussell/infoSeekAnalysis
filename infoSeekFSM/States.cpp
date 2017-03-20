@@ -8,6 +8,18 @@ void StateInterTrialInterval::s_setup()
   Serial.println("ITI");
 //  Serial.println("setting duration");
   set_duration(interval + random(1,1000));
+  Serial.print("Completed Trials: ");
+  Serial.println(cTCount);
+  Serial.print("Forced Info Trials: ");
+  Serial.print(infoFCt);
+  Serial.print("   Forced Rand Trials: ");
+  Serial.println(randFCt);
+  Serial.print("Choice Info Trials: ");
+  Serial.print(infoCCt);
+  Serial.print("   Choice Rand Trials: ");
+  Serial.println(randCCt);
+  Serial.print("Reward Amount: ");
+  Serial.println(rewardAmt);
 }
 
 void StateInterTrialInterval::s_finish()
@@ -96,7 +108,7 @@ void StateCenterOdor::s_finish()
   next_state = CENTER_POSTODOR_DELAY;
 }
 
-//// CENTER_POSTODOR_DELAY
+//// CENTER_POSTODOR_DELAY 6
 void StateCenterPostOdorDelay::s_setup()
 {
   Serial.println("CENTER_POSTODOR_DELAY");
@@ -118,7 +130,7 @@ void StateCenterPostOdorDelay::s_finish()
 }
 
 
-//// GO_CUE_DELAY
+//// GO_CUE_DELAY 8
 void StateGoCueDelay::s_setup()
 {
   Serial.println("DELAY for beep");
@@ -131,11 +143,15 @@ void StateGoCueDelay::s_finish()
 }
 
 
-//// RESPONSE
+//// RESPONSE 9
 void StateResponse::s_setup()
 {
   choiceStart = millis()-startTime;
   Serial.println("RESPONSE");
+  
+//  Serial.print("choiceStart = ");
+//  Serial.println(choiceStart);
+    
   printer(1,trialType,infoSide);
 }
 
@@ -151,7 +167,11 @@ void StateResponse::loop()
       Serial.println("INCORRECT");
     }
     rxn = millis() - startTime;
-      newTrial = 1;
+//    Serial.print("rxn = ");
+//    Serial.println(rxn);
+     // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
+    printer(11,choice,0);   
+    newTrial = 1;
     flag_stop = 1;
 //    next_state = WAIT_FOR_ODOR;
   }
@@ -166,26 +186,28 @@ void StateResponse::loop()
       Serial.println("INCORRECT");
     }
     rxn = millis() - startTime;
+//    Serial.print("rxn = ");
+//    Serial.println(rxn);
+     // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
+    printer(11,choice,0);       
     newTrial = 1;
     flag_stop = 1;
-//s
 //    next_state = WAIT_FOR_ODOR;   
   }
 }
 
 void StateResponse::s_finish()
 {
-  if (choice == 2){
-    Serial.println("end RESPONSE, move to GRACE");
-    next_state = GRACE_PERIOD;
+  if (choice != 2){
+    next_state = WAIT_FOR_ODOR;
   }
   else {
-    next_state = WAIT_FOR_ODOR;
+    next_state = GRACE_PERIOD;
   }
 }
 
 
-//// GRACE_PERIOD
+//// GRACE_PERIOD 10
 void StateGracePeriod::s_setup()
 {
   Serial.println("GRACE_PERIOD ");
@@ -193,37 +215,42 @@ void StateGracePeriod::s_setup()
 
 void StateGracePeriod::loop()
 {
-  if (infoFlag == 1){
-    if(trialType == 1 || trialType == 2){
-      Serial.println("CHOICE INFO");
-      choice = 1;
+  if (choice ==2){
+    if (infoFlag == 1){
+      if(trialType == 1 || trialType == 2){
+        Serial.println("CHOICE INFO");
+        choice = 1;
+      }
+      else {
+        choice = 3;
+        Serial.println("INCORRECT");
+      }
+      rxn = millis() - startTime;   
+  //    Serial.print("rxn = ");
+  //    Serial.println(rxn);
+       // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
+      printer(11,choice,0);          
+      newTrial = 1;
+      flag_stop = 1;
     }
-    else {
-      choice = 3;
-      Serial.println("INCORRECT");
+    else if (randFlag == 1){
+      if(trialType == 1 || trialType == 3){
+        Serial.println("CHOICE RAND");
+        choice = 0;   
+      }
+      else {
+        choice = 3;
+        Serial.println("INCORRECT");
+      }
+      rxn = millis() - startTime;
+  //    Serial.print("rxn = ");
+  //    Serial.println(rxn);
+       // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
+      printer(11,choice,0);           
+      newTrial = 1;
+      flag_stop = 1;
     }
-    rxn = millis() - startTime;
-    newTrial = 1;
-    flag_stop = 1;
-//    next_state = WAIT_FOR_ODOR;
-  }
-  else if (randFlag == 1){
-    if(trialType == 1 || trialType == 3){
-      Serial.println("CHOICE RAND");
-      choice = 0;
- 
-    }
-    else {
-      choice = 3;
-      Serial.println("INCORRECT");
-    }
-    rxn = millis() - startTime;
-    newTrial = 1;
-    flag_stop = 1;
-    Serial.print("rxn ");
-    Serial.println(rxn);
-//    next_state = WAIT_FOR_ODOR;   
-  }
+  }  
 }
 
 void StateGracePeriod::s_finish()
@@ -233,18 +260,19 @@ void StateGracePeriod::s_finish()
     next_state = TIMEOUT;
   }
   else {
-    Serial.println("end GRACE, move to WAIT_FOR_ODOR");
-    next_state = WAIT_FOR_ODOR;
+    Serial.println("end GRACE, move to SIDE_ODOR");
+    next_state = SIDE_ODOR;
   }
 }
 
 
-//// WAIT FOR ODOR
+//// WAIT FOR ODOR 11
 void StateWaitForOdor::s_setup()
 {
-  // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect
-  printer(11,choice,0);
   Serial.println("WAIT FOR ODOR");
+//  Serial.print("Time is ");
+//  Serial.println(currentTime);
+  
 //  unsigned long test = rxn - choiceStart;
 //  Serial.print("rxn - choiceStart ");
 //  Serial.println(test);
@@ -252,7 +280,13 @@ void StateWaitForOdor::s_setup()
 //  Serial.println(odorDelay + gracePeriod);
 //  Serial.print("time should be ");
 //  Serial.println((odorDelay + gracePeriod) - (test));
-  set_duration((odorDelay + gracePeriod) - (rxn - choiceStart));
+  if ((rxn - choiceStart) > odorDelay) {
+    set_duration(1);
+  }
+  else{
+    set_duration(odorDelay - (rxn - choiceStart));      
+  }
+  
 }
 
 void StateWaitForOdor::s_finish()
@@ -262,10 +296,12 @@ void StateWaitForOdor::s_finish()
 }
 
 
-//// SIDE_ODOR
+//// SIDE_ODOR 12
 void StateSideOdor::s_setup()
 {
   Serial.println("SIDE_ODOR");
+//  Serial.print("Time is ");
+//  Serial.println(currentTime);
   if (choice < 2){
 //    Serial.println("choose trial params");
     pickTrialParams(choice);
@@ -299,7 +335,7 @@ void StateSideOdor::s_finish()
   next_state = REWARD_DELAY;
 }
 
-//// REWARD_DELAY
+//// REWARD_DELAY 13
 void StateRewardDelay::s_setup()
 {
   Serial.println("REWARD_DELAY");
@@ -311,10 +347,11 @@ void StateRewardDelay::s_finish()
   next_state = REWARD;
 }
 
-//// REWARD
+//// REWARD 14
 void StateReward::s_setup()
 {
-  int port = 5;
+  int port;
+  port = 5;
   
   Serial.println("REWARD");
 
@@ -329,11 +366,18 @@ void StateReward::s_setup()
       Serial.println("in info port");
       port = 1;
     }
-    if (randFlag == 1){
+    else if (randFlag == 1){
       Serial.println("in rand port");
       port = 0;
     }
-    else port = 5;
+    else {
+      port = 5;
+    }
+
+//    Serial.print("port = ");
+//    Serial.println(port);
+//    Serial.print("choice = ");
+//    Serial.println(choice);
 
     if (port == choice){
       if (currentRewardTime > 0){
@@ -348,11 +392,13 @@ void StateReward::s_setup()
         rewardBigCount++;
         Serial.println("Big reward");
         printer(15, trialType, choice);
+        rewardAmt = rewardAmt + (bigRewardTime/25);
       }
       else {
         rewardSmallCount++;
         Serial.println("Small reward");
         printer(16, trialType, choice);
+        rewardAmt = rewardAmt + (smallRewardTime/25);
       }
     }
   }
@@ -386,10 +432,25 @@ void StateReward::s_finish()
   }
   Serial.println("TRIAL COMPLETE");
   printer(18,trialType,choice);
+  if (trialType == 1 && choice == 0){
+    randCCt++;
+  }
+  else if (trialType == 1 && choice == 1){
+    infoCCt++;
+  }
+  else if (trialType == 2 && choice == 1){
+    infoFCt++;
+  }
+  else if (trialType == 3 && choice == 0){
+    randFCt++;
+  }
+  cTCount = randCCt + infoCCt + infoFCt + randFCt;
 //  Serial.println("end reward, move to ITI");
   next_state = INTER_TRIAL_INTERVAL;
 }
 
+
+//// TIMEOUT 16
 void StateTimeout::s_setup(){
   printer(11,choice,0);
   Serial.println("TIMEOUT");
