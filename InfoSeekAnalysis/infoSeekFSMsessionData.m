@@ -240,7 +240,10 @@ if newData == 1
         b.choice(:,1) = f;        
         
         % not sure this is right--if session ends before choice?
-        if size(b.choice,1) < trialCt
+        
+        % trials with no printer(11 ?!?!
+        
+        if b.choice(size(b.choice,1),3) ~= trialCt
             b.choice = [b.choice; f totalTime trialCt 2];
         end
         
@@ -260,7 +263,9 @@ if newData == 1
         
         b.choiceCorr = b.choice(b.correct,4);
 
-        b.rxn = b.choiceTime - b.goCue(:,2);             
+        b.gotToChoose = ismember(b.goCue(:,3),b.choice(:,3));
+        b.rxn = NaN(trialCt,1);
+        b.rxn(b.gotToChoose) = b.choiceTime - b.goCue(b.gotToChoose,2);             
         
 %% CENTER ENTRY FIRST AND FOR GO CUE
         

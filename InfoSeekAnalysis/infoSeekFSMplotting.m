@@ -189,6 +189,42 @@ for m = 1:a.mouseCt
     end
 end
 
+for m=1:a.mouseCt 
+    [outcomeCounts(m,:),outcomeBins(m,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+end
+
+%%
+figure();
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [1 1 7 9];
+set(fig,'renderer','painters')
+bar(outcomeCounts,'stacked');
+ylabel('Trial Outcomes (% of trials)');
+legend(a.outcomeLabels);
+
+%%
+for m = 1:a.mouseCt
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [1 1 7 9];
+    set(fig,'renderer','painters')
+    for d = 1:a.mouseDayCt(m)
+        ax = nsubplot(1,a.mouseDayCt(m),d,1);
+        title(a.mouseList(m));
+        ax.FontSize = 10;
+        [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+        barh([1:17],outcomeCounts);
+        plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+        plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+        ylabel('Trial Outcomes (% of trials)');
+%         ax.XTick = [1:17];
+        set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',15)
+    end
+end
+
+
 %% PLOT MOST RECENT DAY'S LICKS
     
 figure();
