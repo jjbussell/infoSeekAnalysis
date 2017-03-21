@@ -127,6 +127,21 @@ if newData == 1
         transitions = [zeros(length(transitions),1) transitions];
         transitions(:,1) = f;
         
+% These changed when states changed!
+% FIRST
+% 9_10	response to waitforodor
+% 9_11	response to grace
+% 11_10	grace to wait for odor
+% 11_16	grace to timeout
+% 
+% THEN March 14-19?	
+% 	
+% 9_11	response to waitforodor
+% 9_10	response to grace
+% 10_16	grace to timeout
+% 10_12	grace to sideodor
+
+        
         b.txn0_1 = transitions(transitions(:,5) == 0 & transitions(:,6) == 1,[1 2 3 5 6]);
         b.txn1_2 = transitions(transitions(:,5) == 1 & transitions(:,6) == 2,[1 2 3 5 6]);
         b.txn2_3 = transitions(transitions(:,5) == 2 & transitions(:,6) == 3,[1 2 3 5 6]);
@@ -136,8 +151,8 @@ if newData == 1
         b.txn6_7 = transitions(transitions(:,5) == 6 & transitions(:,6) == 7,[1 2 3 5 6]);
         b.txn7_8 = transitions(transitions(:,5) == 7 & transitions(:,6) == 8,[1 2 3 5 6]);
         b.txn8_9 = transitions(transitions(:,5) == 8 & transitions(:,6) == 9,[1 2 3 5 6]);
+        b.txn9_11 = transitions(transitions(:,5) == 9 & transitions(:,6) == 11,[1 2 3 5 6]);
         b.txn9_10 = transitions(transitions(:,5) == 9 & transitions(:,6) == 10,[1 2 3 5 6]);
-        b.txn10_11 = transitions(transitions(:,5) == 10 & transitions(:,6) == 11,[1 2 3 5 6]);
         b.txn10_12 = transitions(transitions(:,5) == 10 & transitions(:,6) == 12,[1 2 3 5 6]);
         b.txn11_12 = transitions(transitions(:,5) == 11 & transitions(:,6) == 12,[1 2 3 5 6]);
         b.txn12_13 = transitions(transitions(:,5) == 12 & transitions(:,6) == 13,[1 2 3 5 6]);
@@ -147,9 +162,10 @@ if newData == 1
         b.txn4_3 = transitions(transitions(:,5) == 4 & transitions(:,6) == 3,[1 2 3 5 6]);
         b.txn5_3 = transitions(transitions(:,5) == 5 & transitions(:,6) == 3,[1 2 3 5 6]);
         b.txn6_3 = transitions(transitions(:,5) == 5 & transitions(:,6) == 3,[1 2 3 5 6]);
-        b.txn9_11 = transitions(transitions(:,5) == 9 & transitions(:,6) == 11,[1 2 3 5 6]);
+        b.txn10_11 = transitions(transitions(:,5) == 10 & transitions(:,6) == 11,[1 2 3 5 6]);
         b.txn11_10 = transitions(transitions(:,5) == 11 & transitions(:,6) == 10,[1 2 3 5 6]);
         b.txn11_16 = transitions(transitions(:,5) == 11 & transitions(:,6) == 16,[1 2 3 5 6]);
+        b.txn10_16 = transitions(transitions(:,5) == 10 & transitions(:,6) == 16,[1 2 3 5 6]);
         b.txn16_15 = transitions(transitions(:,5) == 16 & transitions(:,6) == 15,[1 2 3 5 6]);        
 
         
@@ -200,6 +216,9 @@ if newData == 1
 %% GO_CUE
 
         b.goCue = b.txn7_8;
+        
+        % maybe this is counterproductive? Added to create gocue where
+        % there is none, but maybe it's bad?
         if length(b.goCue) < trialCt
             b.goCue = [b.goCue; [f totalTime trialCt 0 0]];
         end
@@ -214,39 +233,32 @@ if newData == 1
 
 % Code for choice, includes timeout
 % 1 = info, 0 = rand, 2 = none (timeout), 3 = incorrect (2 and 3 are errors)
+% in trials during grace period changes, 2 == chose during grace
 
-        b.choice = data(data(:,3) == 11, [1 4]);
+        b.choice = data(data(:,3) == 11, [1 2 4]);
         b.choice = [zeros(length(b.choice),1) b.choice];
         b.choice(:,1) = f;        
         
         % not sure this is right--if session ends before choice?
         if length(b.choice) < trialCt
-            b.choice = [b.choice; f totalTime 2];
+            b.choice = [b.choice; f totalTime trialCt 2];
         end
         
 %% REACTION TIME / CHOICE
 
-        % OUTCOMES = correct choice (info or rand), incorrect choice, no choice (txn9_10 (made a choice),
-        % 11_10(made a choice), 11_16 (no choice)
-
-%         b.choice = sortrows([b.txn9_10; b.txn11_10; b.txn11_16],[1 3]);
-%         if length(b.choice)<trialCt
-%             b.choice =  [b.choice; [f totalTime trialCt 0 0]];
-%         end
-
         b.choiceTime = b.choice(:,2);
         
-        b.chose = b.choice(:,3) ~= 2;
+        b.chose = b.choice(:,4) ~= 2;
 
         b.choseTrialCt = sum(b.chose);
 %         b.choseTrials = b.trialNums(b.chose == 1);
 
-        b.correct = b.choice(:,3) < 2;
+        b.correct = b.choice(:,4) < 2;
         b.corrTrialCt = sum(b.correct);
         b.corrTrials = b.trialNums(b.correct);
         b.file = b.fileAll(b.correct);
         
-        b.choiceCorr = b.choice(b.correct,3);
+        b.choiceCorr = b.choice(b.correct,4);
 
         b.rxn = b.choiceTime - b.goCue(:,2);             
         
@@ -432,7 +444,7 @@ if newData == 1
             % CHOICE TRIALS
             if b.choiceTypeCorr(t) == 1
                 % INFO    
-                if b.choiceCorr(t,3) == 1
+                if b.choiceCorr(t,4) == 1
                     % BIG
                     if b.trialParams(t,5) == 1
                         b.type(t,1) = 1; % choice info big
@@ -442,7 +454,7 @@ if newData == 1
                     end
 
                 % RANDOM
-                elseif b.choiceCorr(t,3) == 0
+                elseif b.choiceCorr(t,4) == 0
                     % BIG
                     if b.trialParams(t,5) == 1
                         b.type(t,1) = 3; % choice rand big
@@ -511,10 +523,10 @@ if newData == 1
             % INFO TRIALS
             elseif b.choiceType(t) == 2
                 % NO CHOICE
-                if b.choice(t,3) == 2
+                if b.choice(t,4) == 2
                     b.outcome(t,1) = 8; % info no choice;  
                 % CORRECT
-                elseif b.choice(t,3) == 1
+                elseif b.choice(t,4) == 1
                     % BIG
                     if b.big(t) == 1
                         b.outcome(t,1) = 9; % info big
@@ -533,10 +545,10 @@ if newData == 1
             % RAND TRIALS
             else % if b.choiceType(t) == 3
                 % NO CHOICE
-                if b.choice(t,3) == 2
+                if b.choice(t,4) == 2
                     b.outcome(t,1) = 13; % rand no choice;  
                 % CORRECT
-                elseif b.choice(t,3) == 0
+                elseif b.choice(t,4) == 0
                     % BIG
                     if b.big(t) == 1
                         b.outcome(t,1) = 14; % rand big
@@ -589,7 +601,7 @@ if newData == 1
                 if ~isempty(lickTrialIdx)
                     b.licks(l,10) = lickTrialIdx; % index into correct trials
                     b.licks(l,11) = b.type(lickTrialIdx,1); % trial type
-                    if b.choiceCorr(lickTrialIdx,3) == 1
+                    if b.choiceCorr(lickTrialIdx,4) == 1
                         b.licks(l,12) = info;  % choice port
                     else
                         b.licks(l,12) = rand;  % choice port
@@ -682,21 +694,21 @@ if newData == 1
             a.txn6_7 = [a.txn6_7; b.txn6_7];
             a.txn7_8 = [a.txn7_8; b.txn7_8];
             a.txn8_9 = [a.txn8_9; b.txn8_9];
+            a.txn9_11 = [a.txn9_11; b.txn9_11];
             a.txn9_10 = [a.txn9_10; b.txn9_10];
-            a.txn10_11 = [a.txn10_11; b.txn10_11];
+            a.txn10_12 = [a.txn10_12; b.txn10_12];
             a.txn11_12 = [a.txn11_12; b.txn11_12];
             a.txn12_13 = [a.txn12_13; b.txn12_13];
             a.txn13_14 = [a.txn13_14; b.txn13_14];
             a.txn14_15 = [a.txn14_15; b.txn14_15];
             a.txn15_0 = [a.txn15_0; b.txn15_0];
-            a.txn10_12 = [a.txn10_12; b.txn10_12];
-            a.txn15_0 = [a.txn15_0; b.txn15_0];
             a.txn4_3 = [a.txn4_3; b.txn4_3];
             a.txn5_3 = [a.txn5_3; b.txn5_3];
             a.txn6_3 = [a.txn6_3; b.txn6_3];
-            a.txn9_11 = [a.txn9_11; b.txn9_11];
+            a.txn10_11 = [a.txn10_11; b.txn10_11];
             a.txn11_10 = [a.txn11_10; b.txn11_10];
             a.txn11_16 = [a.txn11_16; b.txn11_16];
+            a.txn10_16 = [a.txn10_16; b.txn10_16];
             a.txn16_15 = [a.txn16_15; b.txn16_15];
             a.centerEntries = [a.centerEntries; b.centerEntries];
             a.centerEntryGo = [a.centerEntryGo; b.centerEntryGo];
@@ -752,6 +764,8 @@ if newData == 1
             a.choiceTrials = [a.choiceTrials; b.choiceTrials];
             a.infoForced = [a.infoForced; b.infoForced];
             a.randForced = [a.randForced; b.randForced];
+            a.choiceTypeCorr = [a.choiceTypeCorr; b.choiceTypeCorr];
+            a.choiceCorr = [a.choiceCorr; b.choiceCorr];
             a.outcome = [a.outcome; b.outcome];
             a.type = [a.type; b.type];
             
