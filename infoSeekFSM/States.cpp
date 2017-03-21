@@ -198,11 +198,11 @@ void StateResponse::loop()
 
 void StateResponse::s_finish()
 {
-  if (choice <> 2){
-    next_state = WAIT_FOR_ODOR;
+  if (choice == 2){
+    next_state = GRACE_PERIOD;
   }
   else {
-    next_state = GRACE_PERIOD;
+    next_state = WAIT_FOR_ODOR;
   }
 }
 
