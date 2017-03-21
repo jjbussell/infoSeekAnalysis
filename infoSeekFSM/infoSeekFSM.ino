@@ -429,7 +429,7 @@ void loop() {
             if (infoFlag == 0){ // if not currently broken
             Serial.println("Enter info");
             infoFlag = 1;
-            if (current_state == RESPONSE){
+            if (current_state == RESPONSE | current_state == GRACE){
               printer(2,infoPort,1);
             }
             else {
@@ -449,7 +449,7 @@ void loop() {
             if (randFlag == 0){ // if not currently broken
             Serial.println("Enter random");
             randFlag = 1;
-            if (current_state == RESPONSE){
+            if (current_state == RESPONSE  | current_state == GRACE){
               printer(2, randPort, 1);
             }
             else {
