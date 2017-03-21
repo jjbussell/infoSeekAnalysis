@@ -235,26 +235,24 @@ if newData == 1
 % 1 = info, 0 = rand, 2 = none (timeout), 3 = incorrect (2 and 3 are errors)
 % in trials during grace period changes, 2 == chose during grace
 
-        b.choice = data(data(:,3) == 11, [1 2 4]);
-        b.choice = [zeros(size(b.choice,1),1) b.choice];
-        b.choice(:,1) = f;        
+        b.choices = data(data(:,3) == 11, [1 2 4]);
+        b.chose = ismember(b.trialNums,b.choices(:,2));
+        b.choseTrialCt = sum(b.chose);
         
-        % not sure this is right--if session ends before choice?
+        b.choice = nan(trialCt,4);
+        b.choice(:,1) = f; 
+        b.choice(:,3) = b.trialNums;
+        b.choice(b.chose,[2 4]) = b.choices(:,[1 3]);
+        b.choice(~b.chose,4) = 2;
         
-        % trials with no printer(11 ?!?!
-        
-        if b.choice(size(b.choice,1),3) ~= trialCt
-            b.choice = [b.choice; f totalTime trialCt 2];
-        end
+        % set choice time for non-choosing trials to max of response
+        % (leaves out grace period)
+        b.choice(~b.chose,2) = b.goCue(~b.chose,2) + odorDelay;
+
         
 %% REACTION TIME / CHOICE
 
         b.choiceTime = b.choice(:,2);
-        
-        b.chose = b.choice(:,4) ~= 2;
-
-        b.choseTrialCt = sum(b.chose);
-%         b.choseTrials = b.trialNums(b.chose == 1);
 
         b.correct = b.choice(:,4) < 2;
         b.corrTrialCt = sum(b.correct);
@@ -385,7 +383,7 @@ if newData == 1
         b.smallReward(f,1) = (b.smallRewardTime(f,1) * 40)/1000;
         b.rewardAmount(f,1) = b.bigRewardCt(f,1) * (b.bigRewardTime(f,1) * 40)/1000 + b.smallRewardCt(f,1) * (b.smallRewardTime(f,1) * 40)/1000; % report
         
-%% OUTCOME
+%% REWARD TYPES
         
         allRewards = sort([b.bigRewards(:,3); b.smallRewards(:,3)]);
         b.rewarded = ismember(b.trialNums, allRewards);
