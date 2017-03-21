@@ -574,6 +574,8 @@ if newData == 1
 % CONSUMMATORY LICKS CAN BE FROM AN INCORRECT ENTRY OR AN ENTRY TECHNICALLY
 % IN THE NEXT TRIAL!!
 
+        b.goCueCorr = b.goCue(b.correct,:);
+
         b.licks = [];
         b.licks = data(data(:,3) == 4 & data(:,4) > 0,[1 2 4]);        
         b.licks = [zeros(size(b.licks,1),1) b.licks];
@@ -609,7 +611,10 @@ if newData == 1
                     else
                         b.licks(l,12) = rand;  % choice port
                     end
-                    b.licks(l,13) = b.licks(l,2) - b.centerEntryGoCorr(lickTrialIdx,3); % time from center correct time
+                    if ~isnan(b.goCueCorr(lickTrialIdx,2))
+                        b.licks(l,13) = b.licks(l,2) - b.goCueCorr(lickTrialIdx,2); % time from go cue
+                    else b.licks(l,13) = nan;
+                    end
                 end
             end                
         end
@@ -620,8 +625,7 @@ if newData == 1
         b.corrLicks = b.licks(corrLickFlag,:);
         
         % time before odor on
-        odorWait = files(f).centerDelay + files(f).centerOdorTime + ...
-            files(f).startDelay + 50 + files(f).odorDelay;
+        odorWait = 50 + files(f).odorDelay;
         % time before reward starts
         rewardWait = odorWait + files(f).odorTime + files(f).rewardDelay;
         
