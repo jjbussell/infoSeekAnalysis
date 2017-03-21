@@ -124,7 +124,7 @@ if newData == 1
 
         transitions = [];
         transitions = data(data(:,3) == 22,:);
-        transitions = [zeros(length(transitions),1) transitions];
+        transitions = [zeros(size(transitions,1),1) transitions];
         transitions(:,1) = f;
         
 % These changed when states changed!
@@ -181,10 +181,10 @@ if newData == 1
         entries = data(data(:,3) == 2,:);
         exits = data(data(:,3) == 6,:);
         
-        entries = [zeros(length(entries),1) entries];
+        entries = [zeros(size(entries,1),1) entries];
         entries(:,1) = f;
         
-        exits = [zeros(length(exits),1) exits];
+        exits = [zeros(size(exits,1),1) exits];
         exits(:,1) = f;        
         
         centerEntries = entries(entries(:,5) == 4,:);
@@ -219,13 +219,13 @@ if newData == 1
         
         % maybe this is counterproductive? Added to create gocue where
         % there is none, but maybe it's bad?
-        if length(b.goCue) < trialCt
+        if size(b.goCue,1) < trialCt
             b.goCue = [b.goCue; [f totalTime trialCt 0 0]];
         end
         b.goParams = data(data(:,3) == 1, :);
-        b.goParams = [zeros(length(b.goParams),1) b.goParams];
+        b.goParams = [zeros(size(b.goParams,1),1) b.goParams];
         b.goParams(:,1) = f;        
-        if length(b.goParams) < trialCt
+        if size(b.goParams,1) < trialCt
             b.goParams = [b.goParams; [f totalTime trialCt 0 0 0]];
         end        
         
@@ -236,11 +236,11 @@ if newData == 1
 % in trials during grace period changes, 2 == chose during grace
 
         b.choice = data(data(:,3) == 11, [1 2 4]);
-        b.choice = [zeros(length(b.choice),1) b.choice];
+        b.choice = [zeros(size(b.choice,1),1) b.choice];
         b.choice(:,1) = f;        
         
         % not sure this is right--if session ends before choice?
-        if length(b.choice) < trialCt
+        if size(b.choice,1) < trialCt
             b.choice = [b.choice; f totalTime trialCt 2];
         end
         
@@ -269,7 +269,7 @@ if newData == 1
             b.centerExitGo(r,1) = f;
             b.centerEntryCt(r,1) = f;
             
-            if length(b.goCue) >= trialCt % if there is a complete center entry in that trial
+            if size(b.goCue,1) >= trialCt % if there is a complete center entry in that trial
                 centerEntryGoDiff =  b.goCue(r,2) - b.centerEntries(:,2); % find entry just before go cue
                 centerEntryGoDiff(centerEntryGoDiff < 0) = inf;
                 [centerEntryVal,centerEntryGoIdx] = min(centerEntryGoDiff);
@@ -310,7 +310,7 @@ if newData == 1
 % wait but not others        
 
         b.centerDwell = b.centerExitGo(:,2) - b.centerEntryGo(:,2);
-        b.centerDwell = [zeros(length(b.centerDwell),1) b.centerDwell];
+        b.centerDwell = [zeros(size(b.centerDwell,1),1) b.centerDwell];
         b.centerDwell(:,1) = f;
         
         b.centerEntryGoCorr = b.centerEntryGo(b.correct,:);
@@ -345,22 +345,22 @@ if newData == 1
         b.centerOdorOn = data(data(:,3) == 3 & data(:,5) == 0,:);
         b.centerOdorOff = data(data(:,3) == 5 & data(:,5) == 0,:);
 
-        b.centerOdorOn = [zeros(length(b.centerOdorOn),1) b.centerOdorOn];
+        b.centerOdorOn = [zeros(size(b.centerOdorOn,1),1) b.centerOdorOn];
         b.centerOdorOn(:,1) = f; 
-        b.centerOdorOff = [zeros(length(b.centerOdorOff),1) b.centerOdorOff];
+        b.centerOdorOff = [zeros(size(b.centerOdorOff,1),1) b.centerOdorOff];
         b.centerOdorOff(:,1) = f;
 
         b.sideOdorOn = data(data(:,3) == 3 & data(:,5) == 1,:);
         b.sideOdorOff = data(data(:,3) == 5 & data(:,5) == 1,:);
-        b.sideOdorOn = [zeros(length(b.sideOdorOn),1) b.sideOdorOn];
+        b.sideOdorOn = [zeros(size(b.sideOdorOn,1),1) b.sideOdorOn];
         b.sideOdorOn(:,1) = f;
-        b.sideOdorOff = [zeros(length(b.sideOdorOff),1) b.sideOdorOff];
+        b.sideOdorOff = [zeros(size(b.sideOdorOff,1),1) b.sideOdorOff];
         b.sideOdorOff(:,1) = f;
 
 %% TRIAL PARAMS
     
         b.trialParams = data(data(:,3) == 17, :);
-        b.trialParams = [zeros(length(b.trialParams),1) b.trialParams];
+        b.trialParams = [zeros(size(b.trialParams,1),1) b.trialParams];
         b.trialParams(:,1) = f;
                
 %% REWARD
@@ -397,9 +397,9 @@ if newData == 1
         b.waterOn = data(data(:,3) == 7, [1 2]);
         b.waterOff = data(data(:,3) == 8, [1 2]);
 
-        b.waterOn = [zeros(length(b.waterOn),1) b.waterOn];
+        b.waterOn = [zeros(size(b.waterOn,1),1) b.waterOn];
         b.waterOn(:,1) = f;
-        b.waterOff = [zeros(length(b.waterOff),1) b.waterOff];
+        b.waterOff = [zeros(size(b.waterOff,1),1) b.waterOff];
         b.waterOff(:,1) = f;        
         
 %% TRIAL LENGTH
@@ -573,7 +573,7 @@ if newData == 1
 
         b.licks = [];
         b.licks = data(data(:,3) == 4 & data(:,4) > 0,[1 2 4]);        
-        b.licks = [zeros(length(b.licks),1) b.licks];
+        b.licks = [zeros(size(b.licks,1),1) b.licks];
         b.licks(:,1) = f;
         b.licks(:,5:13) = 0; % preallocate
         
