@@ -236,6 +236,61 @@ for m = 1:a.mouseCt
 end
 
 
+%% LICKS OVER TIME
+
+win = 50;
+
+% % time before odor on
+% odorWait = files(f).centerDelay + files(f).centerOdorTime + ...
+%     files(f).startDelay + 50 + files(f).odorDelay;
+% % time before reward starts
+% rewardWait = odorWait + files(f).odorTime + files(f).rewardDelay;
+
+odorWait = 200 + 50 + 2000;
+rewardWait = odorWait + 200 + 2000;
+rewardWaitBin = ceil(rewardWait/win);
+
+timeBins = (0:win:rewardWaitBin*win);
+
+% % for ll = 1:size(a.lickFile,1)
+% %     if a.lickTrial(ll)>0
+% %         a.lickMouse(ll,1) = a.fileMouse(a.lickFile(ll));
+% %         a.lickDay(ll,1) = a.fileDay(a.lickFile(ll)); 
+% %     else
+% %         a.lickMouse(ll,1) = 0;
+% %         a.lickDay(ll,1) = 0;
+% %     end        
+% % end
+% % 
+% % a.lickCorrMouse = a.lickMouse(a.lickMouse(:,1)>0);
+% % a.lickCorrDay = a.lickDay(a.lickDay(:,1)>0);
+% 
+% for ll = 1:size(a.lickCorrTime,1)
+%    a.lickCorrMouse(ll,1) = a.fileMouse(a.lickCorrFiles(ll));
+%    a.lickCorrDay(ll,1) = a.fileDay(a.lickCorrFiles(11));    
+% end
+%  
+% for m = 1:a.mouseCt
+%     for d = 1:a.mouseDayCt(m)
+%         ok = a.lickCorrMouse == m & a.lickCorrDay == d;
+%         infoBigLickProbDays{d,:,m} = histcounts(a.lickCorrTime(infoBigLickFlag(ok)),timeBinsDwellRelCenter);
+%         infoBigLickProbDays{d,:,m} = cell2mat(infoBigLickProbDays(d,:,m))./a.typeSizesMouseDays(d,1,m);
+%         infoSmallLickProbDays{d,:,m} = histcounts(a.lickCorrTime(infoSmallLickFlag(ok)),timeBinsDwellRelCenter);
+%         infoSmallLickProbDays{d,:,m} = cell2mat(infoSmallLickProbDays(d,:,m))./a.typeSizesMouseDays(d,2,m);
+%         randBigLickProbDays{d,:,m} = histcounts(a.lickCorrTime(randBigLickFlag(ok)),timeBinsDwellRelCenter);
+%         randBigLickProbDays{d,:,m} = cell2mat(randBigLickProbDays(d,:,m))./a.typeSizesMouseDays(d,3,m);
+%         randSmallLickProbDays{d,:,m} = histcounts(a.lickCorrTime(randSmallLickFlag(ok)),timeBinsDwellRelCenter);
+%         randSmallLickProbDays{d,:,m} = cell2mat(randSmallLickProbDays(d,:,m))./a.typeSizesMouseDays(d,4,m);
+%     end
+%     
+%     lickProbDays{:,:,m} = [cell2mat(infoBigLickProbDays(:,:,m)); cell2mat(infoSmallLickProbDays(:,:,m)); cell2mat(randBigLickProbDays(:,:,m)); cell2mat(randSmallLickProbDays(:,:,m))];
+% end
+% 
+% 
+% bins = [win/2:win:maxDwellRelCenter*win-win/2];   
+% maxLicks = 1; % ylim
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DAY SUMMARY

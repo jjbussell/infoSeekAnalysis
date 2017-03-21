@@ -245,3 +245,31 @@ for m = 1:a.mouseCt
     hold off;
     
 end
+
+%% LICK HISTOGRAMS / BINS BY DAY AND MOUSE
+% 
+% PLOT BY MOUSE AND DAY
+
+% for m = 1:a.mouseCt
+%     plotData = cell2mat(lickProbDays(:,:,m));
+%     for d = 1:a.mouseDayCt(m)        
+%         figure();
+%         for lp = 1:4
+%             ax = nsubplot(2,2,plots(lp,1),plots(lp,2));
+%             hold on;
+%             title(char(a.mouseList{m}) + ' Day ' + char(d));
+% %             title(a.mouseList{m});
+%             ax.FontSize = 12;
+%             bar(bins,plotData((a.mouseDayCt(m)*(lp-1))+d,:),'edgecolor','none','facecolor',[0.4 0.4 0.4],'BarWidth',1);
+%             xlim([0,maxDwell*win]);
+%             ylim([0,maxLicks]);
+%             plot(odorDelay*[1 1],[0 100],'k','yliminclude','off');
+%             plot((odorDelay+300)*[1 1],[0 100],'k','yliminclude','off');
+%             plot((rewardWait+100)*[1 1],[0 100],'k','yliminclude','off');
+%             plot(rewardWait*[1 1],[0 100],'k','yliminclude','off');
+%             xlabel('Time from trial start');
+%             ylabel(strcat('Licks per-',a.typeNames(lp),' Trial'));
+%             hold off;
+%         end
+%     end
+% end

@@ -615,9 +615,9 @@ if newData == 1
         end
         
 %%
-        corrLicks = [];
+        b.corrLicks = [];
         corrLickFlag = b.licks(:,8) == b.licks(:,12) & b.licks(:,13) > 0; % want port = choice and after go cue
-        corrLicks = b.licks(corrLickFlag,:);
+        b.corrLicks = b.licks(corrLickFlag,:);
         
         % time before odor on
         odorWait = files(f).centerDelay + files(f).centerOdorTime + ...
@@ -626,24 +626,24 @@ if newData == 1
         rewardWait = odorWait + files(f).odorTime + files(f).rewardDelay;
         
         anticipateLicks = [];
-        anticipateLicks = corrLicks(:,13) < rewardWait;
+        anticipateLicks = b.corrLicks(:,13) < rewardWait;
         anticipateTrialNums = [];
-        anticipateTrialNums = corrLicks(anticipateLicks,3);
+        anticipateTrialNums = b.corrLicks(anticipateLicks,3);
 
         earlyLicks = [];
-        earlyLicks = corrLicks(:,13) < odorWait;
+        earlyLicks = b.corrLicks(:,13) < odorWait;
         earlyTrialNums = [];
-        earlyTrialNums = corrLicks(earlyLicks,3);
+        earlyTrialNums = b.corrLicks(earlyLicks,3);
         
         betweenLicks = [];
-        betweenLicks = corrLicks(:,13) >= odorWait & corrLicks(:,13) < rewardWait;
+        betweenLicks = b.corrLicks(:,13) >= odorWait & b.corrLicks(:,13) < rewardWait;
         betweenTrialNums = [];
-        betweenTrialNums = corrLicks(betweenLicks,3);
+        betweenTrialNums = b.corrLicks(betweenLicks,3);
 
         waterLicks = [];
-        waterLicks = corrLicks(:,13) >= rewardWait;
+        waterLicks = b.corrLicks(:,13) >= rewardWait;
         waterLicksTrialNums = [];
-        waterLicksTrialNums = corrLicks(waterLicks,3);
+        waterLicksTrialNums = b.corrLicks(waterLicks,3);
 
         b.lickCt = [];
         b.anticipatoryLicks = [];
@@ -655,7 +655,7 @@ if newData == 1
         for t = 1:b.corrTrialCt
            trialNum = b.corrTrials(t,1);
            b.allLickCt(t,1) = sum(b.licks(:,3) == trialNum);
-           b.lickCt(t,1) = sum(corrLicks(:,3) == trialNum);
+           b.lickCt(t,1) = sum(b.corrLicks(:,3) == trialNum);
            b.anticipatoryLicks(t,1) = sum(anticipateTrialNums == trialNum);
            b.earlyLicks(t,1) = sum(earlyTrialNums == trialNum);
            b.betweenLicks(t,1) = sum(betweenTrialNums == trialNum);
@@ -740,6 +740,8 @@ if newData == 1
             a.waterOn = [a.waterOn; b.waterOn];
             a.waterOff = [a.waterOff; b.waterOff];
             a.licks = [a.licks; b.licks];
+            a.corrLicks = [a.corrLicks; b.corrLicks];
+            a.allLickCt = [a.allLickCt; b.allLickCt];
             a.lickCt = [a.lickCt; b.lickCt];
             a.anticipatoryLicks = [a.anticipatoryLicks; b.anticipatoryLicks];
             a.earlyLicks = [a.earlyLicks; b.earlyLicks];
