@@ -12,9 +12,6 @@ a.mColors = a.mColors./255;
 dx = 0.2;
 dy = 0.02;
 
-odorDelay = 2000;
-rewardWait = 2000;
-
 plots = [1 1; 1 2; 2 1; 2 2];
 
 purple = [121 32 196] ./ 255;
@@ -244,4 +241,34 @@ for m = 1:a.mouseCt
     xlabel(a.mouseList(m));
     hold off;
     
+end
+
+%% LICK HISTOGRAMS / BINS BY DAY AND MOUSE
+% 
+% PLOT BY MOUSE AND DAY
+
+bins = [a.win/2:a.win:a.maxBin*a.win-a.win/2];
+
+for m = 1:a.mouseCt
+    plotData = cell2mat(a.lickProbDays(:,:,m));
+    for d = 1:a.mouseDayCt(m)        
+        figure();
+        for lp = 1:4
+            ax = nsubplot(2,2,plots(lp,1),plots(lp,2));
+            hold on;
+            title([char(a.mouseList{m}) ' Day ' char(string(d))]);
+%             title(a.mouseList{m});
+            ax.FontSize = 12;
+            bar(bins,plotData((a.mouseDayCt(m)*(lp-1))+d,:),'edgecolor','none','facecolor',[0.4 0.4 0.4],'BarWidth',1);
+            xlim([0,a.maxBin*a.win]);
+            ylim([0,1]);
+            plot(a.odorWait*[1 1],[0 100],'k','yliminclude','off');
+            plot((a.odorWait+200)*[1 1],[0 100],'k','yliminclude','off');
+            plot((a.rewardWait+100)*[1 1],[0 100],'k','yliminclude','off');
+            plot(a.rewardWait*[1 1],[0 100],'k','yliminclude','off');
+            xlabel('Time from go cue');
+            ylabel(strcat('Licks per-',a.typeNames(lp),' Trial'));
+            hold off;
+        end
+    end
 end
