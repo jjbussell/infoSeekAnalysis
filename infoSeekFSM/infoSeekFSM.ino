@@ -1,14 +1,18 @@
 /*
- * --mouse can't lick both at once?
- * this version for downstairs!! fix ports!
- * --make com port and "box" based of a box variable!! in addition to touch sensors!
  * 
+ * --mouse can't lick both at once?
+ * 
+ * 
+ * 
+ * NEED TO CHANGE CHANNELS B/T 3,6 (bottom) and 4,8 (TOP) FOR LICKS!!!!!!!!!!!!!!!!!!
 
 PROBLEM WITH MARKING REWARD WHEN NOT IN PORT?--no?
-FIXED Licked so ONLY PRINTS AT ONSET
+
+NO CHOICE INDICATED WHEN CHOOSES IN GRACE PERIOD?!?!?
 
 IMPROVEMENTS
 
+--make com port and "box" based of a box variable!! in addition to touch sensors!
 --parse trials and report: type, odors, time to start, center dwell, center entries, rxn, choice/timeout/correct, licks, dwell, reward 
 --GUI to plot choices, correct, and control params
 --chatter communications --> STOP BUTTON
@@ -103,6 +107,13 @@ int currentCenterOdor;
 int rewardCount;
 int rewardBigCount;
 int rewardSmallCount;
+
+int infoFCt;
+int infoCCt;
+int randFCt;
+int randCCt;
+int rewardAmt;
+int cTCount;
 
 //// WITHIN-TRIAL DATA
 int centerFlag;
@@ -315,8 +326,6 @@ void loop() {
       startTime = millis(); // start the timer for this session
 
       printer(0, 0, 0);
-
-      printer(12,random(1,1000),random(1,1000));
 
       digitalWrite(arduScope, LOW); //start imaging
 

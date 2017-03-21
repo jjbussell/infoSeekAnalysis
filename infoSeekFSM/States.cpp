@@ -198,7 +198,7 @@ void StateResponse::loop()
 
 void StateResponse::s_finish()
 {
-  if (choice != 2){
+  if (choice <> 2){
     next_state = WAIT_FOR_ODOR;
   }
   else {
