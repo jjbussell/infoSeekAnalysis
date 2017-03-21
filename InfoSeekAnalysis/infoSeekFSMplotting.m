@@ -194,14 +194,14 @@ for m=1:a.mouseCt
 end
 
 %%
-figure();
-fig = gcf;
-fig.PaperUnits = 'inches';
-fig.PaperPosition = [1 1 7 9];
-set(fig,'renderer','painters')
-bar(outcomeCounts,'stacked');
-ylabel('Trial Outcomes (% of trials)');
-legend(a.outcomeLabels);
+% figure();
+% fig = gcf;
+% fig.PaperUnits = 'inches';
+% fig.PaperPosition = [1 1 7 9];
+% set(fig,'renderer','painters')
+% bar(outcomeCounts,'stacked');
+% ylabel('Trial Outcomes (% of trials)');
+% legend(a.outcomeLabels);
 
 % %%
 % for m = 1:a.mouseCt
