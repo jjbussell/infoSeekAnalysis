@@ -132,7 +132,7 @@ for m = 1:a.mouseCt
     leg.FontWeight = 'bold';
     hold off;
     
-        ax = nsubplot(7,1,6,1);
+    ax = nsubplot(7,1,6,1);
     ax.FontSize = 10;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
 %     ax.YLim = [0 15000];
@@ -254,10 +254,11 @@ for m = 1:a.mouseCt
     for d = 1:a.mouseDayCt(m)        
         figure();
         for lp = 1:4
-            ax = nsubplot(2,2,plots(lp,1),plots(lp,2));
+            ax = nsubplot(4,1,lp,1);
             hold on;
+            if lp ==1
             title([char(a.mouseList{m}) ' Day ' char(string(d))]);
-%             title(a.mouseList{m});
+            end
             ax.FontSize = 12;
             bar(bins,plotData((a.mouseDayCt(m)*(lp-1))+d,:),'edgecolor','none','facecolor',[0.4 0.4 0.4],'BarWidth',1);
             xlim([0,a.maxBin*a.win]);
@@ -266,7 +267,9 @@ for m = 1:a.mouseCt
             plot((a.odorWait+200)*[1 1],[0 100],'k','yliminclude','off');
             plot((a.rewardWait+100)*[1 1],[0 100],'k','yliminclude','off');
             plot(a.rewardWait*[1 1],[0 100],'k','yliminclude','off');
+            if lp == 4
             xlabel('Time from go cue');
+            end
             ylabel(strcat('Licks per-',a.typeNames(lp),' Trial'));
             hold off;
         end
