@@ -1,8 +1,5 @@
 %% TO CALC/FIX
 
-% bar graphs of licking for most recent day
-
-
 %%
 % PLOTTING
 
@@ -25,6 +22,8 @@ a.outcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoSmall','ChoiceInf
 a.choiceLabels = {'ChoiceInfoBig','ChoiceInfoSmall','ChoiceRandBig',...
     'ChoiceRandSmall','InfoBig','InfoSmall','RandBig','RandSmall'};
 
+ bins = [a.win/2:a.win:a.maxBin*a.win-a.win/2];
+
 %% PLOT DAY SUMMARIES BY MOUSE
 
 for m = 1:a.mouseCt
@@ -35,21 +34,22 @@ for m = 1:a.mouseCt
     fig.PaperPosition = [1 1 7 9];
     set(fig,'renderer','painters')
     
-%     ax = nsubplot(7,1,1,1);
-%     title(a.mouseList(m));
-%     ax.FontSize = 10;
-%     ax.XTick = [0:5:a.mouseDayCt(m)];    
-%     ax.YTick = [0 0.25 0.50 0.75 1];
-%     ax.YLim = [0 1];
-%     plot(0:a.mouseDayCt(m),[0 cell2mat(a.daySummary.percentInfo(m,:))],'Color',a.mColors(m,:),'LineWidth',2,'Marker','o','MarkerFaceColor',a.mColors(m,:),'MarkerSize',5);
-%     plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-%     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
-%     ylabel('Info choice probability');
-%     xlabel('Day');
-%     hold off;
-    
-    ax = nsubplot(7,1,1,1);
+    ax = nsubplot(8,1,1,1);
     title(a.mouseList(m));
+    ax.FontSize = 10;
+    ax.XTick = [0:5:a.mouseDayCt(m)];    
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [0 1];
+    if sum(isnan(cell2mat(a.daySummary.percentInfo(m,:)))) ~= a.mouseDayCt(m)
+    plot(0:a.mouseDayCt(m),[0 cell2mat(a.daySummary.percentInfo(m,:))],'Color',a.mColors(m,:),'LineWidth',2,'Marker','o','MarkerFaceColor',a.mColors(m,:),'MarkerSize',5);
+    plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+    end
+    ylabel('Info choice probability');
+    xlabel('Day');
+    hold off;
+    
+    ax = nsubplot(8,1,2,1);
     ax.FontSize = 10;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     plot(cell2mat(a.daySummary.rxnInfoForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',5);
@@ -64,7 +64,7 @@ for m = 1:a.mouseCt
     leg.FontWeight = 'bold';
     hold off;
     
-    ax = nsubplot(7,1,2,1);
+    ax = nsubplot(8,1,3,1);
     ax.FontSize = 10;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
@@ -80,7 +80,7 @@ for m = 1:a.mouseCt
     leg.FontWeight = 'bold';
     hold off;
 
-    ax = nsubplot(7,1,3,1);
+    ax = nsubplot(8,1,4,1);
     ax.FontSize = 10;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
@@ -96,7 +96,7 @@ for m = 1:a.mouseCt
     leg.FontWeight = 'bold';
     hold off;
     
-    ax = nsubplot(7,1,4,1);
+    ax = nsubplot(8,1,5,1);
     ax.FontSize = 10;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
@@ -114,7 +114,7 @@ for m = 1:a.mouseCt
     leg.FontWeight = 'bold';
     hold off;
     
-    ax = nsubplot(7,1,5,1);
+    ax = nsubplot(8,1,6,1);
     ax.FontSize = 10;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
@@ -132,7 +132,7 @@ for m = 1:a.mouseCt
     leg.FontWeight = 'bold';
     hold off;
     
-    ax = nsubplot(7,1,6,1);
+    ax = nsubplot(8,1,7,1);
     ax.FontSize = 10;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
 %     ax.YLim = [0 15000];
@@ -148,7 +148,7 @@ for m = 1:a.mouseCt
     leg.FontWeight = 'bold';
     hold off;
 
-    ax = nsubplot(7,1,7,1);
+    ax = nsubplot(8,1,8,1);
     ax.FontSize = 10;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];   
     plot(cell2mat(a.daySummary.rewardRateInfoForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',5);
@@ -190,56 +190,49 @@ for m=1:a.mouseCt
     [outcomeCounts(m,:),outcomeBins(m,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
 end
 
-%%
-% figure();
-% fig = gcf;
-% fig.PaperUnits = 'inches';
-% fig.PaperPosition = [1 1 7 9];
-% set(fig,'renderer','painters')
-% bar(outcomeCounts,'stacked');
-% ylabel('Trial Outcomes (% of trials)');
-% legend(a.outcomeLabels);
-
-% %%
-% for m = 1:a.mouseCt
-%     figure();
-%     fig = gcf;
-%     fig.PaperUnits = 'inches';
-%     fig.PaperPosition = [1 1 7 9];
-%     set(fig,'renderer','painters')
-%     for d = 1:a.mouseDayCt(m)
-%         ax = nsubplot(1,a.mouseDayCt(m),d,1);
-%         title(a.mouseList(m));
-%         ax.FontSize = 10;
-%         [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
-%         barh([1:17],outcomeCounts);
-%         plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-%         plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-%         ylabel('Trial Outcomes (% of trials)');
-% %         ax.XTick = [1:17];
-%         set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',15)
-%     end
-% end
-
 
 %% PLOT MOST RECENT DAY'S LICKS
     
-figure();
-fig = gcf;
-fig.PaperUnits = 'inches';
-fig.PaperPosition = [1 1 7 9];
-set(fig,'renderer','painters');
-    
 for m = 1:a.mouseCt
+    plotData = cell2mat(a.lickProbDays(:,:,m));
     d = a.mouseDayCt(m);
-    ax = nsubplot(1,a.mouseCt,1,m);
-    ax.FontSize = 10;
-%     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
-%     ax.YLim = [0 inf];
-    bar([cell2mat(a.daySummary.infoBigLicks(m,d)) cell2mat(a.daySummary.infoSmallLicks(m,d)) cell2mat(a.daySummary.randCLicks(m,d)) cell2mat(a.daySummary.randDLicks(m,d))]);      
-    ylabel('Anticipatory lick rate');
-    xlabel(a.mouseList(m));
-    hold off;
+    
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [1 1 7 9];
+    set(fig,'renderer','painters');
+    
+    for lp = 1:4
+        ax = nsubplot(4,1,lp,1);
+        hold on;
+        if lp ==1
+        title([char(a.mouseList{m}) ' Day ' char(string(d))]);
+        end
+        ax.FontSize = 12;
+        bar(bins,plotData((a.mouseDayCt(m)*(lp-1))+d,:),'edgecolor','none','facecolor',[0.4 0.4 0.4],'BarWidth',1);
+        xlim([0,a.maxBin*a.win]);
+        ylim([0,1]);
+        plot(a.odorWait*[1 1],[0 100],'k','yliminclude','off');
+        plot((a.odorWait+200)*[1 1],[0 100],'k','yliminclude','off');
+        plot((a.rewardWait+100)*[1 1],[0 100],'k','yliminclude','off');
+        plot(a.rewardWait*[1 1],[0 100],'k','yliminclude','off');
+        if lp == 4
+        xlabel('Time from go cue');
+        end
+        ylabel(strcat('Licks per-',a.typeNames(lp),' Trial'));
+        hold off;
+    end    
+
+    
+%     ax = nsubplot(1,a.mouseCt,1,m);
+%     ax.FontSize = 10;
+% %     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
+% %     ax.YLim = [0 inf];
+%     bar([cell2mat(a.daySummary.infoBigLicks(m,d)) cell2mat(a.daySummary.infoSmallLicks(m,d)) cell2mat(a.daySummary.randCLicks(m,d)) cell2mat(a.daySummary.randDLicks(m,d))]);      
+%     ylabel('Anticipatory lick rate');
+%     xlabel(a.mouseList(m));
+%     hold off;
     
 end
 
@@ -247,31 +240,30 @@ end
 % 
 % PLOT BY MOUSE AND DAY
 
-bins = [a.win/2:a.win:a.maxBin*a.win-a.win/2];
-
-for m = 1:a.mouseCt
-    plotData = cell2mat(a.lickProbDays(:,:,m));
-    for d = 1:a.mouseDayCt(m)        
-        figure();
-        for lp = 1:4
-            ax = nsubplot(4,1,lp,1);
-            hold on;
-            if lp ==1
-            title([char(a.mouseList{m}) ' Day ' char(string(d))]);
-            end
-            ax.FontSize = 12;
-            bar(bins,plotData((a.mouseDayCt(m)*(lp-1))+d,:),'edgecolor','none','facecolor',[0.4 0.4 0.4],'BarWidth',1);
-            xlim([0,a.maxBin*a.win]);
-            ylim([0,1]);
-            plot(a.odorWait*[1 1],[0 100],'k','yliminclude','off');
-            plot((a.odorWait+200)*[1 1],[0 100],'k','yliminclude','off');
-            plot((a.rewardWait+100)*[1 1],[0 100],'k','yliminclude','off');
-            plot(a.rewardWait*[1 1],[0 100],'k','yliminclude','off');
-            if lp == 4
-            xlabel('Time from go cue');
-            end
-            ylabel(strcat('Licks per-',a.typeNames(lp),' Trial'));
-            hold off;
-        end
-    end
-end
+% 
+% for m = 1:a.mouseCt
+%     plotData = cell2mat(a.lickProbDays(:,:,m));
+%     for d = 1:a.mouseDayCt(m)        
+%         figure();
+%         for lp = 1:4
+%             ax = nsubplot(4,1,lp,1);
+%             hold on;
+%             if lp ==1
+%             title([char(a.mouseList{m}) ' Day ' char(string(d))]);
+%             end
+%             ax.FontSize = 12;
+%             bar(bins,plotData((a.mouseDayCt(m)*(lp-1))+d,:),'edgecolor','none','facecolor',[0.4 0.4 0.4],'BarWidth',1);
+%             xlim([0,a.maxBin*a.win]);
+%             ylim([0,1]);
+%             plot(a.odorWait*[1 1],[0 100],'k','yliminclude','off');
+%             plot((a.odorWait+200)*[1 1],[0 100],'k','yliminclude','off');
+%             plot((a.rewardWait+100)*[1 1],[0 100],'k','yliminclude','off');
+%             plot(a.rewardWait*[1 1],[0 100],'k','yliminclude','off');
+%             if lp == 4
+%             xlabel('Time from go cue');
+%             end
+%             ylabel(strcat('Licks per-',a.typeNames(lp),' Trial'));
+%             hold off;
+%         end
+%     end
+% end

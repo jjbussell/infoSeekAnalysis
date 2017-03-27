@@ -438,7 +438,6 @@ if newData == 1
 % rand big, rand small
 
         b.choiceTypeCorr = b.choiceType(b.correct);
-        b.choiceCorr = b.choice(b.correct,:);
         % b.trialParams(:,5)--> 1 = big, 0 = small
 
         b.type = zeros(b.corrTrialCt,1);
@@ -447,7 +446,7 @@ if newData == 1
             % CHOICE TRIALS
             if b.choiceTypeCorr(t) == 1
                 % INFO    
-                if b.choiceCorr(t,4) == 1
+                if b.choiceCorr(t) == 1
                     % BIG
                     if b.trialParams(t,5) == 1
                         b.type(t,1) = 1; % choice info big
@@ -457,7 +456,7 @@ if newData == 1
                     end
 
                 % RANDOM
-                elseif b.choiceCorr(t,4) == 0
+                elseif b.choiceCorr(t) == 0
                     % BIG
                     if b.trialParams(t,5) == 1
                         b.type(t,1) = 3; % choice rand big
@@ -496,10 +495,10 @@ if newData == 1
             % CHOICE TRIALS
             if b.choiceType(t) == 1
                 % NO CHOICE
-                if b.choice(t,3) == 2
+                if b.choice(t,4) == 2
                     b.outcome(t,1) = 1; % choice no choice;
                 % INFO    
-                elseif b.choice(t,3) == 1
+                elseif b.choice(t,4) == 1
                     % BIG
                     if b.big(t) == 1
                         b.outcome(t,1) = 2; % choice info big
@@ -511,7 +510,7 @@ if newData == 1
                     end
 
                 % RANDOM
-                else %if b.choice(t,3) == 0
+                else %if b.choice(t,4) == 0
                     %BIG
                     if b.big(t) == 1
                         b.outcome(t,1) = 5; % choice rand big
@@ -541,7 +540,7 @@ if newData == 1
                         b.outcome(t,1) = 11; % info not present
                     end
                 % INCORRECT
-                else %b.choice(t,3) == 3
+                else %b.choice(t,4) == 3
                     b.outcome(t,1) = 12; % info incorrect
                 end
 
@@ -563,7 +562,7 @@ if newData == 1
                         b.outcome(t,1) = 16; % rand not present
                     end
                 % INCORRECT
-                else % b.choice(t,3) == 3
+                else % b.choice(t,4) == 3
                     b.outcome(t,1) = 17; % rand incorrect
                 end
             end  
@@ -606,7 +605,7 @@ if newData == 1
                 if ~isempty(lickTrialIdx)
                     b.licks(l,10) = lickTrialIdx; % index into correct trials
                     b.licks(l,11) = b.type(lickTrialIdx,1); % trial type
-                    if b.choiceCorr(lickTrialIdx,4) == 1
+                    if b.choiceCorr(lickTrialIdx) == 1
                         b.licks(l,12) = info;  % choice port
                     else
                         b.licks(l,12) = rand;  % choice port
@@ -732,7 +731,6 @@ if newData == 1
             a.correct = [a.correct; b.correct];
             a.corrTrialCt = [a.corrTrialCt; b.corrTrialCt];
             a.corrTrials = [a.corrTrials; b.corrTrials];
-            a.choiceCorr = [a.choiceCorr; b.choiceCorr];
             a.rxn = [a.rxn; b.rxn];
             a.rewardEntries = [a.rewardEntries; b.rewardEntries];
             a.rewardEntriesCorr = [a.rewardEntriesCorr; b.rewardEntriesCorr];
