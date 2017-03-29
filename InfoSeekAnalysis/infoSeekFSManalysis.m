@@ -211,7 +211,9 @@ for m = 1:a.mouseCt
         a.AlicksEarly(m,d) = sum(a.earlyLicks(a.odorAtrials & ok));
         a.BlicksEarly(m,d) = sum(a.earlyLicks(a.odorBtrials & ok));
         a.ClicksEarly(m,d) = sum(a.earlyLicks(a.odorCtrials & ok));
-        a.DlicksEarly(m,d) = sum(a.earlyLicks(a.odorDtrials & ok)); 
+        a.DlicksEarly(m,d) = sum(a.earlyLicks(a.odorDtrials & ok));
+        a.randBigLicksEarly(m,d) = sum(a.earlyLicks(a.randBig & ok));
+        a.randSmallLicksEarly(m,d) = sum(a.earlyLicks(a.randSmall & ok));
         
         a.AlicksWater(m,d) = sum(a.waterLicks(a.odorAtrials & ok));
         a.BlicksWater(m,d) = sum(a.waterLicks(a.odorBtrials & ok));
@@ -256,6 +258,8 @@ a.timeBins = (0:a.win:a.maxBin*a.win);
 a.lickTrial = a.corrLicks(:,3);
 a.lickFile = a.corrLicks(:,1);
 a.lickTime = a.corrLicks(:,13);
+
+% IS THIS WHAT'S INCORRECT?? from a.corrLicks, find each trial and its type
 a.lickTrialType = a.corrLicks(:,11);
 
 for ll = 1:size(a.lickFile,1)
@@ -324,6 +328,8 @@ for m = 1:a.mouseCt
         a.daySummary.infoSmallLicksEarly{m,d} = a.BlicksEarly(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicksEarly{m,d} = a.ClicksEarly(m,d)/sum(a.odorCtrials & ok);
         a.daySummary.randDLicksEarly{m,d} = a.DlicksEarly(m,d)/sum(a.odorDtrials & ok);
+        a.daySummary.randBigLicksEarly{m,d} = a.randBigLicksEarly(m,d)/sum(a.randBig & ok);
+        a.daySummary.randSmallLicksEarly{m,d} = a.randSmallLicksEarly(m,d)/sum(a.randSmall & ok);                
         a.daySummary.infoBigLicksWater{m,d} = a.AlicksWater(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicksWater{m,d} = a.BlicksWater(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicksWater{m,d} = a.ClicksWater(m,d)/sum(a.odorCtrials & ok);
