@@ -171,7 +171,7 @@ end
 for m = 1:a.mouseCt
     for d = 1:a.mouseDayCt(m)
        ok = a.mice(:,m) & a.mouseDay == d;
-       a.typeSizesmouseDays(d,:,m) = [sum(a.infoBig(ok)) sum(a.infoSmall(ok)) sum(a.randBig(ok)) sum(a.randSmall(ok))];
+       a.typeSizesMouseDays(d,:,m) = [sum(a.infoBig(ok)) sum(a.infoSmall(ok)) sum(a.randBig(ok)) sum(a.randSmall(ok))];
        a.choiceTypeSizesmouseDays(d,:,m) = [sum(a.infoForcedCorr(ok)) sum(a.infoChoiceCorr(ok)) sum(a.randForcedCorr(ok)) sum(a.randChoiceCorr(ok))];
     end
 end
@@ -211,7 +211,9 @@ for m = 1:a.mouseCt
         a.AlicksEarly(m,d) = sum(a.earlyLicks(a.odorAtrials & ok));
         a.BlicksEarly(m,d) = sum(a.earlyLicks(a.odorBtrials & ok));
         a.ClicksEarly(m,d) = sum(a.earlyLicks(a.odorCtrials & ok));
-        a.DlicksEarly(m,d) = sum(a.earlyLicks(a.odorDtrials & ok)); 
+        a.DlicksEarly(m,d) = sum(a.earlyLicks(a.odorDtrials & ok));
+        a.randBigLicksEarly(m,d) = sum(a.earlyLicks(a.randBig & ok));
+        a.randSmallLicksEarly(m,d) = sum(a.earlyLicks(a.randSmall & ok));
         
         a.AlicksWater(m,d) = sum(a.waterLicks(a.odorAtrials & ok));
         a.BlicksWater(m,d) = sum(a.waterLicks(a.odorBtrials & ok));
@@ -233,6 +235,57 @@ for m = 1:a.mouseCt
         a.randBigRewards(m,d) = sum(a.reward(a.randBig & ok));
         a.randSmallRewards(m,d) = sum(a.reward(a.randSmall & ok));
     end
+end
+
+
+%% LICKS OVER TIME
+
+a.win = 50;
+
+% % time before odor on
+% odorWait = files(f).centerDelay + files(f).centerOdorTime + ...
+%     files(f).startDelay + 50 + files(f).odorDelay;
+% % time before reward starts
+% rewardWait = odorWait + files(f).odorTime + files(f).rewardDelay;
+
+a.odorWait = 50 + 2000;
+a.rewardWait = a.odorWait + 200 + 2000;
+a.maxTimeToLick = 10000;
+a.maxBin = ceil(a.maxTimeToLick/a.win);
+
+a.timeBins = (0:a.win:a.maxBin*a.win);
+
+a.lickTrial = a.corrLicks(:,3);
+a.lickFile = a.corrLicks(:,1);
+a.lickTime = a.corrLicks(:,13);
+
+% IS THIS WHAT'S INCORRECT?? from a.corrLicks, find each trial and its type
+a.lickTrialType = a.corrLicks(:,11);
+
+for ll = 1:size(a.lickFile,1)
+    a.lickMouse(ll,1) = a.fileMouse(a.lickFile(ll));
+    a.lickDay(ll,1) = a.fileDay(a.lickFile(ll));     
+end
+
+a.infoBigLickFlag = a.lickTrialType == 1 | a.lickTrialType == 5;
+a.infoSmallLickFlag = a.lickTrialType == 2 | a.lickTrialType == 6;
+a.randBigLickFlag = a.lickTrialType == 3 | a.lickTrialType == 7;
+a.randSmallLickFlag = a.lickTrialType == 4 | a.lickTrialType == 8;
+ 
+for m = 1:a.mouseCt
+    for d = 1:a.mouseDayCt(m)
+        ok = a.lickMouse == m & a.lickDay == d;
+        a.infoBigLickProbDays{d,:,m} = histcounts(a.lickTime(a.infoBigLickFlag(ok)),a.timeBins);
+        a.infoBigLickProbDays{d,:,m} = cell2mat(a.infoBigLickProbDays(d,:,m))./a.typeSizesMouseDays(d,1,m);
+        a.infoSmallLickProbDays{d,:,m} = histcounts(a.lickTime(a.infoSmallLickFlag(ok)),a.timeBins);
+        a.infoSmallLickProbDays{d,:,m} = cell2mat(a.infoSmallLickProbDays(d,:,m))./a.typeSizesMouseDays(d,2,m);
+        a.randBigLickProbDays{d,:,m} = histcounts(a.lickTime(a.randBigLickFlag(ok)),a.timeBins);
+        a.randBigLickProbDays{d,:,m} = cell2mat(a.randBigLickProbDays(d,:,m))./a.typeSizesMouseDays(d,3,m);
+        a.randSmallLickProbDays{d,:,m} = histcounts(a.lickTime(a.randSmallLickFlag(ok)),a.timeBins);
+        a.randSmallLickProbDays{d,:,m} = cell2mat(a.randSmallLickProbDays(d,:,m))./a.typeSizesMouseDays(d,4,m);
+    end
+    
+    a.lickProbDays{:,:,m} = [cell2mat(a.infoBigLickProbDays(:,:,m)); cell2mat(a.infoSmallLickProbDays(:,:,m)); cell2mat(a.randBigLickProbDays(:,:,m)); cell2mat(a.randSmallLickProbDays(:,:,m))];
 end
 
 
@@ -275,6 +328,8 @@ for m = 1:a.mouseCt
         a.daySummary.infoSmallLicksEarly{m,d} = a.BlicksEarly(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicksEarly{m,d} = a.ClicksEarly(m,d)/sum(a.odorCtrials & ok);
         a.daySummary.randDLicksEarly{m,d} = a.DlicksEarly(m,d)/sum(a.odorDtrials & ok);
+        a.daySummary.randBigLicksEarly{m,d} = a.randBigLicksEarly(m,d)/sum(a.randBig & ok);
+        a.daySummary.randSmallLicksEarly{m,d} = a.randSmallLicksEarly(m,d)/sum(a.randSmall & ok);                
         a.daySummary.infoBigLicksWater{m,d} = a.AlicksWater(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicksWater{m,d} = a.BlicksWater(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicksWater{m,d} = a.ClicksWater(m,d)/sum(a.odorCtrials & ok);

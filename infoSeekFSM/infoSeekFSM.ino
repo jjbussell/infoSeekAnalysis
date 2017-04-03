@@ -449,7 +449,8 @@ void loop() {
             if (randFlag == 0){ // if not currently broken
             Serial.println("Enter random");
             randFlag = 1;
-            if (current_state == RESPONSE){
+
+            if (current_state == RESPONSE ){
               printer(2, randPort, 1);
             }
             else {
