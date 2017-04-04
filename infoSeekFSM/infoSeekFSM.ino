@@ -388,17 +388,10 @@ void loop() {
 //            Serial.println(touched);
             sticky_touched = touched;
 
-<<<<<<< HEAD
-            if (get_touched_channel(touched,4) == 1){
-              licked = 1; //right
-            }
-            else if (get_touched_channel(touched,8) == 1){
-=======
             if (get_touched_channel(touched,touch_right) == 1){
               licked = 1; //right
             }
             else if (get_touched_channel(touched,touch_left) == 1){
->>>>>>> lickPortAuto
               licked = 2; //left
             }
             else licked = 0;

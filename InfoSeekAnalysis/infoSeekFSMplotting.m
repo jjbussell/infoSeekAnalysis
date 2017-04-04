@@ -169,6 +169,11 @@ for m = 1:a.mouseCt
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
+    
+    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','best','Orientation','horizontal');
+    leg.Box = 'off';
+    leg.FontWeight = 'bold';
+    
 end
 
 %% PLOT OUTCOMES BY MOUSE
