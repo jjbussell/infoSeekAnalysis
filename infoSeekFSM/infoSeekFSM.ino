@@ -384,10 +384,10 @@ void loop() {
 //            Serial.println(touched);
             sticky_touched = touched;
 
-            if (get_touched_channel(touched,3) == 1){
+            if (get_touched_channel(touched,4) == 1){
               licked = 1; //right
             }
-            else if (get_touched_channel(touched,6) == 1){
+            else if (get_touched_channel(touched,8) == 1){
               licked = 2; //left
             }
             else licked = 0;
@@ -449,8 +449,7 @@ void loop() {
             if (randFlag == 0){ // if not currently broken
             Serial.println("Enter random");
             randFlag = 1;
-
-            if (current_state == RESPONSE ){
+            if (current_state == RESPONSE){
               printer(2, randPort, 1);
             }
             else {
