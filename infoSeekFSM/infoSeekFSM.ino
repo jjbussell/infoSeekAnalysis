@@ -181,6 +181,8 @@ unsigned long interval; // ITI
 
 int TOU_THRESH; // lick sensor touch threshold
 int REL_THRESH; // lick sensor release threshold
+unsigned int touch_right; // lick sensor pin for right sensor
+unsigned int touch_left; // lick sensor pin for left sensor
 
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -283,6 +285,8 @@ void loop() {
       interval          =        Serial.parseInt();
       TOU_THRESH        =        Serial.parseInt();
       REL_THRESH        =        Serial.parseInt();
+      touch_right       =        Serial.parseInt();
+      touch_left        =        Serial.parseInt();
 
       sessionTime = sessionTime * 1000; // convert to ms
 
@@ -384,10 +388,10 @@ void loop() {
 //            Serial.println(touched);
             sticky_touched = touched;
 
-            if (get_touched_channel(touched,3) == 1){
+            if (get_touched_channel(touched,touch_right) == 1){
               licked = 1; //right
             }
-            else if (get_touched_channel(touched,6) == 1){
+            else if (get_touched_channel(touched,touch_left) == 1){
               licked = 2; //left
             }
             else licked = 0;
