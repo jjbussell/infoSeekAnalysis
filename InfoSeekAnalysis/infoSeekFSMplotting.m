@@ -32,7 +32,7 @@ for m = 1:a.mouseCt
     
     fig = gcf;
     fig.PaperUnits = 'inches';
-    fig.PaperPosition = [1 1 7 10];
+    fig.PaperPosition = [1 1 10 7];
     set(fig,'renderer','painters')
     
     ax = nsubplot(4,2,1,1);
@@ -62,7 +62,7 @@ for m = 1:a.mouseCt
     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
     ylabel({'Reaction', 'Time (ms)'});
 %     xlabel('Day');    
-    leg = legend(ax,'Info-Forced','Info-Choice','No Info - Forced','No Info - Choice','Location','best','Orientation','horizontal');
+    leg = legend(ax,'Info-Forced','Info-Choice','No Info - Forced','No Info - Choice','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -80,7 +80,7 @@ for m = 1:a.mouseCt
     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
     ylabel({'Early', 'lick rate'});
 %     xlabel('Day');
-    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','best','Orientation','horizontal');
+    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -96,7 +96,7 @@ for m = 1:a.mouseCt
     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
     ylabel({'Anticipatory', 'lick rate'});
     xlabel('Day');
-    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','best','Orientation','horizontal');
+    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -115,7 +115,7 @@ for m = 1:a.mouseCt
     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
     ylabel({'Post-outcome', 'lick rate'});
 %     xlabel('Day');
-    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - Rew','No Info - No Rew','Location','best','Orientation','horizontal');
+    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - Rew','No Info - No Rew','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -133,7 +133,7 @@ for m = 1:a.mouseCt
     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
     ylabel({'Mean Reward', '(uL)'});
 %     xlabel('Day');
-    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','best','Orientation','horizontal');
+    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -149,7 +149,7 @@ for m = 1:a.mouseCt
     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
     ylabel({'Trial', 'duration (ms)'});
 %     xlabel('Day');
-    leg = legend(ax,'Info Forced','Info Choice','No Info Forced','No Info Choice','Location','best','Orientation','horizontal');
+    leg = legend(ax,'Info Forced','Info Choice','No Info Forced','No Info Choice','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -163,17 +163,24 @@ for m = 1:a.mouseCt
     plot(cell2mat(a.daySummary.rewardRateRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',5);
     plot(cell2mat(a.daySummary.rewardRateRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerEdgeColor',orange,'MarkerFaceColor','w','MarkerSize',5,'LineStyle',':');
     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+        plot(cell2mat(a.daySummary.infoBigLicksWater(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',5,'Visible','off');
+    plot(cell2mat(a.daySummary.infoSmallLicksWater(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',5,'Visible','off');
+    plot(cell2mat(a.daySummary.randBigLicksWater(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',5,'Visible','off');
+    plot(cell2mat(a.daySummary.randSmallLicksWater(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',5,'Visible','off');
+    plot(cell2mat(a.daySummary.CRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5,'Visible','off');
+    plot(cell2mat(a.daySummary.DRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',5,'LineStyle',':','Visible','off');
     ylabel({'Reward', 'Rate'});
     xlabel('Day');    
-    leg = legend(ax,'Info Forced','Info Choice','No Info Forced','No Info Choice','Location','best','Orientation','horizontal');
+    leg = legend(ax,'Info Forced','Info Choice','No Info Forced','No Info Choice','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
+
+%     leg = legend(ax,'Info Forced','Info Choice','No Info Forced','No Info Choice''Info-Rew','Info-No Rew','No Info - Rew','No Info - No Rew','No Info - C','No Info - D','Units','normalized','Position',[0.2 0.6 0.1 0.2],'Orientation','horizontal');
+%     leg.Box = 'off';
+%     leg.FontWeight = 'bold';
+
     hold off;
-    
-    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','best','Orientation','horizontal');
-    leg.Box = 'off';
-    leg.FontWeight = 'bold';
-    
+       
 end
 
 %% PLOT OUTCOMES BY MOUSE
