@@ -211,32 +211,57 @@ end
 %% STACKED BARS
 
 for m = 1:a.mouseCt
-    
-    for d = 1:a.mouseDayCt(m)
-        [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+    if a.mouseDayCt(m) > 3
+        for d = 1:a.mouseDayCt(m)
+            [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+        end
+
+        figure();
+        fig = gcf;
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [1 1 8 10];
+        set(fig,'renderer','painters')
+        set(fig,'PaperOrientation','landscape');
+
+        ax = nsubplot(1,1,1,1);
+        title(a.mouseList(m));
+        ax.FontSize = 10;
+        ylabel('Trial Outcomes (% of trials)');
+        xlabel('Day');
+        ax.YLim = [0 1];
+        ax.YTick = [0:0.25:1];
+        colormap(fig,CC);
+        bar(outcomeCounts,'stacked');
+        set(gca, 'ydir', 'reverse');
+        leg = legend(ax,a.outcomeLabels,'Location','eastoutside');
+        leg.Box = 'off';
+        leg.FontWeight = 'bold';
+    else
+        figure();
+        fig = gcf;
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [1 1 8 10];
+    %     set(fig,'PaperOrientation','landscape');
+        set(fig,'renderer','painters')
+        for d = 1:a.mouseDayCt(m)
+            ax = nsubplot(a.mouseDayCt(m),1,d,1);
+            if d==1
+            title(a.mouseList(m));       
+            end
+            ax.FontSize = 10;
+            [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+            bar([1:17],outcomeCounts);
+            plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+            plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
+            if d == ceil(a.mouseDayCt(m)/2)
+            ylabel('Trial Outcomes (% of trials)');
+            end
+            if d == a.mouseDayCt(m)
+                ax.XTick = [1:17];
+            set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
+            end
+        end
     end
-    
-    figure();
-    fig = gcf;
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [1 1 8 10];
-    set(fig,'renderer','painters')
-    set(fig,'PaperOrientation','landscape');
-    
-    ax = nsubplot(1,1,1,1);
-    title(a.mouseList(m));
-    ax.FontSize = 10;
-    ylabel('Trial Outcomes (% of trials)');
-    xlabel('Day');
-    ax.YLim = [0 1];
-    ax.YTick = [0:0.25:1];
-    colormap(fig,CC);
-    bar(outcomeCounts,'stacked');
-    set(gca, 'ydir', 'reverse');
-    leg = legend(ax,a.outcomeLabels,'Location','eastoutside');
-    leg.Box = 'off';
-    leg.FontWeight = 'bold';
-    
 end
 
 %% bar plot for each day
@@ -358,7 +383,7 @@ for m = 1:a.mouseCt
     figure();
     hold on;
     
-    if a.mouseDayCt(m) > 3
+    if a.mouseDayCt(m) >= 3
         CT = cbrewer('seq', 'Blues', a.mouseDayCt(m));
     else
         CT = ([0.419607843137255,0.682352941176471,0.839215686274510; 0.0313725490196078,0.188235294117647,0.419607843137255]);

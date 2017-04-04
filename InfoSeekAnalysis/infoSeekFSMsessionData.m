@@ -50,7 +50,7 @@ if newData == 1
 
         fname = fullfile(pathname,filename); % report
         dayPlace = strfind(filename,'_');
-
+        
         mouse = cellstr(filename(1:dayPlace-1));
         day = filename(dayPlace(1)+1:dayPlace(2)-1);
 
@@ -116,8 +116,12 @@ if newData == 1
         trialStarts = data(data(:,3) == 10,:);
         b.trialStart = data(data(:,3) == 10,:);
         
-        % + numFiles
-        b.fileAll(1:trialCt,1) = f;
+        % this needs to take into account existing files!
+        if loadData == 0
+            b.fileAll(1:trialCt,1) = f;
+        else
+            b.fileAll(1:trialCt,1) = f + a.numFiles;
+        end
         
         
 %% STATE TRANSITIONS (real time)
@@ -778,6 +782,8 @@ if newData == 1
             
         end
     end
+    
+    % only data
     if isfield(a,'files') == 0
         a.files = files;
         a.numFiles = numFiles;
