@@ -275,13 +275,13 @@ a.randSmallLickFlag = a.lickTrialType == 4 | a.lickTrialType == 8;
 for m = 1:a.mouseCt
     for d = 1:a.mouseDayCt(m)
         ok = a.lickMouse == m & a.lickDay == d;
-        a.infoBigLickProbDays{d,:,m} = histcounts(a.lickTime(a.infoBigLickFlag(ok)),a.timeBins);
+        a.infoBigLickProbDays{d,:,m} = histcounts(a.lickTime(a.infoBigLickFlag == 1 & ok),a.timeBins);
         a.infoBigLickProbDays{d,:,m} = cell2mat(a.infoBigLickProbDays(d,:,m))./a.typeSizesMouseDays(d,1,m);
-        a.infoSmallLickProbDays{d,:,m} = histcounts(a.lickTime(a.infoSmallLickFlag(ok)),a.timeBins);
+        a.infoSmallLickProbDays{d,:,m} = histcounts(a.lickTime(a.infoSmallLickFlag == 1 & ok),a.timeBins);
         a.infoSmallLickProbDays{d,:,m} = cell2mat(a.infoSmallLickProbDays(d,:,m))./a.typeSizesMouseDays(d,2,m);
-        a.randBigLickProbDays{d,:,m} = histcounts(a.lickTime(a.randBigLickFlag(ok)),a.timeBins);
+        a.randBigLickProbDays{d,:,m} = histcounts(a.lickTime(a.randBigLickFlag == 1 & ok),a.timeBins);
         a.randBigLickProbDays{d,:,m} = cell2mat(a.randBigLickProbDays(d,:,m))./a.typeSizesMouseDays(d,3,m);
-        a.randSmallLickProbDays{d,:,m} = histcounts(a.lickTime(a.randSmallLickFlag(ok)),a.timeBins);
+        a.randSmallLickProbDays{d,:,m} = histcounts(a.lickTime(a.randSmallLickFlag == 1 & ok),a.timeBins);
         a.randSmallLickProbDays{d,:,m} = cell2mat(a.randSmallLickProbDays(d,:,m))./a.typeSizesMouseDays(d,4,m);
     end
     
