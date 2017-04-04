@@ -15,6 +15,24 @@ purple = [121 32 196] ./ 255;
 orange = [251 139 6] ./ 255;
 cornflower = [100 149 237] ./ 255;
 
+CC = [0.2,0.2,0.2; %choice no choice
+    0.984313725490196,0.545098039215686,0.0235294117647059; %choice info big
+    1, 0.8, 0.0; %choice info small
+    1,0.8,0.8; %choice info NP
+    0.474509803921569,0.125490196078431,0.768627450980392; %choice rand big
+    0.9490, 0.8, 1.0; %choicerandsmall
+    0.8,0.8,0.8; %choicerandNP
+    0.6,0.6,0.6; %info no choice
+    0,1,0; %info big
+    1,0,1; %infosmall
+    1,0.8,0.8; %info not present
+    0.0,0.0,0.0; %infoincorrect
+    0.2,0.2,0.2;% rand no choice
+    0,0,1; %rand big
+    0,1,1; %rand small
+    0.8,0.8,0.8; %rand NP
+    0.0,0.0,0.0]; %rand incorrect
+
 a.outcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoSmall','ChoiceInfoNP','ChoiceRandBig',...
     'ChoiceRandSmall','ChoiceRandNP','InfoNoChoice','InfoBig','InfoSmall',...
     'InfoNP','InfoIncorrect','RandNoChoice','RandBig','RandSmall','RandNP',...
@@ -183,8 +201,45 @@ for m = 1:a.mouseCt
        
 end
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %% PLOT OUTCOMES BY MOUSE
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% STACKED BARS
+
+for m = 1:a.mouseCt
+    
+    for d = 1:a.mouseDayCt(m)
+        [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+    end
+    
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [1 1 8 10];
+    set(fig,'renderer','painters')
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    title(a.mouseList(m));
+    ax.FontSize = 10;
+    ylabel('Trial Outcomes (% of trials)');
+    xlabel('Day');
+    ax.YLim = [0 1];
+    ax.YTick = [0:0.25:1];
+    colormap(fig,CC);
+    bar(outcomeCounts,'stacked');
+    set(gca, 'ydir', 'reverse');
+    leg = legend(ax,a.outcomeLabels,'Location','eastoutside');
+    leg.Box = 'off';
+    leg.FontWeight = 'bold';
+    
+end
+
+%% bar plot for each day
 % for m = 1:a.mouseCt
 %     figure();
 %     fig = gcf;
@@ -201,7 +256,7 @@ end
 %         [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
 %         bar([1:17],outcomeCounts);
 %         plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-%         plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+%         plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
 %         if d == ceil(a.mouseDayCt(m)/2)
 %         ylabel('Trial Outcomes (% of trials)');
 %         end
@@ -212,6 +267,7 @@ end
 %     end
 % end
 
+%% OVERALL
 % for m=1:a.mouseCt 
 %     [outcomeCounts(m,:),outcomeBins(m,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
 % end
