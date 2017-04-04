@@ -55,9 +55,14 @@ if newData == 1
         day = filename(dayPlace(1)+1:dayPlace(2)-1);
 
         data = [];
-        data = csvread(fname,27,0);
-        sessionParams(:,f) = csvread(fname,1,1,[1,1,26,1]); % report           
-           
+        if csvread(fname,29,0,[29,0,29,0]) == 0
+            data = csvread(fname,29,0);
+            sessionParams(:,f) = csvread(fname,1,1,[1,1,28,1]); % report                       
+        else
+            data = csvread(fname,27,0);
+            sessionParams(:,f) = csvread(fname,1,1,[1,1,26,1]); % report           
+        end
+        
         b = struct;
 
         infoSide = sessionParams(5,f);
