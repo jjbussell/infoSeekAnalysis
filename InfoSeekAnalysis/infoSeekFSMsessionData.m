@@ -694,7 +694,12 @@ if newData == 1
         else
             a.fileAll = [a.fileAll; b.fileAll];
             a.file = [a.file; b.file];
-            a.parameters = [a.parameters; sessionParameters];
+            if size(sessionParameters,2) == size(a.parameters,2)
+                a.parameters = [a.parameters; sessionParameters];
+            else
+                a.parameters = [a.parameters num2cell(zeros(size(a.parameters,1),size(sessionParameters,2) - size(a.parameters,2)))];
+                a.parameters = [a.parameters; sessionParameters];
+            end
             a.trialCts = [a.trialCts trialCt];
             a.mouse = [a.mouse; repmat(mouse,b.corrTrialCt,1)];
             a.mouseAll = [a.mouseAll; repmat(mouse,trialCt,1)];
