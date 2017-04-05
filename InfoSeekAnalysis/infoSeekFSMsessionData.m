@@ -1,6 +1,5 @@
 %% TO FIX
 
-% a.fileAll uses file nums from current batch not total/cumulative!!
 % trials that get started but don't get to trialParams
 % (['JB167_2017-03-14_11h-05m-02s.csv'] orig)
 
@@ -60,7 +59,7 @@ if newData == 1
             sessionParams(:,f) = csvread(fname,1,1,[1,1,28,1]); % report                       
         else
             data = csvread(fname,27,0);
-            sessionParams(:,f) = csvread(fname,1,1,[1,1,26,1]); % report           
+            sessionParams(:,f) = [csvread(fname,1,1,[1,1,26,1]); 0; 0]; % report           
         end
         
         b = struct;
