@@ -1,10 +1,7 @@
 /*
  * 
  * --mouse can't lick both at once?
- * 
- * 
- * 
- * NEED TO CHANGE CHANNELS B/T 3,6 (bottom) and 4,8 (TOP) FOR LICKS!!!!!!!!!!!!!!!!!!
+
 
 PROBLEM WITH MARKING REWARD WHEN NOT IN PORT?--no?
 

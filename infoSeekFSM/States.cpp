@@ -170,8 +170,10 @@ void StateResponse::loop()
 //    Serial.print("rxn = ");
 //    Serial.println(rxn);
      // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
-    printer(11,choice,0);   
-    newTrial = 1;
+    printer(11,choice,0);
+    if (choice < 2) {   
+      newTrial = 1;
+    }
     flag_stop = 1;
 //    next_state = WAIT_FOR_ODOR;
   }
@@ -190,7 +192,9 @@ void StateResponse::loop()
 //    Serial.println(rxn);
      // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
     printer(11,choice,0);       
-    newTrial = 1;
+    if (choice < 2) {   
+      newTrial = 1;
+    }
     flag_stop = 1;
 //    next_state = WAIT_FOR_ODOR;   
   }
@@ -230,7 +234,9 @@ void StateGracePeriod::loop()
   //    Serial.println(rxn);
        // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
       printer(11,choice,0);          
-      newTrial = 1;
+      if (choice < 2) {   
+        newTrial = 1;
+      }
       flag_stop = 1;
     }
     else if (randFlag == 1){
@@ -247,7 +253,9 @@ void StateGracePeriod::loop()
   //    Serial.println(rxn);
        // REPORT THE RESPONSE AFTER ENTRY 0/1 = correct port, 2 = no choice, 3 = incorrect  
       printer(11,choice,0);           
-      newTrial = 1;
+      if (choice < 2) {   
+        newTrial = 1;
+      }
       flag_stop = 1;
     }
   }  
