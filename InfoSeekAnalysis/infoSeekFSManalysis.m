@@ -10,6 +10,20 @@ uiopen('.mat');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% old data
+
+prompt = {'Load data file? 1 = yes, 0 = no'};
+dlg_title = 'Load data?';
+num_lines = 1;
+defaultans = {'1'};
+loadData = inputdlg(prompt,dlg_title,num_lines,defaultans);
+loadData = str2num(cell2mat(loadData));
+
+if loadData == 1
+    [datafilename,datapathname]=uigetfile('*.mat', 'Choose processed data file to load');
+    fname=fullfile(datapathname,datafilename); 
+    load(fname); % opens structure "a" with previos data, if available
+end
 
 %% DAYS
 
@@ -155,7 +169,9 @@ for m = 1:a.mouseCt
         if sum(mouseInfoSideDiff) ~= 0        
 %             a.reverseFile(m,1) = max(find(mouseInfoSideDiff~=0)) + 1;
             a.reverseFile(m,1) = find(mouseInfoSideDiff~=0,1,'first') + 1;
-            a.prereverseFiles(fileSums(m) + a.reverseFile(m,1) : fileSums(m+1)) = 0;
+%             a.prereverseFiles(fileSums(m) + a.reverseFile(m,1) : fileSums(m+1)) = 0;
+            mouseFilesIdx = find(a.fileMouse == m);
+            a.prereverseFiles(mouseFilesIdx(a.reverseFile(m,1):end)) = 0;
             mouseFileDays = a.fileDay(a.fileMouse == m);
             a.reverseDay(m,1) = mouseFileDays(a.reverseFile(m,1));
         end
@@ -166,6 +182,54 @@ a.preReverse = ones(size(a.file,1),1);
 for t = 1:size(a.file,1)
     a.preReverse(t,1) = a.prereverseFiles(a.file(t));
 end
+
+%% CHOICES
+
+% NEED TO CHANGE TO PRE-REVERSAL
+
+for m = 1:a.mouseCt
+   ok = a.mice(:,m) & a.preReverse == 1;
+   a.choicebyMouse{m} = a.choiceCorr(ok == 1 & a.choiceTypeCorr == 1);
+   meanChoice(m,1) = mean(a.choicebyMouse{m});
+   meanChoice(m,2) = m;
+end
+
+a.meanChoice = meanChoice(:,1);
+
+%% SORT BY INFO PREFERENCE
+
+a.sortedChoice = sortrows(meanChoice,1);
+a.meanSortedChoice = a.sortedChoice(:,1);
+a.sortedMouseList = a.mouseList(a.sortedChoice(:,2));
+
+% sort mice by info preference 
+mouseOrder = a.sortedChoice(:,2);
+for m = 1:a.mouseCt
+    a.sortedMice(:,m) = a.mice(:,mouseOrder(m));
+end
+
+%% add old data
+if loadData == 1
+    oldMouseNums(:,1) = (1:size(b.sortedChoice,1))+a.mouseCt;
+    a.allTimeChoice = [a.sortedChoice; b.meanChoice oldMouseNums];
+    a.allTimeMouseList = [a.mouseList; b.mouseList];
+    a.allTimeMouseCt = size(a.sortedAllTimeChoice,1);
+    a.sortedAllTimeChoice = sortrows(a.allTimeChoice,1);
+    a.sortedAllTimeMouseList = a.allTimeMouseList(a.sortedAllTimeChoice(:,2));
+    icp_all = a.sortedAllTimeChoice(:,1)*100;
+    
+else
+    icp_all = a.sortedChoice(:,1)*100;
+end
+
+%% STATS
+
+% NEED TO CHANGE TO PRE-REVERSAL
+
+% icp_all = a.sortedChoice(:,1)*100;
+% icp_dayend = a.lastDay*100;
+overallP = signrank(icp_all-50);
+% lastDayP = signrank(icp_dayend-50);
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY
 

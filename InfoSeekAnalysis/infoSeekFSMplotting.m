@@ -7,6 +7,8 @@ a.mColors = [0 176 80; 255 0 0; 0 176 240; 112 48 160; 234 132 20; 255 255 0; 20
 a.mColors = a.mColors./255;
 
 a.mColors = linspecer(a.mouseCt);
+% sort plotting colors
+a.sortedColors = a.mColors(a.sortedChoice(:,2),:);
 
 dx = 0.2;
 dy = 0.02;
@@ -432,3 +434,53 @@ end
 %         end
 %     end
 % end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ALL MICE SUMMARIES
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% PLOT SORTED PREFERENCE BARS
+
+if a.mouseCt > 1
+    figure();
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 12;
+    ax.XTick = [1:a.mouseCt+1];
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.XTickLabel = [a.sortedMouseList; 'Mean'];
+    ax.YLim = [0 1];
+    for m = 1:a.mouseCt
+        bar(m,(a.sortedChoice(m,1)),'facecolor',a.sortedColors(m,:),'edgecolor','none');
+    end
+    bar(a.mouseCt + 1,mean(a.sortedChoice(:,1)),'facecolor','k','edgecolor','none');
+    errorbar(a.mouseCt + 1,mean(a.sortedChoice(:,1)),sem(a.sortedChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
+    ylabel('Info choice probability');
+    xlabel('Mouse');
+    hold off;   
+end
+
+%% PLOT ALL-TIME SORTED PREFERENCE BARS
+
+ca = linspecer(a.allTimeMouseCt);
+
+if a.mouseCt > 1
+    figure();
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 12;
+    ax.XTick = [1:a.allTimeMouseCt+1];
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.XTickLabel = [a.sortedAllTimeMouseList; 'Mean'];
+    ax.YLim = [0 1];
+    for m = 1:a.allTimeMouseCt
+        bar(m,a.sortedAllTimeChoice(m,1),'facecolor',ca(m,:),'edgecolor','none');
+    end
+    bar(a.allTimeMouseCt+1,mean(a.sortedAllTimeChoice(:,1)),'facecolor','k','edgecolor','none');
+    errorbar(a.allTimeMouseCt+1,mean(a.sortedAllTimeChoice(:,1)),sem(a.sortedAllTimeChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
+    ylabel('Info choice probability');
+    xlabel('All Mice');
+    hold off;   
+end
