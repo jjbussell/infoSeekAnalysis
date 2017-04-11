@@ -153,7 +153,8 @@ for m = 1:a.mouseCt
     if mouseFileCt(m,1) > 1
         mouseInfoSideDiff = diff(infoSide(a.fileMouse == m));
         if sum(mouseInfoSideDiff) ~= 0        
-            a.reverseFile(m,1) = max(find(mouseInfoSideDiff~=0)) + 1;    
+%             a.reverseFile(m,1) = max(find(mouseInfoSideDiff~=0)) + 1;
+            a.reverseFile(m,1) = find(mouseInfoSideDiff~=0,1,'first') + 1;
             a.prereverseFiles(fileSums(m) + a.reverseFile(m,1) : fileSums(m+1)) = 0;
             mouseFileDays = a.fileDay(a.fileMouse == m);
             a.reverseDay(m,1) = mouseFileDays(a.reverseFile(m,1));
