@@ -126,7 +126,7 @@ for m = 1:a.mouseCt
     
     ax = nsubplot(4,2,1,2);
 %     title(a.mouseList(m));
-    title(a.dayCell{find(a.fileMouse == m & a.fileDay == a.mouseDayCt(m))});
+    title(a.dayCell{find(a.fileMouse == m & a.fileDay == a.mouseDayCt(m),1,'first')});
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
@@ -220,7 +220,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% %% STACKED BARS
+%% STACKED BARS
 % 
 % for m = 1:a.mouseCt
 %     if a.mouseDayCt(m) > 3
@@ -277,7 +277,9 @@ end
 % end
 
     %% bar plot for each day
-for m = 1:a.mouseCt
+% for m = 1:a.mouseCt
+    
+for m = [5 7]    
     figure();
     fig = gcf;
     fig.PaperUnits = 'inches';
@@ -311,7 +313,7 @@ end
 
 
 %% PLOT MOST RECENT DAY'S LICKS
-%     
+%%     
 % for m = 1:a.mouseCt
 %     plotData = cell2mat(a.lickProbDays(:,:,m));
 %     d = a.mouseDayCt(m);
@@ -361,48 +363,48 @@ end
 %% LICK HISTOGRAMS / BINS BY DAY AND MOUSE
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for m = 1:a.mouseCt
-    plotData = cell2mat(a.lickProbDays(:,:,m));
-    
-    figure();
-    hold on;
-    
-    if a.mouseDayCt(m) >= 3
-%         CT = cbrewer('seq', 'Blues', a.mouseDayCt(m));
-        CT = linspecer(a.mouseDayCt(m),'blue');
-    else
-        CT = ([0.419607843137255,0.682352941176471,0.839215686274510; 0.0313725490196078,0.188235294117647,0.419607843137255]);
-    end
-    
-    for lp = 1:4            
-        ax = nsubplot(4,1,lp,1);
-        colormap(CT);
-        if lp == 1
-            title([char(a.mouseList{m}) ': Licks per Trial']);
-        end
-        ax.FontSize = 12;
-        xlim([0,a.maxBin*a.win]);
-        ylim([0,0.75]);
-        for d = 1:a.mouseDayCt(m) 
-            plot(bins,plotData((a.mouseDayCt(m)*(lp-1))+d,:),'color',CT(d,:))
-        end
-        plot(a.odorWait*[1 1],[0 100],'k','yliminclude','off');
-        plot((a.odorWait+200)*[1 1],[0 100],'k','yliminclude','off');
-        plot((a.rewardWait+100)*[1 1],[0 100],'k','yliminclude','off');
-        plot(a.rewardWait*[1 1],[0 100],'k','yliminclude','off');
-        if lp == 4
-            xlabel('Time from go cue');
-%             colorbar('southoutside')
-        end
-        ylabel(a.typeNames(lp));
-        hold off;
-    end
-end
+% for m = 1:a.mouseCt
+%     plotData = cell2mat(a.lickProbDays(:,:,m));
+%     
+%     figure();
+%     hold on;
+%     
+%     if a.mouseDayCt(m) >= 3
+% %         CT = cbrewer('seq', 'Blues', a.mouseDayCt(m));
+%         CT = linspecer(a.mouseDayCt(m),'blue');
+%     else
+%         CT = ([0.419607843137255,0.682352941176471,0.839215686274510; 0.0313725490196078,0.188235294117647,0.419607843137255]);
+%     end
+%     
+%     for lp = 1:4            
+%         ax = nsubplot(4,1,lp,1);
+%         colormap(CT);
+%         if lp == 1
+%             title([char(a.mouseList{m}) ': Licks per Trial']);
+%         end
+%         ax.FontSize = 12;
+%         xlim([0,a.maxBin*a.win]);
+%         ylim([0,0.75]);
+%         for d = 1:a.mouseDayCt(m) 
+%             plot(bins,plotData((a.mouseDayCt(m)*(lp-1))+d,:),'color',CT(d,:))
+%         end
+%         plot(a.odorWait*[1 1],[0 100],'k','yliminclude','off');
+%         plot((a.odorWait+200)*[1 1],[0 100],'k','yliminclude','off');
+%         plot((a.rewardWait+100)*[1 1],[0 100],'k','yliminclude','off');
+%         plot(a.rewardWait*[1 1],[0 100],'k','yliminclude','off');
+%         if lp == 4
+%             xlabel('Time from go cue');
+% %             colorbar('southoutside')
+%         end
+%         ylabel(a.typeNames(lp));
+%         hold off;
+%     end
+% end
 
  
 %% PLOT BY MOUSE AND DAY
 
-% 
+%% 
 % for m = 1:a.mouseCt
 %     plotData = cell2mat(a.lickProbDays(:,:,m));
 %     for d = 1:a.mouseDayCt(m)        

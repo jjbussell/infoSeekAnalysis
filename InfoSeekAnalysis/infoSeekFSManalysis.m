@@ -111,8 +111,8 @@ for m = 1:a.mouseCt
 end
 
 %%
-a.dayCell = a.parameters(:,3);
-a.miceCell = a.parameters(:,2);
+a.dayCell = a.parameters(:,3); % names
+a.miceCell = a.parameters(:,2); % names
 
 for m = 1:a.mouseCt
    mouseFileIdx = strcmp(a.miceCell,a.mouseList{m});
