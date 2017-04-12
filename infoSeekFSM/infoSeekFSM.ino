@@ -142,9 +142,9 @@ bool odorValveOpen;
 bool centerOdorValveOpen;
 
 //// IMAGING-move into library?
-int scopeTTLpulse;
-int lastTTL;
-int TTLcount;
+unsigned long scopeTTLpulse;
+unsigned long lastTTL;
+unsigned long TTLcount;
 
 
 //// FROM PYTHON--> these should also go into parameters file
