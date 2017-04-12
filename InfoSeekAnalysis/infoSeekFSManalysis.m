@@ -213,8 +213,8 @@ if loadData == 1
     oldMouseNums(:,1) = (1:size(b.sortedChoice,1))+a.mouseCt;
     a.allTimeChoice = [a.sortedChoice; b.meanChoice oldMouseNums];
     a.allTimeMouseList = [a.mouseList; b.mouseList];
-    a.allTimeMouseCt = size(a.sortedAllTimeChoice,1);
     a.sortedAllTimeChoice = sortrows(a.allTimeChoice,1);
+    a.allTimeMouseCt = size(a.sortedAllTimeChoice,1);
     a.sortedAllTimeMouseList = a.allTimeMouseList(a.sortedAllTimeChoice(:,2));
     icp_all = a.sortedAllTimeChoice(:,1)*100;
     

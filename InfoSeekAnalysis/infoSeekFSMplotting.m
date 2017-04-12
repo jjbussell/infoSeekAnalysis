@@ -481,6 +481,6 @@ if a.mouseCt > 1
     bar(a.allTimeMouseCt+1,mean(a.sortedAllTimeChoice(:,1)),'facecolor','k','edgecolor','none');
     errorbar(a.allTimeMouseCt+1,mean(a.sortedAllTimeChoice(:,1)),sem(a.sortedAllTimeChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
     ylabel('Info choice probability');
-    xlabel('All Mice');
+    xlabel('Mouse (all ever tested)');
     hold off;   
 end
