@@ -34,6 +34,10 @@ defaultans = {'1'};
 newData = inputdlg(prompt,dlg_title,num_lines,defaultans);
 newData = str2num(cell2mat(newData));
 
+for ff = 1:a.numFiles
+   names{ff} = a.files(ff).name; 
+end
+
 if newData == 1
     % select folder with new data file(s) to load
     pathname=uigetdir;
@@ -46,6 +50,15 @@ if newData == 1
 %% FOR EACH FILE
     for f = 1:numFiles
         filename = files(f).name;
+        
+        if sum(strcmp(filename,names)) > 0
+            disp(fprintf(['Skipping duplicate file ' filename]));
+            files(f) = [];
+            f = f+1;
+            filename = files(f).name;
+            numFiles = numFiles - 1;
+        end
+            
 
         fname = fullfile(pathname,filename); % report
         dayPlace = strfind(filename,'_');

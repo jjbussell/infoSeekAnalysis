@@ -12,15 +12,15 @@ uiopen('.mat');
 
 %% old data
 
-prompt = {'Load data file? 1 = yes, 0 = no'};
-dlg_title = 'Load data?';
+prompt = {'Load old data file? 1 = yes, 0 = no'};
+dlg_title = 'Load old data?';
 num_lines = 1;
 defaultans = {'1'};
 loadData = inputdlg(prompt,dlg_title,num_lines,defaultans);
 loadData = str2num(cell2mat(loadData));
 
 if loadData == 1
-    [datafilename,datapathname]=uigetfile('*.mat', 'Choose processed data file to load');
+    [datafilename,datapathname]=uigetfile('*.mat', 'Choose old data file to load');
     fname=fullfile(datapathname,datafilename); 
     load(fname); % opens structure "a" with previos data, if available
 end
