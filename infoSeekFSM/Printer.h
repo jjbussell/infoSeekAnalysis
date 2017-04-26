@@ -7,4 +7,6 @@ extern int trialCt;
 
 void printer (int, int, int);
 
+void printer1P (int, unsigned long);
+
 #endif

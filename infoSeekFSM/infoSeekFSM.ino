@@ -9,13 +9,13 @@ NO CHOICE INDICATED WHEN CHOOSES IN GRACE PERIOD?!?!?
 
 IMPROVEMENTS
 
---make com port and "box" based of a box variable!! in addition to touch sensors!
+--make com port and "box" based of a box variable!!
+--chatter communications --> STOP BUTTON
+--save mouse / session parameters
 --parse trials and report: type, odors, time to start, center dwell, center entries, rxn, choice/timeout/correct, licks, dwell, reward 
 --GUI to plot choices, correct, and control params
---chatter communications --> STOP BUTTON
 --python-based trial setting (scheduler and setter)
 --move main loop out of waiting for python
---save mouse / session parameters
 --move physical pins into library / params file
 --move imaging into library
 
@@ -613,7 +613,7 @@ void readTTL(){
   if (scopeTTLpulse == 1 && lastTTL == 0){
     TTLcount = TTLcount + scopeTTLpulse;
     scopeTTLpulse = TTLcount;
-    printer(20,TTLcount,0);
+    printer1P(20,TTLcount);
     lastTTL = 1;
     scopeTTLpulse = 0;
   }
