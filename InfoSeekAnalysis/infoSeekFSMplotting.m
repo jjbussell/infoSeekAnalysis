@@ -281,7 +281,7 @@ end
     %% bar plot for each day
 % for m = 1:a.mouseCt
     
-for m = [5 7]    
+for m = [9]    
     figure();
     fig = gcf;
     fig.PaperUnits = 'inches';
@@ -456,8 +456,8 @@ if a.mouseCt > 1
     for m = 1:a.mouseCt
         bar(m,(a.sortedChoice(m,1)),'facecolor',a.sortedColors(m,:),'edgecolor','none');
     end
-    bar(a.mouseCt + 1,mean(a.sortedChoice(:,1)),'facecolor','k','edgecolor','none');
-    errorbar(a.mouseCt + 1,mean(a.sortedChoice(:,1)),sem(a.sortedChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
+    bar(a.mouseCt + 1,nanmean(a.sortedChoice(:,1)),'facecolor','k','edgecolor','none');
+    errorbar(a.mouseCt + 1,nanmean(a.sortedChoice(:,1)),sem(a.sortedChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
     ylabel('Info choice probability');
     xlabel('Mouse');
     hold off;   
@@ -478,8 +478,8 @@ if a.mouseCt > 1
     for m = 1:a.allTimeMouseCt
         bar(m,a.sortedAllTimeChoice(m,1),'facecolor',ca(m,:),'edgecolor','none');
     end
-    bar(a.allTimeMouseCt+1,mean(a.sortedAllTimeChoice(:,1)),'facecolor','k','edgecolor','none');
-    errorbar(a.allTimeMouseCt+1,mean(a.sortedAllTimeChoice(:,1)),sem(a.sortedAllTimeChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
+    bar(a.allTimeMouseCt+1,nanmean(a.sortedAllTimeChoice(:,1)),'facecolor','k','edgecolor','none');
+    errorbar(a.allTimeMouseCt+1,nanmean(a.sortedAllTimeChoice(:,1)),sem(a.sortedAllTimeChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
     ylabel('Info choice probability');
     xlabel('Mouse (all ever tested)');
     hold off;   
