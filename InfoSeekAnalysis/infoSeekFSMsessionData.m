@@ -22,6 +22,10 @@ if loadData == 1
     [datafilename,datapathname]=uigetfile('*.mat', 'Choose processed data file to load');
     fname=fullfile(datapathname,datafilename); 
     load(fname); % opens structure "a" with previos data, if available
+    
+    for ff = 1:a.numFiles
+        names{ff} = a.files(ff).name; 
+    end
 end
 
 %% LOAD NEW DATA
@@ -34,9 +38,7 @@ defaultans = {'1'};
 newData = inputdlg(prompt,dlg_title,num_lines,defaultans);
 newData = str2num(cell2mat(newData));
 
-for ff = 1:a.numFiles
-   names{ff} = a.files(ff).name; 
-end
+
 
 if newData == 1
     % select folder with new data file(s) to load
@@ -51,14 +53,15 @@ if newData == 1
     for f = 1:numFiles
         filename = files(f).name;
         
-        if sum(strcmp(filename,names)) > 0
-            disp(fprintf(['Skipping duplicate file ' filename]));
-            files(f) = [];
-            f = f+1;
-            filename = files(f).name;
-            numFiles = numFiles - 1;
-        end
-            
+        if loadData == 1
+            if sum(strcmp(filename,names)) > 0
+                disp(fprintf(['Skipping duplicate file ' filename]));
+                files(f) = [];
+                f = f+1;
+                filename = files(f).name;
+                numFiles = numFiles - 1;
+            end
+        end    
 
         fname = fullfile(pathname,filename); % report
         dayPlace = strfind(filename,'_');
