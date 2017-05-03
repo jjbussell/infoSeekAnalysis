@@ -156,7 +156,8 @@ if newData == 1
     % Pull imaging frame timestamps
     b.images = [];
     b.images = data(data(:,3) == 20, 1);
-        
+    b.images = [zeros(size(b.images,1),1) b.images];
+    b.images(:,1) = ff;    
         
 %% STATE TRANSITIONS (real time)
 
