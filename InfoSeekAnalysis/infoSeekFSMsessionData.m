@@ -163,7 +163,7 @@ if newData == 1
         transitions = [];
         transitions = data(data(:,3) == 22,:);
         transitions = [zeros(size(transitions,1),1) transitions];
-        transitions(:,1) = f;
+        transitions(:,1) = ff;
         
 % These changed when states changed!
 % FIRST
@@ -220,10 +220,10 @@ if newData == 1
         exits = data(data(:,3) == 6,:);
         
         entries = [zeros(size(entries,1),1) entries];
-        entries(:,1) = f;
+        entries(:,1) = ff;
         
         exits = [zeros(size(exits,1),1) exits];
-        exits(:,1) = f;        
+        exits(:,1) = ff;        
         
         centerEntries = entries(entries(:,5) == 4,:);
         rewardEntries = entries(entries(:,5) ~= 4,:);
@@ -258,13 +258,13 @@ if newData == 1
         % maybe this is counterproductive? Added to create gocue where
         % there is none, but maybe it's bad?
         if size(b.goCue,1) < trialCt
-            b.goCue = [b.goCue; [f totalTime trialCt 0 0]];
+            b.goCue = [b.goCue; [ff totalTime trialCt 0 0]];
         end
         b.goParams = data(data(:,3) == 1, :);
         b.goParams = [zeros(size(b.goParams,1),1) b.goParams];
-        b.goParams(:,1) = f;        
+        b.goParams(:,1) = ff;        
         if size(b.goParams,1) < trialCt
-            b.goParams = [b.goParams; [f totalTime trialCt 0 0 0]];
+            b.goParams = [b.goParams; [ff totalTime trialCt 0 0 0]];
         end        
         
 %% CHOICE
@@ -278,7 +278,7 @@ if newData == 1
         b.choseTrialCt = sum(b.chose);
         
         b.choice = nan(trialCt,4);
-        b.choice(:,1) = f; 
+        b.choice(:,1) = ff; 
         b.choice(:,3) = b.trialNums;
         b.choice(b.chose,[2 4]) = b.choices(:,[1 3]);
         b.choice(~b.chose,4) = 2;
@@ -306,9 +306,9 @@ if newData == 1
 %% CENTER ENTRY FIRST AND FOR GO CUE
         
         for r = 1:trialCt
-            b.centerEntryGo(r,1) = f;
-            b.centerExitGo(r,1) = f;
-            b.centerEntryCt(r,1) = f;
+            b.centerEntryGo(r,1) = ff;
+            b.centerExitGo(r,1) = ff;
+            b.centerEntryCt(r,1) = ff;
             
             if size(b.goCue,1) >= trialCt % if there is a complete center entry in that trial
                 centerEntryGoDiff =  b.goCue(r,2) - b.centerEntries(:,2); % find entry just before go cue
@@ -341,7 +341,7 @@ if newData == 1
                 b.centerEntryFirst(r,:) = b.centerEntries(centerEntryFirstIdx,:);
                 b.centerEntries(centerEntryFirstIdx,3) = r;
             else
-                b.centerEntryFirst(r,:) = [f totalTime r 0 0 0 0 0];
+                b.centerEntryFirst(r,:) = [ff totalTime r 0 0 0 0 0];
             end
             
             b.centerEntryCt(r,2) = sum(b.centerEntries(:,3) == r);            
@@ -352,7 +352,7 @@ if newData == 1
 
         b.centerDwell = b.centerExitGo(:,2) - b.centerEntryGo(:,2);
         b.centerDwell = [zeros(size(b.centerDwell,1),1) b.centerDwell];
-        b.centerDwell(:,1) = f;
+        b.centerDwell(:,1) = ff;
         
         b.centerEntryGoCorr = b.centerEntryGo(b.correct,:);
                 
@@ -387,39 +387,39 @@ if newData == 1
         b.centerOdorOff = data(data(:,3) == 5 & data(:,5) == 0,:);
 
         b.centerOdorOn = [zeros(size(b.centerOdorOn,1),1) b.centerOdorOn];
-        b.centerOdorOn(:,1) = f; 
+        b.centerOdorOn(:,1) = ff; 
         b.centerOdorOff = [zeros(size(b.centerOdorOff,1),1) b.centerOdorOff];
-        b.centerOdorOff(:,1) = f;
+        b.centerOdorOff(:,1) = ff;
 
         b.sideOdorOn = data(data(:,3) == 3 & data(:,5) == 1,:);
         b.sideOdorOff = data(data(:,3) == 5 & data(:,5) == 1,:);
         b.sideOdorOn = [zeros(size(b.sideOdorOn,1),1) b.sideOdorOn];
-        b.sideOdorOn(:,1) = f;
+        b.sideOdorOn(:,1) = ff;
         b.sideOdorOff = [zeros(size(b.sideOdorOff,1),1) b.sideOdorOff];
-        b.sideOdorOff(:,1) = f;
+        b.sideOdorOff(:,1) = ff;
 
 %% TRIAL PARAMS
     
         b.trialParams = data(data(:,3) == 17, :);
         b.trialParams = [zeros(size(b.trialParams,1),1) b.trialParams];
-        b.trialParams(:,1) = f;
+        b.trialParams(:,1) = ff;
                
 %% REWARD
 
         b.bigRewards = data(data(:,3) == 15,:); % trial type, choice (1 = info, 0 = rand)
         b.smallRewards = data(data(:,3) == 16,:); % trial type, choice
         b.bigRewards = [zeros(size(b.bigRewards,1),1) b.bigRewards];
-        b.bigRewards(:,1) = f;
+        b.bigRewards(:,1) = ff;
         b.smallRewards = [zeros(size(b.smallRewards,1),1) b.smallRewards];
-        b.smallRewards(:,1) = f;
-        b.bigRewardCt(f,1) = size(b.bigRewards,1); % report
-        b.smallRewardCt(f,1) = size(b.smallRewards,1); % report
-        b.rewardCts(f,1) = b.bigRewardCt(f,1) + b.smallRewardCt(f,1); % report
-        b.bigRewardTime(f,1) = sessionParams(19,f);
-        b.smallRewardTime(f,1) = sessionParams(20,f);
-        b.bigReward(f,1) = (b.bigRewardTime(f,1) * 40)/1000;
-        b.smallReward(f,1) = (b.smallRewardTime(f,1) * 40)/1000;
-        b.rewardAmount(f,1) = b.bigRewardCt(f,1) * (b.bigRewardTime(f,1) * 40)/1000 + b.smallRewardCt(f,1) * (b.smallRewardTime(f,1) * 40)/1000; % report
+        b.smallRewards(:,1) = ff;
+        b.bigRewardCt = size(b.bigRewards,1); % report
+        b.smallRewardCt = size(b.smallRewards,1); % report
+        b.rewardCts = b.bigRewardCt + b.smallRewardCt; % report
+        b.bigRewardTime = sessionParams(19,f);
+        b.smallRewardTime = sessionParams(20,f);
+        b.bigReward = (b.bigRewardTime * 40)/1000;
+        b.smallReward = (b.smallRewardTime * 40)/1000;
+        b.rewardAmount = b.bigRewardCt * (b.bigRewardTime * 40)/1000 + b.smallRewardCt * (b.smallRewardTime * 40)/1000; % report
         
 %% REWARD TYPES
         
@@ -429,8 +429,8 @@ if newData == 1
         b.small = ismember(b.trialNums,b.smallRewards(:,3));
         
         b.reward = zeros(trialCt,1);
-        b.reward(b.big) = b.bigReward(f,1);
-        b.reward(b.small) = b.smallReward(f,1);
+        b.reward(b.big) = b.bigReward;
+        b.reward(b.small) = b.smallReward;
         b.reward = b.reward(b.correct);
 
 %% WATER
@@ -439,9 +439,9 @@ if newData == 1
         b.waterOff = data(data(:,3) == 8, [1 2]);
 
         b.waterOn = [zeros(size(b.waterOn,1),1) b.waterOn];
-        b.waterOn(:,1) = f;
+        b.waterOn(:,1) = ff;
         b.waterOff = [zeros(size(b.waterOff,1),1) b.waterOff];
-        b.waterOff(:,1) = f;        
+        b.waterOff(:,1) = ff;        
         
 %% TRIAL LENGTH
 
@@ -616,7 +616,7 @@ if newData == 1
         b.licks = [];
         b.licks = data(data(:,3) == 4 & data(:,4) > 0,[1 2 4]);        
         b.licks = [zeros(size(b.licks,1),1) b.licks];
-        b.licks(:,1) = f;
+        b.licks(:,1) = ff;
         b.licks(:,5:13) = 0; % preallocate
         
         for l = 1:size(b.licks,1)
@@ -730,6 +730,7 @@ if newData == 1
                 a.parameters = [a.parameters; sessionParameters];
             end
             a.trialCts = [a.trialCts trialCt];
+            a.images = [a.images; b.images];
             a.mouse = [a.mouse; repmat(mouse,b.corrTrialCt,1)];
             a.mouseAll = [a.mouseAll; repmat(mouse,trialCt,1)];
             a.trialNums = [a.trialNums; b.trialNums];
