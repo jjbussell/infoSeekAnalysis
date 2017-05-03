@@ -1,5 +1,7 @@
 %% TO FIX
 
+% f is not the cumulative File Number!!!!!!!!!!!!!!!!!!
+
 % trials that get started but don't get to trialParams
 % (['JB167_2017-03-14_11h-05m-02s.csv'] orig)
 
@@ -23,8 +25,8 @@ if loadData == 1
     fname=fullfile(datapathname,datafilename); 
     load(fname); % opens structure "a" with previos data, if available
     
-    for ff = 1:a.numFiles
-        names{ff} = a.files(ff).name; 
+    for fn = 1:a.numFiles
+        names{fn} = a.files(fn).name; 
     end
 end
 
@@ -61,7 +63,13 @@ if newData == 1
                 filename = files(f).name;
                 numFiles = numFiles - 1;
             end
-        end    
+            
+            ff = a.numFiles + f;
+            
+        else
+            ff = f;
+        end
+        
 
         fname = fullfile(pathname,filename); % report
         dayPlace = strfind(filename,'_');
@@ -142,6 +150,12 @@ if newData == 1
         else
             b.fileAll(1:trialCt,1) = f + a.numFiles;
         end
+
+%% IMAGING
+
+    % Pull imaging frame timestamps
+    b.images = [];
+    b.images = data(data(:,3) == 20, 1);
         
         
 %% STATE TRANSITIONS (real time)
