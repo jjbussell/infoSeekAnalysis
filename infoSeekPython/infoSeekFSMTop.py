@@ -36,7 +36,7 @@ def num(s):
 mouse = 'JB172'
 sessionEnd = '3'
 sessionTrials = '1000000'
-sessionTime = '1000000000'
+imageFlag = '0'
 trialTypes = '5' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = all three
 infoSide = '1' #For now control1 goes to left port (looking from inside box), as do odors 0-2==INFO
 infoOdor = '1'
@@ -68,7 +68,7 @@ touch_left = '8'
 ###############################################################
 # parameters in a list
 
-parameters = [mouse, sessionEnd, sessionTrials, sessionTime,
+parameters = [mouse, sessionEnd, sessionTrials, imageFlag,
               trialTypes, infoSide,
               infoOdor, randOdor, choiceOdor,
               odorA, odorB, odorC, odorD, centerDelay,
@@ -99,7 +99,7 @@ sys.stdout.flush()
 # String of parameters and labels
 sessionParams = ('Mouse,' + fyle[0] + ",\nSession End," +
                  fyle[1] + ',\nTrials in Session,' + fyle[2] + 
-                 ',\nTime in Session,' + fyle[3] + ',\nTrial Types,' 
+                 ',\nImaging Flag,' + fyle[3] + ',\nTrial Types,' 
                  + fyle[4] + ',\nInfo Side,' + fyle[5]
                  + ',\nInfo Odor,' + fyle[6]
                  + ',\nRand Odor,' + fyle [7] + ',\nChoice Odor,'
