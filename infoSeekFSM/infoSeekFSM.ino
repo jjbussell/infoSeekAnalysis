@@ -145,13 +145,14 @@ bool centerOdorValveOpen;
 unsigned long scopeTTLpulse;
 unsigned long lastTTL;
 unsigned long TTLcount;
-
+int image;
+unsigned long lastImageChange;
 
 //// FROM PYTHON--> these should also go into parameters file
 
 int sessionEnd; // trigger to end session: 1 = manual, 2 = # of trials, 3 = time
 int sessionTrials; // # of trials after which to end session
-unsigned long sessionTime; // time after which to end session (seconds)
+int imageFlag; // 1 = image, 0 = no imaging
 int trialTypes; // 1 if all choice, 2 all info, 3 all random, 4 all forced, 5 mixed, 6 biased
 int infoSide; // 0 = left, 1 = right
 
@@ -258,7 +259,7 @@ void loop() {
       //read the parameter values sent from the python GUI
       sessionEnd        =        Serial.parseInt();
       sessionTrials     =        Serial.parseInt();
-      sessionTime       =        Serial.parseInt();
+      imageFlag         =        Serial.parseInt();
       trialTypes        =        Serial.parseInt();
       infoSide          =        Serial.parseInt();
       infoOdor          =        Serial.parseInt();
@@ -284,8 +285,6 @@ void loop() {
       REL_THRESH        =        Serial.parseInt();
       touch_right       =        Serial.parseInt();
       touch_left        =        Serial.parseInt();
-
-      sessionTime = sessionTime * 1000; // convert to ms
 
       unsigned long entryThreshold = 20;
       
@@ -328,7 +327,12 @@ void loop() {
 
       printer(0, 0, 0);
 
-      digitalWrite(arduScope, LOW); //start imaging
+      if (imageFlag == 1){
+          digitalWrite(arduScope, LOW); //start imaging
+          image = 1;
+          lastImageChange = startTime;
+      }
+
 
 //      Serial.println("session start");
 
@@ -401,7 +405,22 @@ void loop() {
           } 
 
         //// CHECK FOR IMAGING /////////////////////
-        readTTL();
+        // CHANGE HERE TO CHANGE TIME!!
+        if (currentTime >= lastImageChange + 300000 & imageFlag == 1){
+          if (image == 1){
+            image = 0;            
+          }
+          else {
+            image = 1;
+          }
+          lastImageChange = currentTime;
+        }
+
+
+        
+        if (image == 1){
+          readTTL();
+        }
 
         //// WATCH PORTS
         //// MOVE TO FUNCTIONS/LIBRARY
