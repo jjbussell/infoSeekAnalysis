@@ -408,10 +408,12 @@ void loop() {
         // CHANGE HERE TO CHANGE TIME!!
         if (currentTime >= lastImageChange + 300000 & imageFlag == 1){
           if (image == 1){
-            image = 0;            
+            image = 0;
+            digitalWrite(arduScope, HIGH);            
           }
           else {
             image = 1;
+            digitalWrite(arduScope, LOW);
           }
           lastImageChange = currentTime;
         }
