@@ -634,7 +634,7 @@ void readTTL(){
   if (scopeTTLpulse == 1 && lastTTL == 0){
     TTLcount = TTLcount + scopeTTLpulse;
     scopeTTLpulse = TTLcount;
-    printer1P(20,TTLcount);
+    printer1P(20,TTLcount,0);
     lastTTL = 1;
     scopeTTLpulse = 0;
   }

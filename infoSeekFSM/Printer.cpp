@@ -11,10 +11,10 @@ void printer (int event, int param, int correct) {
   Serial.println(dataLog);
 }
 
-void printer1P (int event, unsigned long frame) {
+void printer1P (int event, unsigned long frame, int blank) {
   currentTime = millis() - startTime; //get the current time in this session
   String comma = ",";
-  String dataLog = currentTime + comma + trialCt + comma + event + comma + frame;
+  String dataLog = currentTime + comma + trialCt + comma + event + comma + frame + comma + blank;
 
   Serial.println(dataLog);  
 }
