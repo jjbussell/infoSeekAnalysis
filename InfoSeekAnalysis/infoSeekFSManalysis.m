@@ -1,7 +1,7 @@
-% clear;
-% close all;
-% 
-% uiopen('.mat');
+clear;
+close all;
+
+uiopen('.mat');
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,7 +22,7 @@ loadData = str2num(cell2mat(loadData));
 if loadData == 1
     [datafilename,datapathname]=uigetfile('*.mat', 'Choose old data file to load');
     fname=fullfile(datapathname,datafilename); 
-    load(fname); % opens structure "a" with previos data, if available
+    load(fname); % opens structure "b" with previous data, if available
 end
 
 %% DAYS
@@ -45,8 +45,8 @@ a.dayAll = a.fileDays(a.fileAll);
 
 %% TRIAL COUNTS
 
-a.allTrialCt = size(a.trialNums,1);
-a.allCorrTrialCt = size(a.corrTrials,1);
+a.allTrialCt = size(a.fileAll,1);
+a.allCorrTrialCt = size(a.file,1);
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -183,6 +183,12 @@ for t = 1:size(a.file,1)
     a.preReverse(t,1) = a.prereverseFiles(a.file(t));
 end
 
+%% INFOSIDE
+
+for i = 1:size(a.file,1)
+   a.infoSide(i,1) = a.files(a.file(i)).infoSide;  
+end
+
 %% CHOICES
 
 % NEED TO CHANGE TO PRE-REVERSAL
@@ -208,7 +214,8 @@ for m = 1:a.mouseCt
     a.sortedMice(:,m) = a.mice(:,mouseOrder(m));
 end
 
-%% add old data
+%% add old data from chosen file
+
 if loadData == 1
     oldMouseNums(:,1) = (1:size(b.sortedChoice,1))+a.mouseCt;
     a.allTimeChoice = [a.sortedChoice; b.meanChoice oldMouseNums];
