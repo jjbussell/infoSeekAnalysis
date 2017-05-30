@@ -404,9 +404,17 @@ uisave({'a'},'infoSeekFSMDataAnalyzedComplete.mat');
 
 %% ETHAN ANALYSIS
 
+% need choice of init info side (1 if chose init info, 0 if chose init
+% noInfo)
+
+% then, 1 if infoSide = init info, -1 if not. 1 for side. then analyze by
+% mouse.
+
+% for licks, need # early licks per trial, whether pre or post rev, init
+% info side?
+
 for m = 1:mouseCt
     % initial info side
-    IIS(m) =  
-    ok = a.mouse == m & a.preReverse == 1;
-    mean(a.earlyLicks(ok))
+    a.mouseList(m);
+    IIS(m) =  a.files.infoSide(a.files.mouseName);
 end
