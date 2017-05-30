@@ -1,3 +1,12 @@
+% add all mice aligned to reverse day & MEAN + error
+% add all mice aligned to reverse day, trial-by-trial/sliding window
+% all mice pre-reverse aligned to start & MEAN + error
+% all mice pre-reverse aligned to start, trial-by-trial/sliding window
+% Ethan's early lick index 
+% Ethan's logit--choice, infoside, prereverse, trial type
+% table
+
+
 clear;
 close all;
 
