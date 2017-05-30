@@ -20,8 +20,8 @@ uiopen('.mat'); % pulls in data structure "a" with current data
 
 %% old data in structure "b"
 
-prompt = {'Load old data file? 1 = yes, 0 = no'};
-dlg_title = 'Load old data?';
+prompt = {'Load old preFSM data file? 1 = yes, 0 = no'};
+dlg_title = 'Load preFSM data?';
 num_lines = 1;
 defaultans = {'1'};
 loadData = inputdlg(prompt,dlg_title,num_lines,defaultans);
@@ -32,12 +32,48 @@ if loadData == 1
     fname=fullfile(datapathname,datafilename); 
     load(fname); % opens structure "b" with previous data, if available
     
-    b.parameters = [b.allSummary(:,1:30) cell(size(b.allSummary,1),1) b.allSummary(:,31)];
+    c = b;
+    clear b;
+    b = a;
+    clear a;    
     
-    a.parameters = [a.parameters; b.parameters];
-    a.filesAll.day = [a.files.day; b.files.day];
+    c.parameters = [c.allSummary(:,1:30) cell(size(c.allSummary,1),1) c.allSummary(:,31)];   
+    a.parameters = [b.parameters; c.parameters];
     
+    a.numFiles = size(a.parameters,1);    
+
+    f1 = struct2cell(b.files); f2 = struct2cell(c.files);    
+    fileNames = [f1(1,:) f2(1,:)];
+    infoSides = [f1(10,:) f2(9,:)];
+    mouseNames = [f1(8,:) f2(7,:)];
+    daysFromFiles = [f1(7,:) f2(6,:)];
+    e = [fileNames;infoSides;mouseNames;daysFromFiles];
+    fn = {'name';'infoSide';'mouseName';'day'};
+    a.files = cell2struct(e,fn,1);
+
+    a.fileAll = [b.fileAll; c.fileAll + b.numFiles];
+    a.correct = [b.correct; c.correctAll];     
+    a.infoForced = [b.infoForced; c.infoForced];
+    a.randForced = [b.randForced; c.randForced];
+    a.choiceTrials = [b.choiceTrials; c.choice];    
+    a.file = [b.file; c.file + b.numFiles]; 
+    a.type = [b.type; c.type];
+    a.mouse = [b.mouse; c.mouse];
+    a.mouseAll = [b.mouseAll; c.mouseAll];
+    a.choiceCorr = [b.choiceCorr; c.info];
+    a.choiceTypeCorr = [b.choiceTypeCorr; c.trialType];
+        c.rxn = c.firstRewardEntry - c.goCue;
+        c.rxn(c.firstRewardEntry == 0) = NaN;
+    a.rxn  = [b.rxn(b.correct); c.rxn];
+    a.odor2 = [b.trialParams(:,6); c.odor2];
+    a.reward = [b.reward; c.reward];
+    a.trialLength = [b.trialLength(b.correct); c.trialLength];
+    a.anticipatoryLicks = [b.anticipatoryLicks; c.anticipatoryLicks];
+    a.betweenLicks = [b.betweenLicks; c.betweenLicks];
+    a.earlyLicks = [b.earlyLicks; c.earlyLicks];
+    a.waterLicks = [b.waterLicks; c.waterLicks];
     
+    clear b; clear c;
 end
 
 %% DAYS
@@ -48,11 +84,11 @@ days = a.parameters(:,3);
 days = unique(days);
 % assign numeric day to each file
 for s = 1:size(a.parameters,1)
-   a.parameters{s,30} = find(ismember(days,a.parameters{s,3})); 
-   a.files(s).day =a.parameters{s,30};
+   a.parameters{s,33} = find(ismember(days,a.parameters{s,3})); 
+   a.files(s).day = a.parameters{s,33};
 end
 
-a.fileDays = cell2mat(a.parameters(:,30));
+a.fileDays = cell2mat(a.parameters(:,33));
 
 a.day = a.fileDays(a.file);
 a.dayAll = a.fileDays(a.fileAll);
@@ -60,8 +96,8 @@ a.dayAll = a.fileDays(a.fileAll);
 
 %% TRIAL COUNTS
 
-a.allTrialCt = size(a.fileAll,1);
-a.allCorrTrialCt = size(a.file,1);
+a.trialCt = size(a.fileAll,1);
+a.corrTrialCt = size(a.file,1);
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -72,11 +108,6 @@ a.allCorrTrialCt = size(a.file,1);
 a.choiceTypeNames = {'InfoForced','RandForced','Choice'};
 a.choiceTypeCts = [sum(a.infoForced) sum(a.randForced) sum(a.choiceTrials)];
 
-% figure();
-% bar(a.choiceTypeCts);
-% title(mouse);
-% set(gca, 'XTickLabel',a.choiceTypeNames);
-% ylabel('Trial Counts');
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -90,15 +121,9 @@ a.randSmall = a.type == 4 | a.type == 8;
 a.typeNames = {'Info Water','Info None','Rand Water','Rand None'};
 a.typeSizes = [sum(a.infoBig) sum(a.infoSmall) sum(a.randBig) sum(a.randSmall)];
 
-% figure();
-% bar(a.typeSizes);
-% title(mouse);
-% set(gca, 'XTickLabel',a.typeNames);
-% ylabel('Correct Trial Counts');
-
 a.choiceCorrTrials = a.type < 5;
 a.forcedCorrTrials = a.type > 4;
-a.infoCorrTrials = a.choi4ceCorr == 1;
+a.infoCorrTrials = a.choiceCorr == 1;
 a.randCorrTrials = a.choiceCorr == 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,11 +145,10 @@ a.choiceTypeCtsCorr = [sum(a.infoForcedCorr) sum(a.randForcedCorr) sum(a.infoCho
 
 % by trial type
 
-a.rxnCorr = a.rxn(a.correct);
-a.rxnInfoForcedCorr = a.rxnCorr(a.infoForcedCorr);
-a.rxnInfoChoiceCorr = a.rxnCorr(a.infoChoiceCorr);
-a.rxnRandForcedCorr = a.rxnCorr(a.randForcedCorr);
-a.rxnRandChoiceCorr = a.rxnCorr(a.randChoiceCorr);
+a.rxnInfoForcedCorr = a.rxn(a.infoForcedCorr);
+a.rxnInfoChoiceCorr = a.rxn(a.infoChoiceCorr);
+a.rxnRandForcedCorr = a.rxn(a.randForcedCorr);
+a.rxnRandChoiceCorr = a.rxn(a.randChoiceCorr);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -206,7 +230,7 @@ end
 
 %% CHOICES
 
-% NEED TO CHANGE TO PRE-REVERSAL
+a.allTimePreReverseChoice = mean(a.choiceCorr(a.preReverse == 1));
 
 for m = 1:a.mouseCt
    ok = a.mice(:,m) & a.preReverse == 1;
@@ -229,29 +253,10 @@ for m = 1:a.mouseCt
     a.sortedMice(:,m) = a.mice(:,mouseOrder(m));
 end
 
-%% add old data from chosen file
-
-if loadData == 1
-    oldMouseNums(:,1) = (1:size(b.sortedChoice,1))+a.mouseCt;
-    a.allTimeChoice = [a.sortedChoice; b.meanChoice oldMouseNums];
-    a.allTimeMouseList = [a.mouseList; b.mouseList];
-    a.sortedAllTimeChoice = sortrows(a.allTimeChoice,1);
-    a.allTimeMouseCt = size(a.sortedAllTimeChoice,1);
-    a.sortedAllTimeMouseList = a.allTimeMouseList(a.sortedAllTimeChoice(:,2));
-    icp_all = a.sortedAllTimeChoice(:,1)*100;
-    
-else
-    icp_all = a.sortedChoice(:,1)*100;
-end
-
 %% STATS
 
-% NEED TO CHANGE TO PRE-REVERSAL
-
-% icp_all = a.sortedChoice(:,1)*100;
-% icp_dayend = a.lastDay*100;
+icp_all = a.sortedChoice(:,1)*100;
 overallP = signrank(icp_all-50);
-% lastDayP = signrank(icp_dayend-50);
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY
 
@@ -274,12 +279,12 @@ for f = 1:a.numFiles
     a.odorD(f,1) = cell2mat(a.parameters(f,15));   
 end
 
-for t = 1:a.allCorrTrialCt
+for t = 1:a.corrTrialCt
     trialFile = a.file(t);
-    a.odorAtrials(t,1) = a.trialParams(t,6) == a.odorA(trialFile);
-    a.odorBtrials(t,1) = a.trialParams(t,6) == a.odorB(trialFile);
-    a.odorCtrials(t,1) = a.trialParams(t,6) == a.odorC(trialFile);
-    a.odorDtrials(t,1) = a.trialParams(t,6) == a.odorD(trialFile);
+    a.odorAtrials(t,1) = a.odor2(t) == a.odorA(trialFile);
+    a.odorBtrials(t,1) = a.odor2(t) == a.odorB(trialFile);
+    a.odorCtrials(t,1) = a.odor2(t) == a.odorC(trialFile);
+    a.odorDtrials(t,1) = a.odor2(t) == a.odorD(trialFile);
 end
 
 for m = 1:a.mouseCt
@@ -325,57 +330,6 @@ for m = 1:a.mouseCt
 end
 
 
-%% LICKS OVER TIME % only for FSM-based mice
-
-a.win = 50;
-
-% % time before odor on
-% odorWait = files(f).centerDelay + files(f).centerOdorTime + ...
-%     files(f).startDelay + 50 + files(f).odorDelay;
-% % time before reward starts
-% rewardWait = odorWait + files(f).odorTime + files(f).rewardDelay;
-
-a.odorWait = 50 + 2000;
-a.rewardWait = a.odorWait + 200 + 2000;
-a.maxTimeToLick = 10000;
-a.maxBin = ceil(a.maxTimeToLick/a.win);
-
-a.timeBins = (0:a.win:a.maxBin*a.win);
-
-a.lickTrial = a.corrLicks(:,3);
-a.lickFile = a.corrLicks(:,1);
-a.lickTime = a.corrLicks(:,13);
-
-% IS THIS WHAT'S INCORRECT?? from a.corrLicks, find each trial and its type
-a.lickTrialType = a.corrLicks(:,11);
-
-for ll = 1:size(a.lickFile,1)
-    a.lickMouse(ll,1) = a.fileMouse(a.lickFile(ll));
-    a.lickDay(ll,1) = a.fileDay(a.lickFile(ll));     
-end
-
-a.infoBigLickFlag = a.lickTrialType == 1 | a.lickTrialType == 5;
-a.infoSmallLickFlag = a.lickTrialType == 2 | a.lickTrialType == 6;
-a.randBigLickFlag = a.lickTrialType == 3 | a.lickTrialType == 7;
-a.randSmallLickFlag = a.lickTrialType == 4 | a.lickTrialType == 8;
- 
-for m = 1:a.mouseCt
-    for d = 1:a.mouseDayCt(m)
-        ok = a.lickMouse == m & a.lickDay == d;
-        a.infoBigLickProbDays{d,:,m} = histcounts(a.lickTime(a.infoBigLickFlag == 1 & ok),a.timeBins);
-        a.infoBigLickProbDays{d,:,m} = cell2mat(a.infoBigLickProbDays(d,:,m))./a.typeSizesMouseDays(d,1,m);
-        a.infoSmallLickProbDays{d,:,m} = histcounts(a.lickTime(a.infoSmallLickFlag == 1 & ok),a.timeBins);
-        a.infoSmallLickProbDays{d,:,m} = cell2mat(a.infoSmallLickProbDays(d,:,m))./a.typeSizesMouseDays(d,2,m);
-        a.randBigLickProbDays{d,:,m} = histcounts(a.lickTime(a.randBigLickFlag == 1 & ok),a.timeBins);
-        a.randBigLickProbDays{d,:,m} = cell2mat(a.randBigLickProbDays(d,:,m))./a.typeSizesMouseDays(d,3,m);
-        a.randSmallLickProbDays{d,:,m} = histcounts(a.lickTime(a.randSmallLickFlag == 1 & ok),a.timeBins);
-        a.randSmallLickProbDays{d,:,m} = cell2mat(a.randSmallLickProbDays(d,:,m))./a.typeSizesMouseDays(d,4,m);
-    end
-    
-    a.lickProbDays{:,:,m} = [cell2mat(a.infoBigLickProbDays(:,:,m)); cell2mat(a.infoSmallLickProbDays(:,:,m)); cell2mat(a.randBigLickProbDays(:,:,m)); cell2mat(a.randSmallLickProbDays(:,:,m))];
-end
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DAY SUMMARY
@@ -385,7 +339,7 @@ end
 for m = 1:a.mouseCt
     for d = 1:a.mouseDayCt(m)
         % OUTCOMES (all trials)
-        a.daySummary.outcome{m,d} = a.outcome(a.mouseDayAll == d & a.miceAll(:,m) == 1);
+%         a.daySummary.outcome{m,d} = a.outcome(a.mouseDayAll == d & a.miceAll(:,m) == 1);
         
         % OTHER (correct trials)
         ok = [];
@@ -403,10 +357,10 @@ for m = 1:a.mouseCt
         a.daySummary.randSmall{m,d} = sum(a.randSmall(ok));
         a.daySummary.totalRewards{m,d} = sum(a.reward(ok));
         a.daySummary.percentInfo{m,d} = mean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1));
-        a.daySummary.rxnInfoForced{m,d} = mean(a.rxnCorr(a.infoForcedCorr & ok));
-        a.daySummary.rxnInfoChoice{m,d} = mean(a.rxnCorr(a.infoChoiceCorr & ok));
-        a.daySummary.rxnRandForced{m,d} = mean(a.rxnCorr(a.randForcedCorr & ok));
-        a.daySummary.rxnRandChoice{m,d} = mean(a.rxnCorr(a.randChoiceCorr & ok));
+        a.daySummary.rxnInfoForced{m,d} = mean(a.rxn(a.infoForcedCorr & ok));
+        a.daySummary.rxnInfoChoice{m,d} = mean(a.rxn(a.infoChoiceCorr & ok));
+        a.daySummary.rxnRandForced{m,d} = mean(a.rxn(a.randForcedCorr & ok));
+        a.daySummary.rxnRandChoice{m,d} = mean(a.rxn(a.randChoiceCorr & ok));
         a.daySummary.infoBigLicks{m,d} = a.AlicksBetween(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicks{m,d} = a.BlicksBetween(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicks{m,d} = a.ClicksBetween(m,d)/sum(a.odorCtrials & ok);
@@ -445,4 +399,14 @@ for m = 1:a.mouseCt
 end
 
 %%
-uisave({'a'},'infoSeekFSMDataAnalyzed.mat');
+uisave({'a'},'infoSeekFSMDataAnalyzedComplete.mat');
+
+
+%% ETHAN ANALYSIS
+
+for m = 1:mouseCt
+    % initial info side
+    IIS(m) =  
+    ok = a.mouse == m & a.preReverse == 1;
+    mean(a.earlyLicks(ok))
+end
