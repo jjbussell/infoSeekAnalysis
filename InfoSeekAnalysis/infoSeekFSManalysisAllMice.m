@@ -235,6 +235,7 @@ a.allTimePreReverseChoice = mean(a.choiceCorr(a.preReverse == 1));
 for m = 1:a.mouseCt
    ok = a.mice(:,m) & a.preReverse == 1;
    a.choicebyMouse{m} = a.choiceCorr(ok == 1 & a.choiceTypeCorr == 1);
+   a.cumChoiceByMouse{m} = cumsum(a.choicebyMouse{m});
    meanChoice(m,1) = mean(a.choicebyMouse{m});
    meanChoice(m,2) = m;
 end
