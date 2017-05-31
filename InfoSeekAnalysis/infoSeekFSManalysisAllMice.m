@@ -413,8 +413,40 @@ uisave({'a'},'infoSeekFSMDataAnalyzedComplete.mat');
 % for licks, need # early licks per trial, whether pre or post rev, init
 % info side?
 
-for m = 1:mouseCt
+a.choice_all = a.choiceCorr; % choice_all
+a.choice_all(a.preReverse == 0) = ~a.choiceCorr(a.preReverse == 0);
+
+a.initinfoside_info = zeros(a.corrTrialCt,1);
+a.initinfoside_info(:) = -1; % initinfoside_info
+
+a.initinfoside_side = ones(a.corrTrialCt,1); % initinfoside_side
+
+for m = 1:a.mouseCt
     % initial info side
-    a.mouseList(m);
-    IIS(m) =  a.files.infoSide(a.files.mouseName);
+    a.initinfoside(m,1) =  a.files(find(a.fileMouse == m,1)).infoSide;
+    ok = a.mice(:,m) == 1;
+    a.initinfoside_info(a.infoSide == a.initinfoside(m) & ok == 1) = 1;
+    
+    x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
+    y = a.choice_all(ok);
+
+    [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
 end
+
+% 
+% % main effect of side (+ = bias toward side that was initially info)
+% stats.beta(1)
+% % its p-value
+% stats.p(1)
+% 
+% % main effect of infoness (+ = bias toward informative side)
+% stats.beta(2)
+% % its p-value
+% stats.p(2)
+
+%[(mean licks to initial-info side) - (mean licks to initial-noinfo side)]
+% / [(mean licks to initial-info side) + (mean licks to initial-noinfo side)]
+% 
+% I then calculated it separately for each animal, and separately for their pre-reversal and post-reversal data. I defined its significance as a simple t-test comparing the licks to the two sides:
+% 
+% ttest2(mean licks to initial-info side, mean licks to initial-noinfo side)
