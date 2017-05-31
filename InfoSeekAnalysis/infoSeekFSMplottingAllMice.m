@@ -3,6 +3,15 @@
 %%
 % PLOTTING
 
+a.win = 50;
+
+a.odorWait = 50 + 2000;
+a.rewardWait = a.odorWait + 200 + 2000;
+a.maxTimeToLick = 10000;
+a.maxBin = ceil(a.maxTimeToLick/a.win);
+
+a.timeBins = (0:a.win:a.maxBin*a.win);
+
 a.mColors = [0 176 80; 255 0 0; 0 176 240; 112 48 160; 234 132 20; 255 255 0; 204 0 204];
 a.mColors = a.mColors./255;
 
@@ -445,50 +454,61 @@ end
 
 %% PLOT SORTED PREFERENCE BARS
 
+% if a.mouseCt > 1
+%     figure();
+%     ax = nsubplot(1,1,1,1);
+%     ax.FontSize = 12;
+%     ax.XTick = [1:a.mouseCt+1];
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+%     ax.XTickLabel = [a.sortedMouseList; 'Mean'];
+%     ax.YLim = [0 1];
+%     for m = 1:a.mouseCt
+%         bar(m,(a.sortedChoice(m,1)),'facecolor',a.sortedColors(m,:),'edgecolor','none');
+%     end
+%     bar(a.mouseCt + 1,nanmean(a.sortedChoice(:,1)),'facecolor','k','edgecolor','none');
+%     errorbar(a.mouseCt + 1,nanmean(a.sortedChoice(:,1)),sem(a.sortedChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
+%     ylabel('Info choice probability');
+%     xlabel('Mouse');
+%     hold off;   
+% end
+
+%% PLOT ALL-TIME SORTED PREFERENCE BARS
+
+ca = linspecer(a.mouseCt);
+
 if a.mouseCt > 1
-    figure();
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
     ax = nsubplot(1,1,1,1);
-    ax.FontSize = 12;
+    ax.FontSize = 8;
     ax.XTick = [1:a.mouseCt+1];
     ax.YTick = [0 0.25 0.50 0.75 1];
     ax.XTickLabel = [a.sortedMouseList; 'Mean'];
     ax.YLim = [0 1];
     for m = 1:a.mouseCt
-        bar(m,(a.sortedChoice(m,1)),'facecolor',a.sortedColors(m,:),'edgecolor','none');
+%         bar(m,a.sortedChoice(m,1),'facecolor',ca(m,:),'edgecolor','none');
+          bar(m,a.sortedChoice(m,1),'facecolor',[0.3 0.3 0.3],'edgecolor','none');
     end
-    bar(a.mouseCt + 1,nanmean(a.sortedChoice(:,1)),'facecolor','k','edgecolor','none');
-    errorbar(a.mouseCt + 1,nanmean(a.sortedChoice(:,1)),sem(a.sortedChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
+    bar(a.mouseCt+1,nanmean(a.sortedChoice(:,1)),'facecolor','k','edgecolor','none');
+    errorbar(a.mouseCt+1,nanmean(a.sortedChoice(:,1)),sem(a.sortedChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
+    text(a.mouseCt+2,nanmean(a.sortedChoice(:,1)),['p = ' num2str(a.overallP)])
     ylabel('Info choice probability');
     xlabel('Mouse');
-    hold off;   
-end
-
-%% PLOT ALL-TIME SORTED PREFERENCE BARS
-
-ca = linspecer(a.allTimeMouseCt);
-
-if a.mouseCt > 1
-    figure();
-    ax = nsubplot(1,1,1,1);
-    ax.FontSize = 12;
-    ax.XTick = [1:a.allTimeMouseCt+1];
-    ax.YTick = [0 0.25 0.50 0.75 1];
-    ax.XTickLabel = [a.sortedAllTimeMouseList; 'Mean'];
-    ax.YLim = [0 1];
-    for m = 1:a.allTimeMouseCt
-        bar(m,a.sortedAllTimeChoice(m,1),'facecolor',ca(m,:),'edgecolor','none');
-    end
-    bar(a.allTimeMouseCt+1,nanmean(a.sortedAllTimeChoice(:,1)),'facecolor','k','edgecolor','none');
-    errorbar(a.allTimeMouseCt+1,nanmean(a.sortedAllTimeChoice(:,1)),sem(a.sortedAllTimeChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
-    ylabel('Info choice probability');
-    xlabel('Mouse (all ever tested)');
-    hold off;   
+    hold off;
+    
+    saveas(fig,fullfile(pathname,'Overall'),'pdf');
 end
 
 %% PLOT CUMULATIVE CHOICE
 
 cb = linspecer(a.mouseCt);
-numToPlot = 20;
+numToPlot = 100;
 
 alt = zeros(numToPlot,1);
 alt(2:2:numToPlot) = 1;
@@ -496,23 +516,324 @@ alt = cumsum(alt);
 
 perf = cumsum(ones(numToPlot,1));
 
+% figure();
+% ax = nsubplot(1,1,1,1);
+% ax.FontSize = 12;
+% for m = 1:a.mouseCt
+%     cumPlotData = a.cumChoiceByMouse{m};
+%     plot(cumPlotData(1:numToPlot),'color',cb(m,:),'LineWidth',2);
+% end
+% plot(perf,'color','k','LineWidth',4);
+% plot(alt,'color','k','LineWidth',4);
+% hold off;
+
+%% EARLY CHOICE DATA
+
+choiceToPlot = [];
+mouseChoiceData = [];
+rxnData = [];
+lickEarlyData = [];
+lickAnticData = [];
+rxnToPlot = [];
+lickEarlyToPlot = [];
+lickAnticToPlot = [];
+for m = 1:a.mouseCt
+   mouseChoiceData = a.choicebyMouse{m};
+   rxnData = a.choiceRxnByMouse{m};
+   lickEarlyData = a.choiceEarlyLicksByMouse{m};
+   lickAnticData = a.choiceAnticLicksByMouse{m};
+   choiceToPlot(m,:) = mouseChoiceData(1:numToPlot);
+   rxnToPlot(m,:) = rxnData(1:numToPlot);
+   lickEarlyToPlot(m,:) = lickEarlyData(1:numToPlot);
+   lickAnticToPlot(m,:) = lickAnticData(1:numToPlot);
+end
+
+[sortedChoiceToPlot,sortIdx] = sortrows(choiceToPlot);
+miceSortToPlot = (a.mouseList(sortIdx));
+
+%% EARLY CHOICE DATA BY MOUSE
+
+map = linspecer(2);
+
+for m = 1:a.mouseCt
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 7 10];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','portrait');
+    
+    ax = nsubplot(4,1,1,1);
+    ax.FontSize = 12;
+    title(a.mouseList(m));
+    ax.XLim = [1 numToPlot];
+    ax.YLim = [0.5 1.5];
+    ax.XTickLabel = [];
+    ax.YTick = [];
+    ylabel('Choice');
+    imagesc('XData',(1:numToPlot),'YData',(1),'CData',choiceToPlot(m,:))
+    colormap(map);
+    % colorbar('YTick',[0.25 0.75],'TickLabels',{'No Info','Info'},'FontSize',12,'TickLength',0,'Location','northoutside');
+
+    ax = nsubplot(4,1,2,1);
+    ax.FontSize = 12;
+    ax.XLim = [1 numToPlot];
+    ax.XTickLabel = [];
+    ylabel('Reaction Time');
+    scatter(find(choiceToPlot(m,:)==1),rxnToPlot(m,choiceToPlot(m,:)==1),'filled','markerfacecolor',map(2,:));
+    scatter(find(choiceToPlot(m,:)==0),rxnToPlot(m,choiceToPlot(m,:)==0),'filled','markerfacecolor',map(1,:));
+
+    ax = nsubplot(4,1,3,1);
+    ax.FontSize = 12;
+    ax.XLim = [1 numToPlot];
+    ax.XTickLabel = [];
+    ylabel('Early Licks');
+    scatter(find(choiceToPlot(m,:)==1),lickEarlyToPlot(m,choiceToPlot(m,:)==1),'filled','markerfacecolor',map(2,:));
+    scatter(find(choiceToPlot(m,:)==0),lickEarlyToPlot(m,choiceToPlot(m,:)==0),'filled','markerfacecolor',map(1,:));
+
+    ax = nsubplot(4,1,4,1);
+    ax.FontSize = 12;
+    ax.XLim = [1 numToPlot];
+    ylabel('Anticipatory Licks');
+    scatter(find(choiceToPlot(m,:)==1),lickAnticToPlot(m,choiceToPlot(m,:)==1),'filled','markerfacecolor',map(2,:));
+    scatter(find(choiceToPlot(m,:)==0),lickAnticToPlot(m,choiceToPlot(m,:)==0),'filled','markerfacecolor',map(1,:));
+    xlabel('Choice Trial');
+    lgd = legend('Info','No Info');
+    lgd.FontSize = 16; lgd.Location = 'southoutside';
+    lgd.Orientation = 'horizontal'; lgd.Box = 'off';
+    % set(icons(:),'MarkerSize',20); %// Or whatever
+    % icons(1).Children.MarkerSize = 20;
+    
+    saveas(fig,fullfile(pathname,[a.mouseList{m} 'early']),'pdf');
+    
+end
+
+%% CHOICE HEATMAP
+
 figure();
 ax = nsubplot(1,1,1,1);
 ax.FontSize = 12;
-for m = 1:a.mouseCt
-    cumPlotData = a.cumChoiceByMouse{m};
-    plot(cumPlotData(1:numToPlot),'color',cb(m,:),'LineWidth',2);
-end
-plot(perf,'color','k','LineWidth',4);
-plot(alt,'color','k','LineWidth',4);
+title('Choices by Trial');
+xlabel('Choice Trial');
+ylabel('Mouse');
+ax.YTick = [1:a.mouseCt];
+ax.XLim = [1 numToPlot];
+ax.YLim = [0.5 a.mouseCt+0.5];
+ax.YTickLabel = miceSortToPlot;
+ax.YGrid = 'on';
+set(ax,'Box','off');
+set(ax,'TickDir','out');
+set(ax,'ticklen',[.01 .01]);
+set(ax,'Color','none');
+set(ax,'layer','top');
+% set parent figure to have white bg color
+set(get(ax,'parent'),'color','w');
+hold(ax,'on');
+imagesc('XData',(1:numToPlot),'YData',(1:a.mouseCt),'CData',sortedChoiceToPlot)
+colormap(linspecer(2));
+colorbar('YTick',[0.25 0.75],'TickLabels',{'No Info','Info'},'FontSize',12,'TickLength',0);
 hold off;
 
-%% PLOT CHOICE HEATMAP
+
+%% ALL CHOICE ORGANIZED
+
+% a.choicebyMouse = pre-Reverse, cell for each mouse
+
+% a.choiceCorr = all relative to infoness
+% a.choice_all = relative to initial info side
+% a.preReverse
+
+% a.choicesbyDay = cell for each mouse for each day (includes reverse)
+% = a.daySummary.percentInfo (includes reverse)
+% a.choiceTrialsOrg = row for each mouse, NaNs if no more trials,
+% preReverse
+
+trialsToCount = 100;
+
 for m = 1:a.mouseCt
-   mouseChoiceData = a.choicebyMouse{m};
-   choiceToPlot(m,:) = mouseChoiceData(1:numToPlot);
+    ok = a.mice(:,m) & a.choiceTypeCorr == 1;
+    a.choiceIISRevByMouse{m} = a.choice_all(ok == 1);
+    a.preReverseByMouse{m} = a.preReverse(ok == 1);
+
+    preReverseTrials = find(a.preReverseByMouse{m},100,'last');
+    postReverseTrials= find(a.preReverseByMouse{m} == 0,100,'last');
+    choicesIIS = a.choiceIISRevByMouse{m};
+    
+    a.pref(m,1) = mean(choicesIIS(preReverseTrials));
+    a.pref(m,2) = mean(choicesIIS(postReverseTrials));
+    
 end
 
+%% CHOICE BY DAY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% THIS IS THE SAME AS a.daySummary.percentInfo
+
+% need to make pre-reverse?!? rel to initial info side?!?
+
+for m = 1:a.mouseCt
+    for d = 1:a.mouseDayCt(m)
+       ok = a.mice(:,m) & a.mouseDay == d;
+       a.choicesbyDay{m,d} = a.choiceCorr(ok & a.choiceTypeCorr == 1);
+       a.meanDayChoice{m,d} = mean(a.choicesbyDay{m,d});
+    end
+end
+
+for m = 1:a.mouseCt
+    choiceDays = find(~isnan(cell2mat(a.meanDayChoice(m,:))));
+    choiceDayCt(m) = size(choiceDays,2);
+    a.choiceDays{m,:} = choiceDays;
+    for dd = 1:size(choiceDays,2)
+        a.meanDayChoicesOrg{m,dd} = a.meanDayChoice{m,choiceDays(dd)};
+    end    
+end
+
+%% ALIGN TO REVERSAL
+
+% FINDS a.revChoiceDays(m,:), the days in a.mouseDay for each mouse to calculate aligned values
+
+for m = 1:a.mouseCt
+    choiceReverseDay(m) = find(a.choiceDays{m,:} == a.reverseDay(m));
+end
+
+maxPreReverse = max(choiceReverseDay)-1;
+postReverseDayCt = choiceDayCt - choiceReverseDay;
+% maxPostReverse = max(cell2mat(postReverseDays));
+% DAY TO ALIGN REVERSALS
+revAlign = maxPreReverse+1;
+
+a.meanDayChoicesRevOrg = cell(a.mouseCt);
+for m=1:a.mouseCt
+    preReverseDays{m} = a.choiceDays{m,1}(1):choiceReverseDay(m);
+    postReverseDays{m} = choiceReverseDay(m)+1:choiceReverseDay(m) + postReverseDayCt(m);
+    mouseDayswRev{m} = [preReverseDays{m} postReverseDays{m}]; % same as choice days!
+    for d = 1:choiceReverseDay(m)
+       a.meanDayChoicesRevOrg(m,revAlign-choiceReverseDay(m)+d) = a.meanDayChoicesOrg(m,d); 
+    end
+    for d = 1:choiceDayCt(m)-choiceReverseDay(m)
+       a.meanDayChoicesRevOrg(m,revAlign+d) = a.meanDayChoicesOrg(m,choiceReverseDay(m)+d); 
+    end
+    a.revChoiceDays{m,:} = find(~cellfun(@isempty,a.meanDayChoicesRevOrg(m,:)));
+end
+
+a.meanDayChoicesRevOrg(cellfun(@isempty,a.meanDayChoicesRevOrg(:,:))) = {NaN};
+a.dayswRev = size(a.meanDayChoicesRevOrg,2);
+
+a.meanChoicebyRevDay = mean(cell2mat(a.meanDayChoicesRevOrg),1,'omitnan');
+a.semChoicebyRevDay = sem(cell2mat(a.meanDayChoicesRevOrg));
+
+a.totalChoiceDays = size(a.meanDayChoicesRevOrg,2);
+
+
+%% CALCULATE COMMON DAY FOR EACH TRIAL
+
+% a.allDay is the day from 1:totalchoicedays for each trial, aligned to
+% reversal
+
+a.allDay = zeros(size(a.mouseDay,1),1);
+for m = 1:a.mouseCt
+    revChoiceDays = a.revChoiceDays{m,1};
+    choiceDays = a.choiceDays{m,1};
+    for d = 1:size(revChoiceDays,2)
+        corrDay = revChoiceDays(d);
+        ok = a.mice(:,m) == 1 & a.mouseDay == choiceDays(d);
+        a.allDay(ok) = corrDay;
+    end
+end
+
+% test mean choices
+
+% for d = 1:a.totalChoiceDays
+%    ok = a.allDay == d & a.trialType == 1;
+%    overallDayMean(d) = mean(a.info(ok));  
+% end
+
+%% PLOT CHOICES BY DAY
+% 
 figure();
-imagesc(choiceToPlot);
-legend();
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 12;
+ax.XTick = [1:max(choiceDayCt)];
+ax.YTick = [0 0.25 0.50 0.75 1];
+ax.YLim = [0 1];
+for m = 1:a.mouseCt
+    plot(cell2mat(a.meanDayChoicesOrg(m,:)),'Color',a.mColors(m,:),'LineWidth',3,'Marker','o','MarkerFaceColor',a.mColors(m,:),'MarkerSize',8);
+end
+plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+leg = legend(a.mouseList,'Location','southoutside','Orientation','horizontal');
+leg.Box = 'off';
+leg.FontWeight = 'bold';
+ylabel('Info choice probability');
+xlabel('Day');
+hold off;
+
+%% PLOT CHOICES BY DAY ALIGNED TO REVERSE
+
+% figure();
+% ax = nsubplot(1,1,1,1);
+% ax.FontSize = 12;
+% ax.XTick = [0:5:a.totalChoiceDays];
+% ax.YTick = [0 0.25 0.50 0.75 1];
+% ax.YLim = [0 1];
+% for m = 1:a.mouseCt
+%     plot(a.revChoiceDays{m,:},cell2mat(a.meanDayChoicesOrg(m,:)),'Color',a.mColors(m,:),'LineWidth',3,'Marker','o','MarkerFaceColor',a.mColors(m,:),'MarkerSize',8);
+% end
+% plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+% plot([revAlign-0.5 revAlign-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+% leg = legend(a.mouseList,'Location','southoutside','Orientation','horizontal');
+% leg.Box = 'off';
+% leg.FontWeight = 'bold';
+% ylabel('Info choice probability');
+% xlabel('Day');
+% hold off;
+
+
+%% PLOT MEAN CHOICE BY DAY WITH REVERSALS
+
+% maxDays = a.dayswRev;
+% plotDays = 1:maxDays;
+% semPlus = a.meanChoicebyRevDay + a.semChoicebyRevDay;
+% semMinus = a.meanChoicebyRevDay - a.semChoicebyRevDay;
+% 
+% figure();
+% ax = nsubplot(1,1,1,1);
+% ax.FontSize = 12;
+% ax.XTick = [0:5:maxDays];
+% ax.YTick = [0 0.25 0.50 0.75 1];
+% ax.YLim = [0 1];
+% p = patch([plotDays fliplr(plotDays)], [semMinus,fliplr(semPlus)],[0.8 0.8 0.8]);
+% p.EdgeColor = 'none';
+% plot(a.meanChoicebyRevDay,'LineWidth',4,'Marker','none','color',[0.3 0.3 0.3]);
+% plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color','k','LineWidth',2)
+% plot([revAlign-0.5 revAlign-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+% ylabel('Population Mean Info choice probability');
+% xlabel('Day');
+% hold off;
+
+%% PLOT MEAN CHOICE BY DAY
+
+a.meanDayChoicesOrg(cellfun(@isempty,a.meanDayChoicesOrg(:,:))) = {NaN};
+
+a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
+a.semChoicebyDay = sem(cell2mat(a.meanDayChoicesOrg));
+
+maxDays = size(a.meanDayChoicesOrg,2);
+plotDays = 1:maxDays;
+semPlus = a.meanChoicebyDay + a.semChoicebyDay;
+semMinus = a.meanChoicebyDay - a.semChoicebyDay;
+
+figure();
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 12;
+ax.XTick = [0:5:maxDays];
+ax.YTick = [0 0.25 0.50 0.75 1];
+ax.YLim = [0 1];
+p = patch([plotDays fliplr(plotDays)], [semMinus,fliplr(semPlus)],[0.8 0.8 0.8]);
+p.EdgeColor = 'none';
+plot(a.meanChoicebyDay,'LineWidth',4,'Marker','none','color',[0.3 0.3 0.3]);
+plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color','k','LineWidth',2)
+% plot([revAlign-0.5 revAlign-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+ylabel('Population Mean Info choice probability');
+xlabel('Day');
+hold off;

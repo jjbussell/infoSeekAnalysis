@@ -232,12 +232,18 @@ end
 
 a.allTimePreReverseChoice = mean(a.choiceCorr(a.preReverse == 1));
 
+% MAKE THESE INCLUDE REVERSE, THEN CAN DO AVERAGES AND LIMIT TO LAST X
+% TRIALS/DAYS
+
 for m = 1:a.mouseCt
    ok = a.mice(:,m) & a.preReverse == 1;
-   a.choicebyMouse{m} = a.choiceCorr(ok == 1 & a.choiceTypeCorr == 1);
+   a.choicebyMouse{m} = a.choiceCorr(ok == 1 & a.choiceTypeCorr == 1); % preReverse
    a.cumChoiceByMouse{m} = cumsum(a.choicebyMouse{m});
    meanChoice(m,1) = mean(a.choicebyMouse{m});
    meanChoice(m,2) = m;
+   a.choiceRxnByMouse{m} = a.rxn(ok == 1 & a.choiceTypeCorr == 1);
+   a.choiceEarlyLicksByMouse{m} = a.earlyLicks(ok == 1 & a.choiceTypeCorr == 1);
+   a.choiceAnticLicksByMouse{m} = a.betweenLicks(ok == 1 & a.choiceTypeCorr == 1);
 end
 
 a.meanChoice = meanChoice(:,1);
@@ -256,8 +262,8 @@ end
 
 %% STATS
 
-icp_all = a.sortedChoice(:,1)*100;
-overallP = signrank(icp_all-50);
+a.icp_all = a.sortedChoice(:,1)*100;
+a.overallP = signrank(a.icp_all-50);
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY
 
@@ -399,9 +405,6 @@ for m = 1:a.mouseCt
     end
 end
 
-%%
-uisave({'a'},'infoSeekFSMDataAnalyzedComplete.mat');
-
 
 %% ETHAN ANALYSIS
 
@@ -451,3 +454,24 @@ end
 % I then calculated it separately for each animal, and separately for their pre-reversal and post-reversal data. I defined its significance as a simple t-test comparing the licks to the two sides:
 % 
 % ttest2(mean licks to initial-info side, mean licks to initial-noinfo side)
+
+%% ALL PRE-REVERSE CHOICES ALIGNED TO START
+
+% a.choiceByMouse %a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
+
+for m=1:a.mouseCt
+a.choiceTrialCt(m,1) = size(a.choicebyMouse{m},1);
+end
+a.maxChoiceTrials = max(a.choiceTrialCt);
+
+a.choiceTrialsOrg = NaN(a.mouseCt,a.maxChoiceTrials);
+for m=1:a.mouseCt
+   a.choiceTrialsOrg(m,1:a.choiceTrialCt(m)) = a.choicebyMouse{m}; 
+end
+
+a.meanChoiceByTrial = mean(a.choiceTrialsOrg,1,'omitnan');
+
+
+
+%%
+uisave({'a'},'infoSeekFSMDataAnalyzedComplete.mat');
