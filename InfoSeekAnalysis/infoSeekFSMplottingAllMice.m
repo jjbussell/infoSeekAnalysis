@@ -1,9 +1,6 @@
 %% TO CALC/FIX
 
-%%
-% PLOTTING
-
-a.win = 50;
+%% PLOTTING COLORS
 
 a.odorWait = 50 + 2000;
 a.rewardWait = a.odorWait + 200 + 2000;
@@ -17,7 +14,9 @@ a.mColors = a.mColors./255;
 
 a.mColors = linspecer(a.mouseCt);
 % sort plotting colors
-a.sortedColors = a.mColors(a.sortedChoice(:,2),:);
+a.sortedColors = a.mColors(a.sortedChoice(:,3),:);
+
+ca = linspecer(a.mouseCt);
 
 dx = 0.2;
 dy = 0.02;
@@ -54,7 +53,11 @@ a.outcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoSmall','ChoiceInf
 a.choiceLabels = {'ChoiceInfoBig','ChoiceInfoSmall','ChoiceRandBig',...
     'ChoiceRandSmall','InfoBig','InfoSmall','RandBig','RandSmall'};
 
- bins = [a.win/2:a.win:a.maxBin*a.win-a.win/2];
+
+%% SET ANALYSIS PARAMS
+
+a.win = 50;
+bins = [a.win/2:a.win:a.maxBin*a.win-a.win/2];
 
 %% PLOT DAY SUMMARIES BY MOUSE
 
@@ -227,7 +230,7 @@ end
     
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% PLOT OUTCOMES BY MOUSE - ONLY WORKS FOR FSM
+%% PLOT OUTCOMES BY MOUSE - ONLY WORKS FOR FSM, CURRENTLY SKIP
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -323,7 +326,7 @@ end
 % end
 
 
-%% PLOT MOST RECENT DAY'S LICKS
+%% PLOT MOST RECENT DAY'S LICKS - SKIP
 %%     
 % for m = 1:a.mouseCt
 %     plotData = cell2mat(a.lickProbDays(:,:,m));
@@ -371,7 +374,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% LICK HISTOGRAMS / BINS BY DAY AND MOUSE
+%% LICK HISTOGRAMS / BINS BY DAY AND MOUSE - SKIPS 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % for m = 1:a.mouseCt
@@ -412,7 +415,6 @@ end
 %     end
 % end
 
- 
     %%  PLOT BY MOUSE AND DAY
 
     %% 
@@ -451,30 +453,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-%% PLOT SORTED PREFERENCE BARS
-
-% if a.mouseCt > 1
-%     figure();
-%     ax = nsubplot(1,1,1,1);
-%     ax.FontSize = 12;
-%     ax.XTick = [1:a.mouseCt+1];
-%     ax.YTick = [0 0.25 0.50 0.75 1];
-%     ax.XTickLabel = [a.sortedMouseList; 'Mean'];
-%     ax.YLim = [0 1];
-%     for m = 1:a.mouseCt
-%         bar(m,(a.sortedChoice(m,1)),'facecolor',a.sortedColors(m,:),'edgecolor','none');
-%     end
-%     bar(a.mouseCt + 1,nanmean(a.sortedChoice(:,1)),'facecolor','k','edgecolor','none');
-%     errorbar(a.mouseCt + 1,nanmean(a.sortedChoice(:,1)),sem(a.sortedChoice(:,1)),'LineStyle','none','LineWidth',2,'Color','k');
-%     ylabel('Info choice probability');
-%     xlabel('Mouse');
-%     hold off;   
-% end
-
 %% PLOT ALL-TIME SORTED PREFERENCE BARS
-
-ca = linspecer(a.mouseCt);
 
 if a.mouseCt > 1
     fig = figure();
@@ -507,7 +486,6 @@ end
 
 %% PLOT CUMULATIVE CHOICE
 
-cb = linspecer(a.mouseCt);
 numToPlot = 100;
 
 alt = zeros(numToPlot,1);
@@ -521,7 +499,7 @@ perf = cumsum(ones(numToPlot,1));
 % ax.FontSize = 12;
 % for m = 1:a.mouseCt
 %     cumPlotData = a.cumChoiceByMouse{m};
-%     plot(cumPlotData(1:numToPlot),'color',cb(m,:),'LineWidth',2);
+%     plot(cumPlotData(1:numToPlot),'color',ca(m,:),'LineWidth',2);
 % end
 % plot(perf,'color','k','LineWidth',4);
 % plot(alt,'color','k','LineWidth',4);
@@ -552,6 +530,9 @@ end
 miceSortToPlot = (a.mouseList(sortIdx));
 
 %% EARLY CHOICE DATA BY MOUSE
+
+% ADD REWARDS
+% MAKE DYNAMIC re: trial nums, pre/post reverse
 
 map = linspecer(2);
 
@@ -610,6 +591,8 @@ for m = 1:a.mouseCt
 end
 
 %% CHOICE HEATMAP
+
+% SAVE
 
 figure();
 ax = nsubplot(1,1,1,1);

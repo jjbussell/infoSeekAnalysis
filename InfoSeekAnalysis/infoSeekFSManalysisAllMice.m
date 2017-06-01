@@ -35,7 +35,11 @@ if loadData == 1
     c = b;
     clear b;
     b = a;
-    clear a;    
+    clear a;
+    
+    b.FSM = ones(numel(b.file),1);
+    c.FSM = zeros(numel(c.file),1);
+    a.FSM = [b.FSM; c.FSM];
     
     c.parameters = [c.allSummary(:,1:30) cell(size(c.allSummary,1),1) c.allSummary(:,31)];   
     a.parameters = [b.parameters; c.parameters];
@@ -191,7 +195,7 @@ end
 
 %% REVERSAL
 
-% FINDS REVERSE DAY (a.reverseDay(m,1)
+% FINDS REVERSE DAY (a.reverseDay(m,1) AND TRIAL (a.preReverse)
 
 infoSide = cell2mat({a.files.infoSide});
 
@@ -230,10 +234,25 @@ end
 
 %% CHOICES
 
-a.allTimePreReverseChoice = mean(a.choiceCorr(a.preReverse == 1));
-
 % MAKE THESE INCLUDE REVERSE, THEN CAN DO AVERAGES AND LIMIT TO LAST X
 % TRIALS/DAYS
+
+a.choice_all = a.choiceCorr; % choice relative to initial info side, all trials
+reverseFlag = a.preReverse == 0;
+a.choice_all(reverseFlag) = ~a.choice_all(reverseFlag);
+
+a.initinfoside_info = zeros(a.corrTrialCt,1);
+a.initinfoside_info(:) = -1; % initinfoside_info all trials
+
+a.initinfoside_side = ones(a.corrTrialCt,1); % initinfoside_side all trials
+
+for m = 1:a.mouseCt
+    % initial info side
+    a.initinfoside(m,1) =  a.files(find(a.fileMouse == m,1)).infoSide;
+    ok = a.mice(:,m) == 1;
+    a.initinfoside_info(a.infoSide == a.initinfoside(m) & ok == 1) = 1;
+end
+
 
 for m = 1:a.mouseCt
    ok = a.mice(:,m) & a.choiceTypeCorr == 1;
@@ -242,33 +261,52 @@ for m = 1:a.mouseCt
    a.cumChoiceByMouse{m} = cumsum(a.choicebyMouse{m});
    a.meanChoice(m,1) = mean(a.choiceCorr(ok & a.preReverse == 1));
    a.meanChoice(m,2) = mean(a.choiceCorr(ok & a.preReverse == 0));
+   a.meanChoice(m,3) = m;
    a.choiceRxnByMouse{m} = a.rxn(ok == 1 & a.preReverse == 1);
    a.choiceEarlyLicksByMouse{m} = a.earlyLicks(ok == 1 & a.preReverse == 1);
    a.choiceAnticLicksByMouse{m} = a.betweenLicks(ok == 1 & a.preReverse == 1);
+   a.choiceRewardByMouse{m} = a.reward(ok == 1 & a.preReverse == 1);
    a.choiceAllRxnByMouse{m} = a.rxn(ok == 1);
    a.choiceAllEarlyLicksByMouse{m} = a.earlyLicks(ok == 1);
-   a.choiceAllAnticLicksByMouse{m} = a.betweenLicks(ok == 1);   
+   a.choiceAllAnticLicksByMouse{m} = a.betweenLicks(ok == 1);
+   a.choiceAllRewardByMouse{m} = a.reward(ok == 1);
+   a.preReverseByMouse{m} = a.preReverse(ok == 1);
+   a.choiceIISByMouse{m} = a.choice_all(ok == 1);
+   
+   x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
+   y = a.choice_all(ok);
+   [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
+   a.beta(m,:) = a.stats(m).beta;
+   a.betaP(m,:) = a.stats(m).p;
+   
 end
 
-% for m = 1:a.mouseCt
-%    ok = a.mice(:,m) & a.preReverse == 1;
-%    a.choicebyMouse{m} = a.choiceCorr(ok == 1 & a.choiceTypeCorr == 1); % preReverse
-%    a.cumChoiceByMouse{m} = cumsum(a.choicebyMouse{m});
-%    meanChoice(m,1) = mean(a.choicebyMouse{m});
-%    meanChoice(m,2) = m;
-%    a.choiceRxnByMouse{m} = a.rxn(ok == 1 & a.choiceTypeCorr == 1);
-%    a.choiceEarlyLicksByMouse{m} = a.earlyLicks(ok == 1 & a.choiceTypeCorr == 1);
-%    a.choiceAnticLicksByMouse{m} = a.betweenLicks(ok == 1 & a.choiceTypeCorr == 1);
-% end
+%% ALL PRE-REVERSE CHOICES ALIGNED TO START
+
+% a.choiceByMouse %a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
+
+for m=1:a.mouseCt
+a.choiceTrialCt(m,1) = numel(a.choicebyMouse{m});
+end
+a.maxChoiceTrials = max(a.choiceTrialCt);
+
+a.choiceTrialsOrg = NaN(a.mouseCt,a.maxChoiceTrials);
+for m=1:a.mouseCt
+   a.choiceTrialsOrg(m,1:a.choiceTrialCt(m)) = a.choicebyMouse{m}; 
+end
+
+%% ALL CHOICES ALIGNED TO REVERSE START
+
+
 
 %% SORT BY INFO PREFERENCE
 
-a.sortedChoice = sortrows(meanChoice,1);
+a.sortedChoice = sortrows(a.meanChoice,1);
 a.meanSortedChoice = a.sortedChoice(:,1);
-a.sortedMouseList = a.mouseList(a.sortedChoice(:,2));
+a.sortedMouseList = a.mouseList(a.sortedChoice(:,3));
 
 % sort mice by info preference 
-mouseOrder = a.sortedChoice(:,2);
+mouseOrder = a.sortedChoice(:,3);
 for m = 1:a.mouseCt
     a.sortedMice(:,m) = a.mice(:,mouseOrder(m));
 end
@@ -350,6 +388,33 @@ for m = 1:a.mouseCt
 end
 
 
+%% EARLY LICKS BY REVERSAL
+
+% NEED TO FINISH
+
+a.initInfoLicks = mean(a.earlyLicks(a.initinfoside_info == 1));
+a.initNoInfoLicks = mean(a.earlyLicks(a.initinfoside_info == -1));
+a.earlyLickIdx = (a.initInfoLicks - a.initNoInfoLicks)/(a.initInfoLicks + a.initNoInfoLicks);
+
+for m=1:a.mouseCt
+   ok = a.mice(:,m) == 1;
+   % pre-reverse, INFO
+   a.preRevEarlyLicks(m,1) = mean(a.earlyLicks(a.initinfoside_info == 1 & a.preReverse == 1 & ok == 1));
+   % pre-reverse, NO INFO
+   a.preRevEarlyLicks(m,2) = mean(a.earlyLicks(a.initinfoside_info == -1 & a.preReverse == 1 & ok == 1));
+   % post-reverse, INFO
+   a.postRevEarlyLicks(m,1) = mean(a.earlyLicks(a.initinfoside_info == 1 & a.preReverse == 0 & ok == 1));
+   % post-reverse, NO INFO
+   a.postRevEarlyLicks(m,2) = mean(a.earlyLicks(a.initinfoside_info == -1 & a.preReverse == 0 & ok == 1));
+end
+
+% [(mean licks to initial-info side) - (mean licks to initial-noinfo side)]
+% / [(mean licks to initial-info side) + (mean licks to initial-noinfo side)]
+% 
+% I then calculated it separately for each animal, and separately for their pre-reversal and post-reversal data. I defined its significance as a simple t-test comparing the licks to the two sides:
+
+% ttest2(mean licks to initial-info side, mean licks to initial-noinfo side)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DAY SUMMARY
@@ -417,103 +482,6 @@ for m = 1:a.mouseCt
         a.daySummary.rewardRateRandChoice{m,d} = sum(a.reward(a.randChoiceCorr == 1 & ok == 1)) / nansum(a.trialLength(a.randChoiceCorr == 1 & ok == 1))*1000;        
     end
 end
-
-
-%% ETHAN ANALYSIS
-
-% need choice of init info side (1 if chose init info, 0 if chose init
-% noInfo)
-
-% then, 1 if infoSide = init info, -1 if not. 1 for side. then analyze by
-% mouse.
-
-% for licks, need # early licks per trial, whether pre or post rev, init
-% info side?
-
-
-% THIS IS NOT CORRECT--maybe ok now?
-a.choice_all = a.choiceCorr; % choice_all
-reverseFlag = a.preReverse == 0;
-a.choice_all(reverseFlag) = ~a.choice_all(reverseFlag);
-
-a.initinfoside_info = zeros(a.corrTrialCt,1);
-a.initinfoside_info(:) = -1; % initinfoside_info
-
-a.initinfoside_side = ones(a.corrTrialCt,1); % initinfoside_side
-
-for m = 1:a.mouseCt
-    % initial info side
-    a.initinfoside(m,1) =  a.files(find(a.fileMouse == m,1)).infoSide;
-    ok = a.mice(:,m) == 1;
-    a.initinfoside_info(a.infoSide == a.initinfoside(m) & ok == 1) = 1;
-    
-    x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
-    y = a.choice_all(ok);
-
-    [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
-end
-
-% 
-% % main effect of side (+ = bias toward side that was initially info)
-% stats.beta(1)
-% % its p-value
-% stats.p(1)
-% 
-% % main effect of infoness (+ = bias toward informative side)
-% stats.beta(2)
-% % its p-value
-% stats.p(2)
-
-%[(mean licks to initial-info side) - (mean licks to initial-noinfo side)]
-% / [(mean licks to initial-info side) + (mean licks to initial-noinfo side)]
-% 
-% I then calculated it separately for each animal, and separately for their pre-reversal and post-reversal data. I defined its significance as a simple t-test comparing the licks to the two sides:
-% 
-% ttest2(mean licks to initial-info side, mean licks to initial-noinfo side)
-
-%% ALL PRE-REVERSE CHOICES ALIGNED TO START
-
-% a.choiceByMouse %a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
-
-for m=1:a.mouseCt
-a.choiceTrialCt(m,1) = size(a.choicebyMouse{m},1);
-end
-a.maxChoiceTrials = max(a.choiceTrialCt);
-
-a.choiceTrialsOrg = NaN(a.mouseCt,a.maxChoiceTrials);
-for m=1:a.mouseCt
-   a.choiceTrialsOrg(m,1:a.choiceTrialCt(m)) = a.choicebyMouse{m}; 
-end
-
-a.meanChoiceByTrial = mean(a.choiceTrialsOrg,1,'omitnan');
-
-%% EARLY LICKS BY REVERSAL
-
-% NEED TO FINISH
-
-a.initInfoLicks = mean(a.earlyLicks(a.initinfoside_info == 1));
-a.initNoInfoLicks = mean(a.earlyLicks(a.initinfoside_info == -1));
-a.earlyLickIdx = (a.initInfoLicks - a.initNoInfoLicks)/(a.initInfoLicks + a.initNoInfoLicks);
-
-for m=1:a.mouseCt
-   ok = a.mice(:,m) == 1;
-   % pre-reverse, INFO
-   a.preRevEarlyLicks(m,1) = mean(a.earlyLicks(a.initinfoside_info == 1 & a.preReverse == 1 & ok == 1));
-   % pre-reverse, NO INFO
-   a.preRevEarlyLicks(m,2) = mean(a.earlyLicks(a.initinfoside_info == -1 & a.preReverse == 1 & ok == 1));
-   % post-reverse, INFO
-   a.postRevEarlyLicks(m,1) = mean(a.earlyLicks(a.initinfoside_info == 1 & a.preReverse == 0 & ok == 1));
-   % post-reverse, NO INFO
-   a.postRevEarlyLicks(m,2) = mean(a.earlyLicks(a.initinfoside_info == -1 & a.preReverse == 0 & ok == 1));
-end
-
-% [(mean licks to initial-info side) - (mean licks to initial-noinfo side)]
-% / [(mean licks to initial-info side) + (mean licks to initial-noinfo side)]
-% 
-% I then calculated it separately for each animal, and separately for their pre-reversal and post-reversal data. I defined its significance as a simple t-test comparing the licks to the two sides:
-
-% ttest2(mean licks to initial-info side, mean licks to initial-noinfo side)
-
 
 %%
 uisave({'a'},'infoSeekFSMDataAnalyzedComplete.mat');
