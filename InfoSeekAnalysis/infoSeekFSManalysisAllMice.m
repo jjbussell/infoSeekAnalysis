@@ -232,6 +232,11 @@ for i = 1:size(a.file,1)
    a.infoSide(i,1) = a.files(a.file(i)).infoSide;  
 end
 
+%% REWARD FLAG
+
+a.rewardFlag = zeros(numel(a.reward),1);
+a.rewardFlag(a.reward>0) = 1;
+
 %% CHOICES
 
 % MAKE THESE INCLUDE REVERSE, THEN CAN DO AVERAGES AND LIMIT TO LAST X
@@ -241,8 +246,7 @@ a.choice_all = a.choiceCorr; % choice relative to initial info side, all trials
 reverseFlag = a.preReverse == 0;
 a.choice_all(reverseFlag) = ~a.choice_all(reverseFlag);
 
-a.initinfoside_info = zeros(a.corrTrialCt,1);
-a.initinfoside_info(:) = -1; % initinfoside_info all trials
+a.initinfoside_info = -ones(a.corrTrialCt,1); % initinfoside_info all trials
 
 a.initinfoside_side = ones(a.corrTrialCt,1); % initinfoside_side all trials
 
@@ -255,61 +259,212 @@ end
 
 
 for m = 1:a.mouseCt
-   ok = a.mice(:,m) & a.choiceTypeCorr == 1;
-   a.choiceAllbyMouse{m} = a.choiceCorr(ok == 1);
-   a.choicebyMouse{m} = a.choiceCorr(ok == 1 & a.preReverse == 1); % preReverse
+   ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
+   a.choiceAllbyMouse{m} = a.choiceCorr(ok);
+   a.choiceAllTrialCt(m,1) = numel(a.choiceAllbyMouse{m});
+   a.choicebyMouse{m} = a.choiceCorr(ok & a.preReverse == 1); % preReverse
+   a.choiceTrialCt(m,1) = numel(a.choicebyMouse{m});
    a.cumChoiceByMouse{m} = cumsum(a.choicebyMouse{m});
-   a.meanChoice(m,1) = mean(a.choiceCorr(ok & a.preReverse == 1));
-   a.meanChoice(m,2) = mean(a.choiceCorr(ok & a.preReverse == 0));
+   a.choiceRxnByMouse{m} = a.rxn(ok & a.preReverse == 1);
+   a.choiceEarlyLicksByMouse{m} = a.earlyLicks(ok & a.preReverse == 1);
+   a.choiceAnticLicksByMouse{m} = a.betweenLicks(ok & a.preReverse == 1);
+   a.choiceRewardByMouse{m} = a.rewardFlag(ok & a.preReverse == 1);
+   a.choiceAllRxnByMouse{m} = a.rxn(ok);
+   a.choiceAllEarlyLicksByMouse{m} = a.earlyLicks(ok);
+   a.choiceAllAnticLicksByMouse{m} = a.betweenLicks(ok);
+   a.choiceAllRewardByMouse{m} = a.rewardFlag(ok);
+   a.preReverseByMouse{m} = a.preReverse(ok);
+   a.choiceIISByMouse{m} = a.choice_all(ok);   
+end
+
+%% ALL PRE-REVERSE CHOICES ALIGNED TO START
+
+% a.choiceByMouse %a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
+a.maxChoiceTrials = max(a.choiceTrialCt);
+a.choiceTrialsOrg = NaN(a.mouseCt,a.maxChoiceTrials);
+for m=1:a.mouseCt   
+   a.choiceTrialsOrg(m,1:a.choiceTrialCt(m)) = a.choicebyMouse{m}; 
+end
+
+%% CHOICE AND REVERSE START
+
+% FIND DAYS WITH CHOICE TRIALS
+% ASK IF THEY ARE PREREVERSE
+
+% a.firstChoice = first choice trial
+% a.firstChoiceDay = first choice day
+% a.firstReverse = first reverse trial
+% a.reverseDay = first reverse day
+% need reverse trianing trials
+% total reverse trials
+
+for m = 1:a.mouseCt
+   ok = a.mice(:,m) == 1;
+   mouseTypes = a.choiceTypeCorr(ok);
+   mouseReverse = a.preReverse(ok);
+   a.firstChoice(m,1) = find(mouseTypes == 1,1); % within all that mouse's trials
+   a.mouseChoiceDays{m} = unique(a.mouseDay(find(a.choiceTypeCorr==1 & ok)));
+   a.firstChoiceDay(m,1) = a.mouseDay(find(a.choiceTypeCorr==1 & ok,1));
+   a.mouseReverseDays{m} = unique(a.mouseDay(find(a.preReverse==0 & ok)));
+   a.firstReverse(m,1) = find(mouseReverse == 0,1); % within all that mouse's trials
+   a.firstReverseChoice(m,1) = find(mouseTypes == 1 & mouseReverse == 0,1);
+   a.lastReverse(m,1) = find(mouseReverse == 0,1,'last');
+   choiceDays = a.mouseChoiceDays{m};
+   reverseDays = a.mouseReverseDays{m};
+   a.reverseChoiceDays(m) = numel(choiceDays(ismember(a.mouseChoiceDays{m},a.mouseReverseDays{m})));
+   a.reverseTrainingDays(m) = numel(reverseDays(~ismember(a.mouseReverseDays{m},a.mouseChoiceDays{m})));
+   reverse = a.preReverseByMouse{m};
+   a.firstReverseInChoiceTrials(m,1) = find(reverse==0,1);
+end
+
+a.trialsPreReverse = a.firstReverse - a.firstChoice;
+a.choiceDaysPreReverse = a.reverseDay - a.firstChoiceDay;
+a.trialsReverseTraining = a.firstReverseChoice - a.firstReverse;
+a.trialsReverseWithChoices = a.lastReverse - a.firstReverseChoice;
+
+%% ALL CHOICES ALIGNED TO REVERSE START
+
+% find first reverse trial within choicesand then max pre and post, create NaN array
+% will with data for each mouse
+
+maxChoiceAllTrials = max(a.firstReverseInChoiceTrials) + max(a.choiceAllTrialCt - a.firstReverseInChoiceTrials)+1;
+a.commonReverse = max(a.firstReverseInChoiceTrials); % first reversed choice trial
+a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
+
+for m = 1:a.mouseCt
+   % relative to reverse start
+   % postReverse = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));
+   % preReverse = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
+   
+   choices = a.choiceAllbyMouse{m};
+   
+   a.choiceTrialsOrgRev(m,a.commonReverse - a.firstReverseInChoiceTrials(m,1)+1 : a.commonReverse-1) = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
+   a.choiceTrialsOrgRev(m,a.commonReverse : a.commonReverse + a.choiceAllTrialCt(m,1)-a.firstReverseInChoiceTrials(m,1)) = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));  
+end
+
+%% MEAN CHOICES / STATS AND CHOICE RANGES
+
+trialsToCount = 500;
+
+for m = 1:a.mouseCt
+    
+   choicesIIS = a.choiceIISByMouse{m};
+   
+   preReverseTrials = find(a.preReverseByMouse{m} == 1,trialsToCount,'last');
+   postReverseTrials = find(a.preReverseByMouse{m} == 0,trialsToCount,'last');
+   
+   [a.pref(m,1),a.prefCI(m,1:2)] = binofit(sum(choicesIIS(preReverseTrials)==1),numel(choicesIIS(preReverseTrials)));
+   [a.pref(m,2),a.prefRevCI(m,1:2)] = binofit(sum(choicesIIS(postReverseTrials)==1),numel(choicesIIS(postReverseTrials)));
+    
+   ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
+   
+   choicePreRev = a.choice_all(ok & a.preReverse == 1);
+   choicePostRev = a.choice_all(ok & a.preReverse == 0);
+   
+   [a.meanChoice(m,1),a.choiceCI(m,1:2)] = binofit(sum(choicePreRev==1),numel(choicePreRev));
+   [a.meanChoice(m,2),a.choiceRevCI(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
    a.meanChoice(m,3) = m;
-   a.choiceRxnByMouse{m} = a.rxn(ok == 1 & a.preReverse == 1);
-   a.choiceEarlyLicksByMouse{m} = a.earlyLicks(ok == 1 & a.preReverse == 1);
-   a.choiceAnticLicksByMouse{m} = a.betweenLicks(ok == 1 & a.preReverse == 1);
-   a.choiceRewardByMouse{m} = a.reward(ok == 1 & a.preReverse == 1);
-   a.choiceAllRxnByMouse{m} = a.rxn(ok == 1);
-   a.choiceAllEarlyLicksByMouse{m} = a.earlyLicks(ok == 1);
-   a.choiceAllAnticLicksByMouse{m} = a.betweenLicks(ok == 1);
-   a.choiceAllRewardByMouse{m} = a.reward(ok == 1);
-   a.preReverseByMouse{m} = a.preReverse(ok == 1);
-   a.choiceIISByMouse{m} = a.choice_all(ok == 1);
    
    x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
    y = a.choice_all(ok);
    [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
    a.beta(m,:) = a.stats(m).beta;
    a.betaP(m,:) = a.stats(m).p;
-   
 end
 
-%% ALL PRE-REVERSE CHOICES ALIGNED TO START
+allChoices = a.choiceCorr(a.choiceCorrTrials & a.preReverse == 1);
+[a.overallPref,a.overallCI] = binofit(sum(allChoices == 1),numel(allChoices));
+clear allChoices;
 
-% a.choiceByMouse %a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
+%% CHOICE BY DAY - SKIP 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-for m=1:a.mouseCt
-a.choiceTrialCt(m,1) = numel(a.choicebyMouse{m});
-end
-a.maxChoiceTrials = max(a.choiceTrialCt);
+% THIS IS THE SAME AS a.daySummary.percentInfo
 
-a.choiceTrialsOrg = NaN(a.mouseCt,a.maxChoiceTrials);
-for m=1:a.mouseCt
-   a.choiceTrialsOrg(m,1:a.choiceTrialCt(m)) = a.choicebyMouse{m}; 
-end
+% need to make pre-reverse?!? rel to initial info side?!?
 
-%% ALL CHOICES ALIGNED TO REVERSE START
-
-
+% for m = 1:a.mouseCt
+%     for d = 1:a.mouseDayCt(m)
+%        ok = a.mice(:,m) & a.mouseDay == d;
+%        a.choicesbyDay{m,d} = a.choiceCorr(ok & a.choiceTypeCorr == 1);
+%        a.meanDayChoice{m,d} = mean(a.choicesbyDay{m,d});
+%     end
+% end
+% 
+% for m = 1:a.mouseCt
+%     choiceDays = find(~isnan(cell2mat(a.meanDayChoice(m,:))));
+%     choiceDayCt(m) = size(choiceDays,2);
+%     a.choiceDays{m,:} = choiceDays;
+%     for dd = 1:size(choiceDays,2)
+%         a.meanDayChoicesOrg{m,dd} = a.meanDayChoice{m,choiceDays(dd)};
+%     end    
+% end
+% 
+% %% ALIGN TO REVERSAL
+% 
+% % FINDS a.revChoiceDays(m,:), the days in a.mouseDay for each mouse to calculate aligned values
+% 
+% for m = 1:a.mouseCt
+%     choiceReverseDay(m) = find(a.choiceDays{m,:} == a.reverseDay(m));
+% end
+% 
+% a.commonReverse = max(choiceReverseDay)-1;
+% postReverseDayCt = choiceDayCt - choiceReverseDay;
+% % maxPostReverse = max(cell2mat(postReverseDays));
+% % DAY TO ALIGN REVERSALS
+% revAlign = a.commonReverse+1;
+% 
+% a.meanDayChoicesRevOrg = cell(a.mouseCt);
+% for m=1:a.mouseCt
+%     preReverseDays{m} = a.choiceDays{m,1}(1):choiceReverseDay(m);
+%     postReverseDays{m} = choiceReverseDay(m)+1:choiceReverseDay(m) + postReverseDayCt(m);
+%     mouseDayswRev{m} = [preReverseDays{m} postReverseDays{m}]; % same as choice days!
+%     for d = 1:choiceReverseDay(m)
+%        a.meanDayChoicesRevOrg(m,revAlign-choiceReverseDay(m)+d) = a.meanDayChoicesOrg(m,d); 
+%     end
+%     for d = 1:choiceDayCt(m)-choiceReverseDay(m)
+%        a.meanDayChoicesRevOrg(m,revAlign+d) = a.meanDayChoicesOrg(m,choiceReverseDay(m)+d); 
+%     end
+%     a.revChoiceDays{m,:} = find(~cellfun(@isempty,a.meanDayChoicesRevOrg(m,:)));
+% end
+% 
+% a.meanDayChoicesRevOrg(cellfun(@isempty,a.meanDayChoicesRevOrg(:,:))) = {NaN};
+% a.dayswRev = size(a.meanDayChoicesRevOrg,2);
+% 
+% a.meanChoicebyRevDay = mean(cell2mat(a.meanDayChoicesRevOrg),1,'omitnan');
+% a.semChoicebyRevDay = sem(cell2mat(a.meanDayChoicesRevOrg));
+% 
+% a.totalChoiceDays = size(a.meanDayChoicesRevOrg,2);
+% 
+% 
+% %% CALCULATE COMMON DAY FOR EACH TRIAL
+% 
+% % a.allDay is the day from 1:totalchoicedays for each trial, aligned to
+% % reversal
+% 
+% a.allDay = zeros(size(a.mouseDay,1),1);
+% for m = 1:a.mouseCt
+%     revChoiceDays = a.revChoiceDays{m,1};
+%     choiceDays = a.choiceDays{m,1};
+%     for d = 1:size(revChoiceDays,2)
+%         corrDay = revChoiceDays(d);
+%         ok = a.mice(:,m) == 1 & a.mouseDay == choiceDays(d);
+%         a.allDay(ok) = corrDay;
+%     end
+% end
+% 
+% % test mean choices
+% 
+% % for d = 1:a.totalChoiceDays
+% %    ok = a.allDay == d & a.trialType == 1;
+% %    overallDayMean(d) = mean(a.info(ok));  
+% % end
 
 %% SORT BY INFO PREFERENCE
 
-a.sortedChoice = sortrows(a.meanChoice,1);
-a.meanSortedChoice = a.sortedChoice(:,1);
-a.sortedMouseList = a.mouseList(a.sortedChoice(:,3));
-
-% sort mice by info preference 
-mouseOrder = a.sortedChoice(:,3);
-for m = 1:a.mouseCt
-    a.sortedMice(:,m) = a.mice(:,mouseOrder(m));
-end
+[a.sortedChoice,a.sortIdx] = sortrows(a.meanChoice,1);
+a.sortedMouseList = a.mouseList(a.sortIdx);
+a.sortedCI = a.choiceCI(a.sortIdx,:);
 
 %% STATS
 
@@ -325,7 +480,6 @@ for m = 1:a.mouseCt
        a.choiceTypeSizesmouseDays(d,:,m) = [sum(a.infoForcedCorr(ok)) sum(a.infoChoiceCorr(ok)) sum(a.randForcedCorr(ok)) sum(a.randChoiceCorr(ok))];
     end
 end
-
 
 %% LICK INDEX
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
