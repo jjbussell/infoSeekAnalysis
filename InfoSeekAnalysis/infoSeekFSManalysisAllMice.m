@@ -240,8 +240,8 @@ for m = 1:a.mouseCt
    a.choiceAllbyMouse{m} = a.choiceCorr(ok == 1);
    a.choicebyMouse{m} = a.choiceCorr(ok == 1 & a.preReverse == 1); % preReverse
    a.cumChoiceByMouse{m} = cumsum(a.choicebyMouse{m});
-   meanChoice(m,1) = mean(a.choicebyMouse{m});
-   meanChoice(m,2) = m;
+   a.meanChoice(m,1) = mean(a.choiceCorr(ok & a.preReverse == 1));
+   a.meanChoice(m,2) = mean(a.choiceCorr(ok & a.preReverse == 0));
    a.choiceRxnByMouse{m} = a.rxn(ok == 1 & a.preReverse == 1);
    a.choiceEarlyLicksByMouse{m} = a.earlyLicks(ok == 1 & a.preReverse == 1);
    a.choiceAnticLicksByMouse{m} = a.betweenLicks(ok == 1 & a.preReverse == 1);
@@ -260,8 +260,6 @@ end
 %    a.choiceEarlyLicksByMouse{m} = a.earlyLicks(ok == 1 & a.choiceTypeCorr == 1);
 %    a.choiceAnticLicksByMouse{m} = a.betweenLicks(ok == 1 & a.choiceTypeCorr == 1);
 % end
-
-a.meanChoice = meanChoice(:,1);
 
 %% SORT BY INFO PREFERENCE
 
@@ -432,8 +430,11 @@ end
 % for licks, need # early licks per trial, whether pre or post rev, init
 % info side?
 
+
+% THIS IS NOT CORRECT--maybe ok now?
 a.choice_all = a.choiceCorr; % choice_all
-a.choice_all(a.preReverse == 0) = ~a.choiceCorr(a.preReverse == 0);
+reverseFlag = a.preReverse == 0;
+a.choice_all(reverseFlag) = ~a.choice_all(reverseFlag);
 
 a.initinfoside_info = zeros(a.corrTrialCt,1);
 a.initinfoside_info(:) = -1; % initinfoside_info
@@ -488,15 +489,21 @@ a.meanChoiceByTrial = mean(a.choiceTrialsOrg,1,'omitnan');
 
 %% EARLY LICKS BY REVERSAL
 
+% NEED TO FINISH
+
 a.initInfoLicks = mean(a.earlyLicks(a.initinfoside_info == 1));
 a.initNoInfoLicks = mean(a.earlyLicks(a.initinfoside_info == -1));
 a.earlyLickIdx = (a.initInfoLicks - a.initNoInfoLicks)/(a.initInfoLicks + a.initNoInfoLicks);
 
 for m=1:a.mouseCt
    ok = a.mice(:,m) == 1;
+   % pre-reverse, INFO
    a.preRevEarlyLicks(m,1) = mean(a.earlyLicks(a.initinfoside_info == 1 & a.preReverse == 1 & ok == 1));
+   % pre-reverse, NO INFO
    a.preRevEarlyLicks(m,2) = mean(a.earlyLicks(a.initinfoside_info == -1 & a.preReverse == 1 & ok == 1));
+   % post-reverse, INFO
    a.postRevEarlyLicks(m,1) = mean(a.earlyLicks(a.initinfoside_info == 1 & a.preReverse == 0 & ok == 1));
+   % post-reverse, NO INFO
    a.postRevEarlyLicks(m,2) = mean(a.earlyLicks(a.initinfoside_info == -1 & a.preReverse == 0 & ok == 1));
 end
 
