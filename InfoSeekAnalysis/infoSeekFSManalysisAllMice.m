@@ -25,6 +25,7 @@ dlg_title = 'Load preFSM data?';
 num_lines = 1;
 defaultans = {'1'};
 loadData = inputdlg(prompt,dlg_title,num_lines,defaultans);
+
 loadData = str2num(cell2mat(loadData));
 
 if loadData == 1
