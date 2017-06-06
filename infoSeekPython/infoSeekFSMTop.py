@@ -37,11 +37,11 @@ mouse = 'JB175'
 sessionEnd = '3'
 sessionTrials = '1000000'
 imageFlag = '1'
-trialTypes = '4' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = all three
+trialTypes = '5' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = all three
 infoSide = '0' #For now control1 goes to left port (looking from inside box), as do odors 0-2==INFO
 infoOdor = '2'
 randOdor = '1'
-choiceOdor = '0'
+choiceOdor = '4'
 odorA = '0'
 odorB = '3'
 odorC = '1' 
@@ -52,7 +52,7 @@ startDelay = '0' #50, 0
 odorDelay = '2000' #1300, 0
 odorTime = '200'  #300, 0
 rewardDelay = '2000' #1500, 0
-bigRewardTime = '150' #100, 50 for training
+bigRewardTime = '200' #100, 50 for training
 smallRewardTime = '0' #0, 50 for training
 infoRewardProb = '50' #50
 randRewardProb = '50' #50

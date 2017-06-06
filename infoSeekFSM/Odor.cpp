@@ -77,9 +77,11 @@ void odorOff (int rewardOdor) {
 
 // Center odors
 void centerOdorOn (int centOdor){
-  controlOff(3);
-  digitalWrite (valves4[centOdor], HIGH);
-  digitalWrite (valves5[centOdor], HIGH);
+  if (centOdor<4){
+    controlOff(3);
+    digitalWrite (valves4[centOdor], HIGH);
+    digitalWrite (valves5[centOdor], HIGH);
+  }
   centerOdorValveOpen = 1;
   currentCenterOdor = centOdor;
   Serial.print("center odor on ");
@@ -88,9 +90,11 @@ void centerOdorOn (int centOdor){
 }
 
 void centerOdorOff (int centOdor){
-  controlOn(3);
-  digitalWrite (valves4[centOdor], LOW);
-  digitalWrite (valves5[centOdor], LOW);
+  if (centOdor<4){
+    controlOn(3);
+    digitalWrite (valves4[centOdor], LOW);
+    digitalWrite (valves5[centOdor], LOW);
+  }
   centerOdorValveOpen = 0;
   Serial.print("center odor off ");
   Serial.println(centOdor);

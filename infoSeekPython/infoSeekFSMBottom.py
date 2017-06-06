@@ -41,7 +41,7 @@ trialTypes = '5' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = 
 infoSide = '0' #For now control1 goes to left port (looking from inside box), as do odors 0-2==INFO
 infoOdor = '3'
 randOdor = '0'
-choiceOdor = '2'
+choiceOdor = '4'
 odorA = '2'
 odorB = '0'
 odorC = '3' 
