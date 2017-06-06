@@ -77,6 +77,7 @@ if loadData == 1
     a.betweenLicks = [b.betweenLicks; c.betweenLicks];
     a.earlyLicks = [b.earlyLicks; c.earlyLicks];
     a.waterLicks = [b.waterLicks; c.waterLicks];
+    a.outcome = [b.outcome; zeros(numel(b.fileAll),1)]; % outcome only calculated for FSM
     
     clear b; clear c;
 end
@@ -578,8 +579,10 @@ end
 
 for m = 1:a.mouseCt
     for d = 1:a.mouseDayCt(m)
-        % OUTCOMES (all trials)
+        % OUTCOMES (all trials)        
+%         if sum(a.FSM(a.miceAll(:,m) == 1)>0)
 %         a.daySummary.outcome{m,d} = a.outcome(a.mouseDayAll == d & a.miceAll(:,m) == 1);
+%         end
         
         % OTHER (correct trials)
         ok = [];

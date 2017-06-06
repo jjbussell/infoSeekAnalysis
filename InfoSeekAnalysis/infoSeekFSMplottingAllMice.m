@@ -391,16 +391,16 @@ end
 % end
 
     %% bar plot for each day
-% for m = 1:a.mouseCt
+% for m = 15:a.mouseCt
 %     
-% % for m = [9]    
+% % for m = 1:mouseCt    
 %     figure();
 %     fig = gcf;
 %     fig.PaperUnits = 'inches';
 %     fig.PaperPosition = [1 1 8 10];
 % %     set(fig,'PaperOrientation','landscape');
 %     set(fig,'renderer','painters')
-%     for d = 1:a.mouseDayCt(m)
+%     for d = a.mouseDayCt(m)
 %         ax = nsubplot(a.mouseDayCt(m),1,d,1);
 %         if d==1
 %         title(a.mouseList(m));       
@@ -419,6 +419,40 @@ end
 %         end
 %     end
 % end
+
+%%  bar plot for most recent day
+
+% for m = 15:a.mouseCt
+for m = 1:a.mouseCt
+    
+% for m = 1:mouseCt    
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [1 1 10 7];
+    set(fig,'PaperOrientation','landscape');
+    set(fig,'renderer','painters')
+    for d = a.mouseDayCt(m)
+        ax = nsubplot(1,1,1,1);
+        title(a.mouseList(m));       
+        ax.FontSize = 10;
+        [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+        bar([1:17],outcomeCounts);
+        plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+        plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
+        if d == ceil(a.mouseDayCt(m)/2)
+        ylabel('Trial Outcomes (% of trials)');
+        end
+        if d == a.mouseDayCt(m)
+            ax.XTick = [1:17];
+        set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
+        end
+    end
+    
+    saveas(fig,fullfile(pathname,['outcomes' a.mouseList{m}]),'pdf');
+    
+end
+
 
     %% OVERALL
 % for m=1:a.mouseCt 
