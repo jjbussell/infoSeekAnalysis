@@ -304,14 +304,29 @@ for m = 1:a.mouseCt
    ok = a.mice(:,m) == 1;
    mouseTypes = a.choiceTypeCorr(ok);
    mouseReverse = a.preReverse(ok);
-   a.firstChoice(m,1) = find(mouseTypes == 1,1); % within all that mouse's trials
-   a.mouseChoiceDays{m} = unique(a.mouseDay(find(a.choiceTypeCorr==1 & ok)));
-   a.firstChoiceDay(m,1) = a.mouseDay(find(a.choiceTypeCorr==1 & ok,1));
+%    if isempty(find(mouseTypes == 1,1))
+%       a.firstChoice(m,1) = NaN;
+%       a.mouseChoiceDays{m} = [];
+%       a.firstChoiceDay(m,1) = NaN;
+%       choiceDays =[];
+%    else
+     a.firstChoice(m,1) = find(mouseTypes == 1,1); % within all that mouse's trials
+     a.mouseChoiceDays{m} = unique(a.mouseDay(find(a.choiceTypeCorr==1 & ok)));
+     a.firstChoiceDay(m,1) = a.mouseDay(find(a.choiceTypeCorr==1 & ok,1)); 
+     choiceDays = a.mouseChoiceDays{m};
+%    end
+%    if isempty(find(mouseReverse == 0,1))
+%        a.mouseReverseDays{m} = [];
+%        a.firstReverse(m,1) = NaN;
+%        a.firstReverseChoice(m,1) % if empty
+%        a.lastReverse(m,1) = NaN;
+%        reverseDays
+%        a.firstReverseInChoiceTrials(m,1)
+%    end
    a.mouseReverseDays{m} = unique(a.mouseDay(find(a.preReverse==0 & ok)));
    a.firstReverse(m,1) = find(mouseReverse == 0,1); % within all that mouse's trials
    a.firstReverseChoice(m,1) = find(mouseTypes == 1 & mouseReverse == 0,1);
    a.lastReverse(m,1) = find(mouseReverse == 0,1,'last');
-   choiceDays = a.mouseChoiceDays{m};
    reverseDays = a.mouseReverseDays{m};
    a.reverseChoiceDays(m) = numel(choiceDays(ismember(a.mouseChoiceDays{m},a.mouseReverseDays{m})));
    a.reverseTrainingDays(m) = numel(reverseDays(~ismember(a.mouseReverseDays{m},a.mouseChoiceDays{m})));
