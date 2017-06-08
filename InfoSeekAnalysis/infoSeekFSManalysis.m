@@ -1,3 +1,5 @@
+% account for choice vs all mice
+
 clear;
 close all;
 
