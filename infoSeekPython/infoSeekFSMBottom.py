@@ -33,29 +33,29 @@ def num(s):
 ##############  SET ARDUINO PARAMETERS  ############################
 
 ##############  SET ARDUINO PARAMETERS  ############################
-mouse = 'JB181'
+mouse = 'JB179'
 sessionEnd = '3'
 sessionTrials = '1000000'
 imageFlag = '0'
-trialTypes = '5' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = all three
+trialTypes = '4' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = all three
 infoSide = '0' #For now control1 goes to left port (looking from inside box), as do odors 0-2==INFO
-infoOdor = '3'
-randOdor = '0'
-choiceOdor = '4'
+infoOdor = '2'
+randOdor = '3'
+choiceOdor = '0'
 odorA = '2'
-odorB = '0'
-odorC = '3' 
-odorD = '1'
+odorB = '1'
+odorC = '0' 
+odorD = '3'
 centerDelay = '0' #0
 centerOdorTime = '200' #200, 0
 startDelay = '0' #50, 0
 odorDelay = '1200' #1300, 0
 odorTime = '200'  #300, 0
 rewardDelay = '3000' #1500, 0
-bigRewardTime = '200' #100, 50 for training
+bigRewardTime = '400' #100, 50 for training
 smallRewardTime = '0' #0, 50 for training
-infoRewardProb = '50' #50
-randRewardProb = '50' #50
+infoRewardProb = '12.5' #50
+randRewardProb = '12.5' #50
 gracePeriod = '0' #4000, 1000000000
 interval = '4000' #4500, 0
 TOU_THRESH = '15'
