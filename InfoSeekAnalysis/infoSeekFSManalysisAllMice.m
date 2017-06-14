@@ -373,18 +373,18 @@ maxChoiceAllTrials = max(a.firstReverseInChoiceTrials) + max(a.choiceAllTrialCt 
 a.commonReverse = max(a.firstReverseInChoiceTrials); % first reversed choice trial
 a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 
-if ~isempty(a.choiceMice)
-    for m = a.choiceMice(1):a.choiceMice(end) 
-       % relative to reverse start
-       % postReverse = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));
-       % preReverse = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
-
-       choices = a.choiceAllbyMouse{m};
-
-       a.choiceTrialsOrgRev(m,a.commonReverse - a.firstReverseInChoiceTrials(m,1)+1 : a.commonReverse-1) = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
-       a.choiceTrialsOrgRev(m,a.commonReverse : a.commonReverse + a.choiceAllTrialCt(m,1)-a.firstReverseInChoiceTrials(m,1)) = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));  
-    end
-end
+% if ~isempty(a.choiceMice)
+%     for m = a.choiceMice(1):a.choiceMice(end) 
+%        % relative to reverse start
+%        % postReverse = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));
+%        % preReverse = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
+% 
+%        choices = a.choiceAllbyMouse{m};
+% 
+%        a.choiceTrialsOrgRev(m,a.commonReverse - a.firstReverseInChoiceTrials(m,1)+1 : a.commonReverse-1) = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
+%        a.choiceTrialsOrgRev(m,a.commonReverse : a.commonReverse + a.choiceAllTrialCt(m,1)-a.firstReverseInChoiceTrials(m,1)) = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));  
+%     end
+% end
 
 %% MEAN CHOICES / STATS AND CHOICE RANGES
 
@@ -645,7 +645,10 @@ for m = 1:a.mouseCt
         a.daySummary.infoSmall{m,d} = sum(a.infoSmall(ok));
         a.daySummary.randBig{m,d} = sum(a.randBig(ok));
         a.daySummary.randSmall{m,d} = sum(a.randSmall(ok));
+        lastFileIdx = find(ok,1,'last');
+        a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),24};
         a.daySummary.totalRewards{m,d} = sum(a.reward(ok));
+        a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
         a.daySummary.percentInfo{m,d} = mean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1));
         a.daySummary.rxnInfoForced{m,d} = mean(a.rxn(a.infoForcedCorr & ok));
         a.daySummary.rxnInfoChoice{m,d} = mean(a.rxn(a.infoChoiceCorr & ok));
