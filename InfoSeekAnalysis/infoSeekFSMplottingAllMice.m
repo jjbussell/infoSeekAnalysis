@@ -1,6 +1,8 @@
 %% TO CALC/FIX
 
 % fix lick prob days for histogram
+% automatically plot only new mice! test=cell2mat(a.parameters(:,3)); t =
+% datetime(test,'InputFormat','yyyy-MM-dd');
 
 % scatter of initial vs reversal pref for IIS in diff bins (# trials,
 % days)--> NEED TO FIX BINNING/numToPlot?
@@ -239,14 +241,14 @@ for m = 1:a.mouseCt
 
    
     saveas(fig,fullfile(pathname,a.mouseList{m}),'pdf');
-%     close(fig);
+    close(fig);
     
 end
 
 
 %% PLOT DAY SUMMARIES BY MOUSE BEFORE CHOICE
 
-for m = 1:a.mouseCt
+for m = 21:a.mouseCt
     figure();
     
     fig = gcf;
@@ -258,18 +260,24 @@ for m = 1:a.mouseCt
     ax = nsubplot(4,2,1,1);
     title(a.mouseList(m));
     ax.FontSize = 8;
-    ax.XTick = [0:5:a.mouseDayCt(m)];    
-    ax.YTick = [0 0.25 0.50 0.75 1];
-    ax.YLim = [0 1];
+    ax.XTick = [0:5:a.mouseDayCt(m)];
+    ax.XLim = [1 a.mouseDayCt(m)]; 
 %     set(ax,'units','inches');
-%     ax.Position = [1 1 5 1];
-    if sum(isnan(cell2mat(a.daySummary.percentInfo(m,:)))) ~= a.mouseDayCt(m)
-    plot(0:a.mouseDayCt(m),[0 cell2mat(a.daySummary.percentInfo(m,:))],'Color',a.mColors(m,:),'LineWidth',2,'Marker','o','MarkerFaceColor',a.mColors(m,:),'MarkerSize',3);
-    plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+%     adoc x.Position = [1 1 5 1];
+%     yyaxis left;
+%     bar(1:a.mouseDayCt(m),cell2mat(a.daySummary.totalTrials(m,:)),0.5,'FaceColor',[1 1 1],'EdgeColor',[0.3 0.3 0.3]);
+%     ylabel('Trials completed');
+%     ax.YColor = 'k';
+%     yyaxis right;
+%     scatter(1:a.mouseDayCt(m),cell2mat(a.daySummary.infoBigProb(m,:)),'filled','markerfacecolor','k');
+    plot(1:a.mouseDayCt(m),cell2mat(a.daySummary.infoBigProb(m,:)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
+    for d = 1:a.mouseDayCt(m)
+    text(d+0.1,a.daySummary.infoBigProb{m,d}+10,[num2str(a.daySummary.totalTrials{m,d}),' trials'],'Fontsize',5);
     end
-    ylabel({'Info choice', 'probability'}); %ylabel({'line1', 'line2','line3'},)
-%     xlabel('Day');
+    ylabel('Big reward probability');
+    ax.YLim = [0 100];
+    ax.YTick = [0 25 50 75 100];
+%     ax.YColor = 'k';
     hold off;
     
     ax = nsubplot(4,2,2,1);
@@ -403,8 +411,8 @@ for m = 1:a.mouseCt
     hold off;
 
    
-    saveas(fig,fullfile(pathname,a.mouseList{m}),'pdf');
-%     close(fig);
+    saveas(fig,fullfile(pathname,['preChoice' a.mouseList{m}]),'pdf');
+    close(fig);
     
 end
 
@@ -516,60 +524,62 @@ a.FSMmouseIdx = find(a.FSMmice);
 
 
     %% STACKED BARS
-% 
-% for m = 1:a.mouseCt
-%     if a.mouseDayCt(m) > 3
-%         for d = 1:a.mouseDayCt(m)
-%             [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
-%         end
-% 
-%         figure();
-%         fig = gcf;
-%         fig.PaperUnits = 'inches';
-%         fig.PaperPosition = [1 1 8 10];
-%         set(fig,'renderer','painters')
-%         set(fig,'PaperOrientation','landscape');
-% 
-%         ax = nsubplot(1,1,1,1);
-%         title(a.mouseList(m));
-%         ax.FontSize = 10;
-%         ylabel('Trial Outcomes (% of trials)');
-%         xlabel('Day');
-%         ax.YLim = [0 1];
-%         ax.YTick = [0:0.25:1];
-%         colormap(fig,CC);
-%         bar(outcomeCounts,'stacked');
-%         set(gca, 'ydir', 'reverse');
-%         leg = legend(ax,a.outcomeLabels,'Location','eastoutside');
-%         leg.Box = 'off';
-%         leg.FontWeight = 'bold';
-%     else
-%         figure();
-%         fig = gcf;
-%         fig.PaperUnits = 'inches';
-%         fig.PaperPosition = [1 1 8 10];
-%     %     set(fig,'PaperOrientation','landscape');
-%         set(fig,'renderer','painters')
-%         for d = 1:a.mouseDayCt(m)
-%             ax = nsubplot(a.mouseDayCt(m),1,d,1);
-%             if d==1
-%             title(a.mouseList(m));       
-%             end
-%             ax.FontSize = 10;
-%             [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
-%             bar([1:17],outcomeCounts);
-%             plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-%             plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
-%             if d == ceil(a.mouseDayCt(m)/2)
-%             ylabel('Trial Outcomes (% of trials)');
-%             end
-%             if d == a.mouseDayCt(m)
-%                 ax.XTick = [1:17];
-%             set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
-%             end
-%         end
-%     end
-% end
+
+for m = 21:a.mouseCt
+    if a.mouseDayCt(m) > 3
+        for d = 1:a.mouseDayCt(m)
+            [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+        end
+
+        figure();
+        fig = gcf;
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [1 1 8 10];
+        set(fig,'renderer','painters')
+        set(fig,'PaperOrientation','portrait');
+
+        ax = nsubplot(1,1,1,1);
+        title(a.mouseList(m));
+        ax.FontSize = 10;
+        ylabel('Trial Outcomes (% of trials)');
+        xlabel('Day');
+        ax.YLim = [0 1];
+        ax.YTick = [0:0.25:1];
+        colormap(fig,CC);
+        bar(outcomeCounts,'stacked');
+        set(gca, 'ydir', 'reverse');
+        leg = legend(ax,a.outcomeLabels,'Location','eastoutside');
+        leg.Box = 'off';
+        leg.FontWeight = 'bold';
+    else
+        figure();
+        fig = gcf;
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [1 1 8 10];
+    %     set(fig,'PaperOrientation','landscape');
+        set(fig,'renderer','painters')
+        for d = 1:a.mouseDayCt(m)
+            ax = nsubplot(a.mouseDayCt(m),1,d,1);
+            if d==1
+            title(a.mouseList(m));       
+            end
+            ax.FontSize = 10;
+            [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+            bar([1:17],outcomeCounts);
+            plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+            plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
+            if d == ceil(a.mouseDayCt(m)/2)
+            ylabel('Trial Outcomes (% of trials)');
+            end
+            if d == a.mouseDayCt(m)
+                ax.XTick = [1:17];
+            set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
+            end
+        end
+    end
+    saveas(fig,fullfile(pathname,['outcomes' a.mouseList{m}]),'pdf');
+    close(fig);
+end
 
     %% bar plot for each day
 % for m = 15:a.mouseCt
@@ -603,10 +613,9 @@ a.FSMmouseIdx = find(a.FSMmice);
 
 %%  bar plot for most recent day
 
-% for m = 15:a.mouseCt
-for m = a.FSMmouseIdx(1):a.FSMmouseIdx(end)
-    
-% for m = 1:mouseCt    
+% for m = a.FSMmouseIdx(1):a.FSMmouseIdx(end)
+%     
+for m = 21:a.mouseCt    
     figure();
     fig = gcf;
     fig.PaperUnits = 'inches';
@@ -630,9 +639,8 @@ for m = a.FSMmouseIdx(1):a.FSMmouseIdx(end)
         end
     end
     
-    saveas(fig,fullfile(pathname,['outcomes' a.mouseList{m}]),'pdf');
-%     close(fig);
-    
+    saveas(fig,fullfile(pathname,['outcomeDay' a.mouseList{m}]),'pdf');
+    close(fig);
 end
 
 
