@@ -1,4 +1,7 @@
 % add back lickProbDays
+
+% LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!!
+
 % add all mice aligned to reverse day & MEAN + error
 % add all mice aligned to reverse day, trial-by-trial/sliding window
 % all mice pre-reverse aligned to start & MEAN + error
