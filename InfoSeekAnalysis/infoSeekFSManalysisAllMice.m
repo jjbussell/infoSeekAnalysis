@@ -293,13 +293,22 @@ for m = 1:a.mouseCt
    a.choiceIISByMouse{m} = a.choice_all(ok);   
 end
 
-%% INSERT HERE
+%% CURRENT AND CHOICE MICE
 
 % create list of mice with choices to cycle through and sort names
 
 a.choiceMice = find(a.choiceTrialCt>0);
 a.choiceMiceList = a.mouseList(a.choiceMice);
 a.choiceMouseCt = numel(a.choiceMice);
+a.preChoiceMice = find(a.choiceTrialCt == 0);
+
+dayDates = datetime(cell2mat(a.parameters(:,3)),'InputFormat','yyyy-MM-dd');
+today = max(dayDates);
+currentDay = a.parameters(:,3) == today;
+a.currentMice = unique(a.parameters(currentDay,2));
+[~,a.currentMiceNums] = ismember(a.currentMice,a.mouseList);
+[~,a.currentChoiceMice] = ismember(a.currentMiceNums,a.choiceMice);
+a.currentChoiceMiceList = a.mouseList(a.currentChoiceMice);
 
 %% ALL PRE-REVERSE CHOICES ALIGNED TO START
 
