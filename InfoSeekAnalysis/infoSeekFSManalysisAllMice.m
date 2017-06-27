@@ -225,7 +225,7 @@ for m = 1:a.mouseCt
     fileSums = [0; cumsum(mouseFileCt)];
     if mouseFileCt(m,1) > 1
         mouseInfoSideDiff = diff(infoSide(a.fileMouse == m));
-        if sum(mouseInfoSideDiff) ~= 0        
+        if ~isempty(find(mouseInfoSideDiff) ~= 0)       
 %             a.reverseFile(m,1) = max(find(mouseInfoSideDiff~=0)) + 1;
             a.reverseFile(m,1) = find(mouseInfoSideDiff~=0,1,'first') + 1;
 %             a.prereverseFiles(fileSums(m) + a.reverseFile(m,1) : fileSums(m+1)) = 0;
