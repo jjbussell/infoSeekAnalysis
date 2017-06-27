@@ -339,7 +339,8 @@ void StateSideOdor::s_finish()
           controlOn(randControl);
       }      
     }
-  }  
+  }
+  tone(buzzer,12000);  
   next_state = REWARD_DELAY;
 }
 
@@ -396,6 +397,7 @@ void StateReward::s_setup()
       }
       else {Serial.println("reward 0, water not on");}
       rewardCount++;
+      //noTone(buzzer);
       if (reward == 1) {
         rewardBigCount++;
         Serial.println("Big reward");
@@ -440,6 +442,7 @@ void StateReward::s_finish()
   }
   Serial.println("TRIAL COMPLETE");
   printer(18,trialType,choice);
+  noTone(buzzer);
   if (trialType == 1 && choice == 0){
     randCCt++;
   }
