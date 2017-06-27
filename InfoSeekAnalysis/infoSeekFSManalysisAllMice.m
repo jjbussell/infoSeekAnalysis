@@ -293,7 +293,7 @@ for m = 1:a.mouseCt
    a.choiceIISByMouse{m} = a.choice_all(ok);   
 end
 
-%% CURRENT AND CHOICE MICE
+%% CURRENT AND CHOICE AND REVERSED MICE
 
 % create list of mice with choices to cycle through and sort names
 
@@ -309,6 +309,9 @@ a.currentMice = unique(a.parameters(currentDay,2));
 [~,a.currentMiceNums] = ismember(a.currentMice,a.mouseList);
 [~,a.currentChoiceMice] = ismember(a.currentMiceNums,a.choiceMice);
 a.currentChoiceMiceList = a.mouseList(a.currentChoiceMice);
+
+a.reverseMice = find(a.reverseFile>0);
+a.reverseMiceList = a.mouseList(a.reverseMice);
 
 %% ALL PRE-REVERSE CHOICES ALIGNED TO START
 
@@ -400,10 +403,12 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 
 %% MEAN CHOICES / STATS AND CHOICE RANGES
 
+% TAKE NON-REVERSE MICE OUT OF GLM CALCS
+
 trialsToCount = 500;
 
 if ~isempty(a.choiceMice)
-    for m = a.choiceMice(1):a.choiceMice(end) 
+    for m = a.reverseMice(1):a.reverseMice(end) 
 
        choicesIIS = a.choiceIISByMouse{m};
 
@@ -422,6 +427,7 @@ if ~isempty(a.choiceMice)
        [a.meanChoice(m,2),a.choiceRevCI(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
        a.meanChoice(m,3) = m;
 
+%        disp(['mouse ' num2str(m)]);
        x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
        y = a.choice_all(ok);
        [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');

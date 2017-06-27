@@ -1,9 +1,10 @@
 %% TO CALC/FIX
 
-% fix numToPlot for animals with few choices
-% make pre-choice animals automatic
+% TRIAL LENGTHS / LICKING TIME IN PORT-->how long does ITI need to be?
 
-% other things to plot only for current mice?
+% "checking"/out of trial flow side entries
+
+% outcome plots
 
 % fix lick prob days for histogram
 
@@ -994,16 +995,16 @@ if a.choiceMouseCt > 0
     ax.FontSize = 8;
     ax.XLim = [0 1];
     ax.YLim = [0 1];
-    for m = 1:a.choiceMouseCt
-%         plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+    for m = a.reverseMice(1):a.reverseMice(end)
+        plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
         plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
         dy = a.prefRevCI(m,2) - a.pref(m,2) + 0.02;
-        text(a.pref(m,1),a.pref(m,2) + dy,a.choiceMiceList{m},'HorizontalAlignment','center');
+        text(a.pref(m,1),a.pref(m,2) + dy,a.reverseMiceList{m},'HorizontalAlignment','center');
     end
     scatter(a.pref(:,1),a.pref(:,2),'filled')
     plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
     plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    text(a.choiceMouseCt+2,a.overallPref,['p = ' num2str(a.overallP)])
+    text(numel(a.reverseMice)+2,a.overallPref,['p = ' num2str(a.overallP)])
 %     patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
     ylabel({'% choice of initially informative side', 'POST-reversal'}); %{'Info choice', 'probability'}
     xlabel({'% choice of initially informative side', 'PRE-reversal'});
@@ -1032,15 +1033,15 @@ if a.choiceMouseCt > 0
         text(a.beta(m,1),a.beta(m,2) + 0.2,a.choiceMiceList{m},'HorizontalAlignment','center');
     end
     scatter(a.beta(:,1),a.beta(:,2),'filled')
-    plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
     ylabel({'Info preference', '(log odds biasing to currently informative side'}); %{'Info choice', 'probability'}
     xlabel({'Side bias', '(log odds biasing to initially informative side)'});
     title('Logistic Regression Analysis');
     hold off;
 
     saveas(fig,fullfile(pathname,'Regression'),'pdf');
-    close(fig);
+%     close(fig);
 
 end
 
