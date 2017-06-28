@@ -1,4 +1,10 @@
-% add back lickProbDays
+% TRIAL LENGTHS / LICKING TIME IN PORT-->how long does ITI need to be?
+
+% "checking"/out of trial flow side entries
+
+% outcome plots - ERROR RATES!
+
+% fix lick prob days for histogram
 
 % LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!!
 
@@ -9,6 +15,7 @@
 % Ethan's early lick index 
 % Ethan's logit--choice, infoside, prereverse, trial type
 % table
+% graph of all entries for each trial
 
 
 clear;
@@ -85,15 +92,17 @@ if loadData == 1
     a.earlyLicks = [b.earlyLicks; c.earlyLicks];
     a.waterLicks = [b.waterLicks; c.waterLicks];
     a.outcome = [b.outcome; zeros(numel(b.fileAll),1)]; % outcome only calculated for FSM
+    a.rewardAssigned = [b.trialParams(:,5); c.rewardSize]; % rewardSize in pre-FSM, need to calc from trialParms in FSM
     
     clear b; clear c;
     
-else % only FSM files
+else % only FSM files NEED TO FIX?!?!
     a.FSM = ones(numel(a.file),1);
     a.FSMall = ones(numel(a.fileAll),1);
     a.rxn = a.rxn(a.correct);
     a.odor2 = a.trialParams(:,6);
     a.trialLength = a.trialLength(a.correct);
+    a.rewardAssigned = b.trialParams(:,5);
 end
 
 %% DAYS

@@ -11,10 +11,11 @@
 % LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!!
 
 % scatter of initial vs reversal pref for IIS in diff bins (# trials,
-% days)--> NEED TO FIX BINNING/numToPlot?
+% days)--> NEED TO FIX BINNING/numToPlot? GET DAYS!!!
 % early lick index/other lick index
-% correlation side/info bias-->REGRESSION
-% correlation rxn time/early licks (normalize to time?)
+% correlation side/info bias-->REGRESSION--OK
+% correlation rxn time/early licks (normalize to time?) -- TALK TO ETHAN
+% AGAIN - need to throw out bad rxn time trials and days
 
 % sliding window (adjustable) of mean choice + CI from start through reversal
 % sliding window (adjustable) of mean choice + CI divided by reversal
