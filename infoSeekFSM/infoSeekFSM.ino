@@ -121,6 +121,10 @@ unsigned long rxn; // Time of choice
 unsigned long choiceStart; // Time of goCue
 unsigned long trialStart; // Time of trial start
 uint16_t sticky_touched = 0;
+uint16_t lickCt;
+uint16_t lastLickCt;
+uint16_t lickRate;
+
 
 //// PORTS AND ODORS AND WATER
 int infoPort; // informative port entry sensor
@@ -302,6 +306,9 @@ void loop() {
       rewardCount = 0;
       rewardBigCount = 0;
       rewardSmallCount = 0;
+      lickCt = 0;
+      lastLickCt = 0;
+      lickRt = 0;
 
       centerFlag = 0;
       randFlag = 0;
@@ -399,10 +406,18 @@ void loop() {
             if (licked > 0){
               Serial.print("licked ");
               Serial.println(licked);
+              lickCt++;
               printer(4, licked, 0);
               licked = 0;
             }
-          } 
+          }
+
+          if (currentTime % 100 == 0){
+            lickRate = lickCt - lastLickCt;
+            lastLickCt = lickCt;
+          }
+
+        //// GET LICK RATE (FOR DETERMINING REWARD)
 
         //// CHECK FOR IMAGING /////////////////////
         // CHANGE HERE TO CHANGE TIME!!
