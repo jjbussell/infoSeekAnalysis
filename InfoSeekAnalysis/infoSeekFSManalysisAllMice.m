@@ -1,14 +1,26 @@
-% test test test
-
 % TRIAL LENGTHS / LICKING TIME IN PORT-->how long does ITI need to be?
+    % a.centerEntryFirstTxn = first transition to center delay, but not time of
+    % entry b/c can have already entered when trial start. need
+    % b.centerEntryFirst, which doesn't get saved to a.!!! take (correct)
+    % for pre-FSM, b.firstCenterEntry (correct trials only)
 
-% "checking"/out of trial flow side entries
+% FOR TRIAL LENGTH, want time from goCue to next first correct center entry
+    % first correct center entries now exist--pull a.firstCenterEntry (FSM) and
+    % b.firstCenterEntry (pre-FSM)
+    % PULL IN GO CUE! FIX TRIAL LENGTH CALCS FOR FUTURE!
+
+% WANT DWELL TIME FOR REWARDED PORT ENTRY -- get entries
+
+% "checking"/out of trial flow side entries--> GET ENTRIES!!!
+
+% NEED TO SAVE ENTRIES TO a.
 
 % outcome plots - ERROR RATES!
 
 % fix lick prob days for histogram
 
-% LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!!
+% LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!! AND LICKING AFTER TRIAL
+% "ENDS"
 
 % add all mice aligned to reverse day & MEAN + error
 % add all mice aligned to reverse day, trial-by-trial/sliding window
@@ -95,6 +107,11 @@ if loadData == 1
     a.waterLicks = [b.waterLicks; c.waterLicks];
     a.outcome = [b.outcome; zeros(numel(b.fileAll),1)]; % outcome only calculated for FSM
     a.rewardAssigned = [b.trialParams(:,5); c.rewardSize]; % rewardSize in pre-FSM, need to calc from trialParms in FSM
+    a.goCue = [b.goCue(:,2); c.goCueAll];
+    a.firstCenterEntry = [b.firstCenterEntry(:,2); c.firstCenterEntryAll];
+%     a.rewardEntries = [b.rewardEntries; allRewardEntries Stuff
+    
+    % NEED TO PULL IN CENTER ENTRIES AND REWARD ENTRIES! and GO CUE
     
     clear b; clear c;
     
@@ -180,6 +197,21 @@ a.rxnInfoForcedCorr = a.rxn(a.infoForcedCorr);
 a.rxnInfoChoiceCorr = a.rxn(a.infoChoiceCorr);
 a.rxnRandForcedCorr = a.rxn(a.randForcedCorr);
 a.rxnRandChoiceCorr = a.rxn(a.randChoiceCorr);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% TRIAL LENGTH BY ENTRIES
+
+% for each file
+% for each trial before last
+a.trialLengthEntries = NaN(numel(a.fileAll));
+a.trialLengthEntries(1:end-1) = a.firstCenterEntry(2:end,2)-a.goCue(1:end-1);
+% a.trialLengthEntries = a.firstCenterEntry() - a.goCue(t);
+% for last trial
+% a.trialLengthEntries(tmax) = sum(a
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
