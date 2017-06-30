@@ -21,22 +21,25 @@ IMPROVEMENTS
 
 
 STATES:
-  WAIT_FOR_TRIAL,
-  START_TRIAL,
-  START_TRIAL_DELAY,
-  WAIT_FOR_CENTER,
-  CENTER_DELAY,
-  CENTER_ODOR,
-  CENTER_POSTODOR_DELAY,
-  GO_CUE, 
-  GO_CUE_DELAY,
-  RESPONSE,
-  GRACE_PERIOD,
-  SIDE_ODOR,
-  REWARD_DELAY,
-  REWARD,
-  INTER_TRIAL_INTERVAL, 
-  TIMEOUT
+ 0 WAIT_FOR_TRIAL,
+ 1 START_TRIAL,
+ 2 START_TRIAL_DELAY,
+ 3 WAIT_FOR_CENTER,
+ 4 CENTER_DELAY,
+ 5 CENTER_ODOR,
+ 6 CENTER_POSTODOR_DELAY,
+ 7 GO_CUE,
+ 8 GO_CUE_DELAY,
+ 9 RESPONSE,
+ 10 GRACE_PERIOD,
+ 11 WAIT_FOR_ODOR,
+ 12 SIDE_ODOR,
+ 13 REWARD_DELAY,
+ 14 DELIVER_REWARD,
+ 15 INTER_TRIAL_INTERVAL,
+ 16 TIMEOUT,
+ 17 REWARD_PAUSE
+ 18 REWARD_COMPLETE
  */
 
 
@@ -82,6 +85,8 @@ int TOUCH_IRQ = 3;
 unsigned long startTime; // Start time of session
 unsigned long currentTime; // Frequently updated
 int runSession;
+unsigned long rewardPauseTime;
+unsigned long rewardDropTime;
 
  // STATES
 STATE_TYPE next_state;
@@ -95,6 +100,7 @@ int newTrial;
 int trialCt;
 int trialType;
 unsigned long currentRewardTime;
+int rewardDrops;
 int  odor;
 int reward;
 int water;
@@ -291,6 +297,9 @@ void loop() {
       touch_left        =        Serial.parseInt();
 
       unsigned long entryThreshold = 20;
+
+      rewardDropTime = 30;
+      rewardPauseTime = 200;
       
       startTime = 0;
       currentTime = 0;
@@ -308,7 +317,7 @@ void loop() {
       rewardSmallCount = 0;
       lickCt = 0;
       lastLickCt = 0;
-      lickRt = 0;
+      lickRate = 0;
 
       centerFlag = 0;
       randFlag = 0;
@@ -368,8 +377,8 @@ void loop() {
         static StateGracePeriod state_grace_period(gracePeriod);
         static StateSideOdor state_side_odor(odorTime);
         static StateRewardDelay state_reward_delay(rewardDelay);
-        static StateReward state_reward(bigRewardTime); // update each trial
         static StateTimeout state_timeout(odorTime + rewardDelay + bigRewardTime);
+        static StateRewardPause state_reward_pause(rewardPauseTime);
 
 
         uint16_t touched = 0;
@@ -412,12 +421,13 @@ void loop() {
             }
           }
 
-          if (currentTime % 100 == 0){
-            lickRate = lickCt - lastLickCt;
-            lastLickCt = lickCt;
-          }
-
         //// GET LICK RATE (FOR DETERMINING REWARD)
+        if (currentTime % 200 == 0){
+          lickRate = lickCt - lastLickCt;
+          lastLickCt = lickCt;
+        }
+
+
 
         //// CHECK FOR IMAGING /////////////////////
         // CHANGE HERE TO CHANGE TIME!!
@@ -441,8 +451,8 @@ void loop() {
 
         //// WATCH PORTS
         //// MOVE TO FUNCTIONS/LIBRARY
-        if (beamBreak(centerPort) == 1){ // is being broken
-//        if (digitalRead(53) == LOW){ // TOUCHING
+//        if (beamBreak(centerPort) == 1){ // is being broken
+        if (digitalRead(53) == LOW){ // TOUCHING
           if (centerFlag == 0){ // if not currently broken
             Serial.println("Enter center");
             centerFlag = 1;
@@ -461,8 +471,8 @@ void loop() {
         }
 
 
-        if (beamBreak(infoPort) == 1){ // is being broken
-//        if (digitalRead(47) == LOW){
+//        if (beamBreak(infoPort) == 1){ // is being broken
+        if (digitalRead(47) == LOW){
             if (infoFlag == 0){ // if not currently broken
             Serial.println("Enter info");
             infoFlag = 1;
@@ -482,8 +492,8 @@ void loop() {
 
 
         if (beamBreak(randPort) == 1){ // is being broken
-//        if (digitalRead(49) == LOW){
-            if (randFlag == 0){ // if not currently broken
+        if (digitalRead(49) == LOW){
+//            if (randFlag == 0){ // if not currently broken
             Serial.println("Enter random");
             randFlag = 1;
             if (current_state == RESPONSE){
@@ -594,8 +604,32 @@ void loop() {
             state_reward_delay.run(currentTime);
             break;
 
-          case REWARD:
-            state_reward.run(currentTime);
+          case DELIVER_REWARD:
+            Serial.println("DELIVER REWARD DROP");
+
+            if (rewardDrops > 0 & reward == 1 & lickRate >0){
+              Serial.println("water on");
+              digitalWrite(water, HIGH);
+              printer(7, choice, 0);
+              waterValveOpen = true;
+            }
+
+            delay(rewardDropTime);
+
+            if (waterValveOpen) {
+              Serial.println("water off");
+              digitalWrite(water, LOW);
+              waterValveOpen = false;
+              printer(8, choice, 0);
+              rewardDrops = rewardDrops - 1;   
+            }
+
+            if (rewardDrops > 0){
+              next_state = REWARD_PAUSE;
+            }
+            else{
+              next_state = REWARD_COMPLETE;
+            }
             break;
 
           case INTER_TRIAL_INTERVAL:
@@ -604,7 +638,31 @@ void loop() {
 
           case TIMEOUT:
             state_timeout.run(currentTime);
-            break;            
+            break;
+
+          case REWARD_PAUSE:
+            state_reward_pause.run(currentTime);
+            break;
+
+          case REWARD_COMPLETE:
+              Serial.println("TRIAL COMPLETE");
+              printer(18,trialType,choice);
+              if (trialType == 1 && choice == 0){
+                randCCt++;
+              }
+              else if (trialType == 1 && choice == 1){
+                infoCCt++;
+              }
+              else if (trialType == 2 && choice == 1){
+                infoFCt++;
+              }
+              else if (trialType == 3 && choice == 0){
+                randFCt++;
+              }
+              cTCount = randCCt + infoCCt + infoFCt + randFCt;
+              //  Serial.println("end reward, move to ITI");
+              next_state = INTER_TRIAL_INTERVAL;
+              break;
         }
       
         //// Update the state variable

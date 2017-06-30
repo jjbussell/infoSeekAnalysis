@@ -340,7 +340,7 @@ void StateSideOdor::s_finish()
       }      
     }
   }
-  tone(buzzer,12000);  
+  
   next_state = REWARD_DELAY;
 }
 
@@ -348,27 +348,50 @@ void StateSideOdor::s_finish()
 void StateRewardDelay::s_setup()
 {
   Serial.println("REWARD_DELAY");
+  buzzInterval = 1000;
+  change = 0;
+}
+
+void StateRewardDelay::loop(){
+
+  // check if time to increase frequency
+  if (currentTime % 1000 == 0 & change == 0){
+    buzzInterval = buzzInterval - 100;
+    change = 1;
+  }
+
+  if (currentTime % 1000 != 0 & change == 1){
+    change = 0;
+  }
+
+  //check if time to turn buzzer on
+  if (currentTime >= lastBuzzerOff + buzzInterval) {
+    tone(buzzer,8000);
+    lastBuzzerOn = currentTime;
+    lastBuzzerOff = 1000000000000000000000;
+  }
+
+  // check if time to turn buzzer off
+  if (currentTime >= lastBuzzerOn + 20) {
+    noTone(buzzer);
+    lastBuzzerOff = currentTime;
+    lastBuzzerOn = 1000000000000000000000;
+  } 
 }
 
 void StateRewardDelay::s_finish()
 {
 //  Serial.println("end Reward delay, move to REWARD");
-  next_state = REWARD;
-}
 
-//// REWARD 14
-void StateReward::s_setup()
-{
+  noTone(buzzer);
   int port;
   port = 5;
   
-  Serial.println("REWARD");
-
-//  Serial.print("reward start ");
+//  Serial.print("reward delay end ");
 //  Serial.println(currentTime);
 //
-//  Serial.print("current reward time ");
-//  Serial.println(currentRewardTime);
+ Serial.print("current reward time (drops) ");
+ Serial.println(currentRewardTime);
   
   if (choice < 2){
     if (infoFlag == 1){
@@ -388,15 +411,13 @@ void StateReward::s_setup()
 //    Serial.print("choice = ");
 //    Serial.println(choice);
 
-    if (port == choice){
-      if (currentRewardTime > 0){
-        Serial.println("water on");
-        digitalWrite(water, HIGH);
-        printer(7, port, 0);
-        waterValveOpen = true;
-      }
-      else {Serial.println("reward 0, water not on");}
+    Serial.print("lickRate = ");
+    Serial.println(lickRate);
+
+    if (port == choice && lickRate > 0){
       rewardCount++;
+      rewardDrops = currentRewardTime;
+
       //noTone(buzzer);
       if (reward == 1) {
         rewardBigCount++;
@@ -412,52 +433,8 @@ void StateReward::s_setup()
       }
     }
   }
-}
 
-void StateReward::loop()
-{
-  if (currentRewardTime < duration){
-    if ((millis()-startTime) >= (timer - duration + currentRewardTime)) {
-      if (waterValveOpen) {
-        Serial.println("water off");
-        digitalWrite(water, LOW);
-        waterValveOpen = false;
-        printer(8, choice, 0);   
-      }
-    }
-  }
-}
-
-void StateReward::s_finish()
-{
-  if (choice <2){
-    if ((millis()-startTime) >= (timer - duration + currentRewardTime)) {
-      if (waterValveOpen) {
-        Serial.println("water off");
-        digitalWrite(water, LOW);
-        waterValveOpen = false;
-        printer(8, choice, 0);   
-      }
-    }
-  }
-  Serial.println("TRIAL COMPLETE");
-  printer(18,trialType,choice);
-  noTone(buzzer);
-  if (trialType == 1 && choice == 0){
-    randCCt++;
-  }
-  else if (trialType == 1 && choice == 1){
-    infoCCt++;
-  }
-  else if (trialType == 2 && choice == 1){
-    infoFCt++;
-  }
-  else if (trialType == 3 && choice == 0){
-    randFCt++;
-  }
-  cTCount = randCCt + infoCCt + infoFCt + randFCt;
-//  Serial.println("end reward, move to ITI");
-  next_state = INTER_TRIAL_INTERVAL;
+  next_state = DELIVER_REWARD;
 }
 
 
@@ -471,4 +448,14 @@ void StateTimeout::s_finish()
 {
   next_state = INTER_TRIAL_INTERVAL;
 }
+
+//// REWARD_PAUSE 17
+void StateRewardPause::s_setup(){
+  Serial.println("REWARD PAUSE");
+}
+
+void StateRewardPause::s_finish(){
+  next_state = DELIVER_REWARD;
+}
+
 
