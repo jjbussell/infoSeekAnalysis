@@ -1,6 +1,14 @@
 %% TO CALC/FIX
 
+% TRIAL LENGTHS / LICKING TIME IN PORT-->how long does ITI need to be?
+
+% "checking"/out of trial flow side entries
+
+% outcome plots
+
 % fix lick prob days for histogram
+
+% LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!!
 
 % scatter of initial vs reversal pref for IIS in diff bins (# trials,
 % days)--> NEED TO FIX BINNING/numToPlot?
@@ -25,7 +33,7 @@ bins = [a.win/2:a.win:a.maxBin*a.win-a.win/2];
 a.timeBins = (0:a.win:a.maxBin*a.win);
 
 % trials to plot
-numToPlot = 100;
+numToPlot = 200;
 
 %% PLOTTING COLORS
 
@@ -77,11 +85,12 @@ a.choiceLabels = {'ChoiceInfoBig','ChoiceInfoSmall','ChoiceRandBig',...
     'ChoiceRandSmall','InfoBig','InfoSmall','RandBig','RandSmall'};
 
 
-%% PLOT DAY SUMMARIES BY MOUSE
+%% PLOT DAY SUMMARIES BY MOUSE FOR CURRENT MICE
 
  pathname=uigetdir('','Choose save directory');
 
-for m = 1:a.mouseCt
+for m = a.currentMiceNums(1):a.currentMiceNums(end)
+% for m = 1:a.mouseCt
     figure();
     
     fig = gcf;
@@ -197,7 +206,7 @@ for m = 1:a.mouseCt
     ax = nsubplot(4,2,3,2);
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
-    ax.YLim = [6000 10000];
+    ax.YLim = [6000 20000];
     plot(cell2mat(a.daySummary.trialLengthInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
     plot(cell2mat(a.daySummary.trialLengthInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3,'LineStyle',':');
     plot(cell2mat(a.daySummary.trialLengthRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
@@ -239,39 +248,62 @@ for m = 1:a.mouseCt
 
    
     saveas(fig,fullfile(pathname,a.mouseList{m}),'pdf');
-    close(fig);
+%     close(fig);
     
 end
 
-%% ALL MOUSE SUMMARIES CHOICE + LICKING
 
-for m = 1:a.mouseCt
+%% PLOT DAY SUMMARIES BY MOUSE BEFORE CHOICE ONLY FOR PRE-CHOICE MICE
+
+if ~isempty(a.preChoiceMice)
+for m = a.preChoiceMice(1):a.preChoiceMice(end)
     figure();
     
     fig = gcf;
     fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0.5 0.5 7 10];
+    fig.PaperPosition = [0.5 0.5 10 7];
     set(fig,'renderer','painters');
-    set(fig,'PaperOrientation','portrait');
+    set(fig,'PaperOrientation','landscape');
     
-    ax = nsubplot(4,1,1,1);
+    ax = nsubplot(4,2,1,1);
     title(a.mouseList(m));
     ax.FontSize = 8;
-    ax.XTick = [0:5:a.mouseDayCt(m)];    
-    ax.YTick = [0 0.25 0.50 0.75 1];
-    ax.YLim = [0 1];
+    ax.XTick = [0:5:a.mouseDayCt(m)];
+    ax.XLim = [1 a.mouseDayCt(m)]; 
 %     set(ax,'units','inches');
-%     ax.Position = [1 1 5 1];
-    if sum(isnan(cell2mat(a.daySummary.percentInfo(m,:)))) ~= a.mouseDayCt(m)
-    plot(0:a.mouseDayCt(m),[0 cell2mat(a.daySummary.percentInfo(m,:))],'Color',a.mColors(m,:),'LineWidth',2,'Marker','o','MarkerFaceColor',a.mColors(m,:),'MarkerSize',3);
-    plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+%     adoc x.Position = [1 1 5 1];
+%     yyaxis left;
+%     bar(1:a.mouseDayCt(m),cell2mat(a.daySummary.totalTrials(m,:)),0.5,'FaceColor',[1 1 1],'EdgeColor',[0.3 0.3 0.3]);
+%     ylabel('Trials completed');
+%     ax.YColor = 'k';
+%     yyaxis right;
+%     scatter(1:a.mouseDayCt(m),cell2mat(a.daySummary.infoBigProb(m,:)),'filled','markerfacecolor','k');
+    plot(1:a.mouseDayCt(m),cell2mat(a.daySummary.infoBigProb(m,:)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
+    for d = 1:a.mouseDayCt(m)
+    text(d+0.1,a.daySummary.infoBigProb{m,d}+10,[num2str(a.daySummary.totalTrials{m,d}),' trials'],'Fontsize',5);
     end
-    ylabel({'Info choice', 'probability'}); %ylabel({'line1', 'line2','line3'},)
-%     xlabel('Day');
+    ylabel('Big reward probability');
+    ax.YLim = [0 100];
+    ax.YTick = [0 25 50 75 100];
+%     ax.YColor = 'k';
     hold off;
     
-    ax = nsubplot(4,1,2,1);
+    ax = nsubplot(4,2,2,1);
+    ax.FontSize = 8;
+    ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
+    plot(cell2mat(a.daySummary.rxnInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
+    plot(cell2mat(a.daySummary.rxnInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerEdgeColor',purple,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
+    plot(cell2mat(a.daySummary.rxnRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
+    plot(cell2mat(a.daySummary.rxnRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerEdgeColor',orange,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+    ylabel({'Reaction', 'Time (ms)'});
+%     xlabel('Day');    
+    leg = legend(ax,'Info-Forced','Info-Choice','No Info - Forced','No Info - Choice','Location','southoutside','Orientation','horizontal');
+    leg.Box = 'off';
+    leg.FontWeight = 'bold';
+    hold off;
+    
+    ax = nsubplot(4,2,3,1);
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
@@ -289,7 +321,7 @@ for m = 1:a.mouseCt
     leg.FontWeight = 'bold';
     hold off;
 
-    ax = nsubplot(4,1,3,1);
+    ax = nsubplot(4,2,4,1);
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
@@ -305,7 +337,7 @@ for m = 1:a.mouseCt
     leg.FontWeight = 'bold';
     hold off;
     
-    ax = nsubplot(4,1,4,1);
+    ax = nsubplot(4,2,1,2);
 %     title(a.mouseList(m));
     title(a.dayCell{find(a.fileMouse == m & a.fileDay == a.mouseDayCt(m),1,'first')});
     ax.FontSize = 8;
@@ -324,11 +356,163 @@ for m = 1:a.mouseCt
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
+    
+    ax = nsubplot(4,2,2,2);
+    ax.FontSize = 8;
+    ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
+    ax.YLim = [0 inf];
+    plot(cell2mat(a.daySummary.ARewards(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3);
+    plot(cell2mat(a.daySummary.BRewards(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3);
+    plot(cell2mat(a.daySummary.CRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',3);
+    plot(cell2mat(a.daySummary.DRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':');
+%     plot(cell2mat(a.daySummary.randBigRewards(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
+%     plot(cell2mat(a.daySummary.randSmallRewards(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
+    ylabel({'Mean Reward', '(uL)'});
+%     xlabel('Day');
+    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
+    leg.Box = 'off';
+    leg.FontWeight = 'bold';
+    hold off;
+    
+    ax = nsubplot(4,2,3,2);
+    ax.FontSize = 8;
+    ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
+    ax.YLim = [6000 20000];
+    plot(cell2mat(a.daySummary.trialLengthInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
+    plot(cell2mat(a.daySummary.trialLengthInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3,'LineStyle',':');
+    plot(cell2mat(a.daySummary.trialLengthRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
+    plot(cell2mat(a.daySummary.trialLengthRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3,'LineStyle',':');
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+    ylabel({'Trial', 'duration (ms)'});
+%     xlabel('Day');
+    leg = legend(ax,'Info Forced','Info Choice','No Info Forced','No Info Choice','Location','southoutside','Orientation','horizontal');
+    leg.Box = 'off';
+    leg.FontWeight = 'bold';
+    hold off;
+
+    ax = nsubplot(4,2,4,2);
+    ax.FontSize = 8;
+    ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
+    ax.YLim = [0 0.5];
+    plot(cell2mat(a.daySummary.rewardRateInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
+    plot(cell2mat(a.daySummary.rewardRateInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerEdgeColor',purple,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
+    plot(cell2mat(a.daySummary.rewardRateRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
+    plot(cell2mat(a.daySummary.rewardRateRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerEdgeColor',orange,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+        plot(cell2mat(a.daySummary.infoBigLicksWater(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3,'Visible','off');
+    plot(cell2mat(a.daySummary.infoSmallLicksWater(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3,'Visible','off');
+    plot(cell2mat(a.daySummary.randBigLicksWater(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3,'Visible','off');
+    plot(cell2mat(a.daySummary.randSmallLicksWater(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3,'Visible','off');
+    plot(cell2mat(a.daySummary.CRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',3,'Visible','off');
+    plot(cell2mat(a.daySummary.DRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':','Visible','off');
+    ylabel({'Reward', 'Rate'});
+    xlabel('Day');    
+    leg = legend(ax,'Info Forced','Info Choice','No Info Forced','No Info Choice','Location','southoutside','Orientation','horizontal');
+    leg.Box = 'off';
+    leg.FontWeight = 'bold';
+
+%     leg = legend(ax,'Info Forced','Info Choice','No Info Forced','No Info Choice''Info-Rew','Info-No Rew','No Info - Rew','No Info - No Rew','No Info - C','No Info - D','Units','normalized','Position',[0.2 0.6 0.1 0.2],'Orientation','horizontal');
+%     leg.Box = 'off';
+%     leg.FontWeight = 'bold';
+
+    hold off;
+
    
-    saveas(fig,fullfile(pathname,['licks' a.mouseList{m}]),'pdf');
+    saveas(fig,fullfile(pathname,['preChoice' a.mouseList{m}]),'pdf');
     close(fig);
     
 end
+end
+
+
+%% SUMMARIES CHOICE + LICKING FOR CURRENT MICE - SKIPS
+
+% for m = 1:a.mouseCt
+% for m = a.currentMiceNums(1):a.currentMiceNums(end)
+%     figure();
+%     
+%     fig = gcf;
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0.5 0.5 7 10];
+%     set(fig,'renderer','painters');
+%     set(fig,'PaperOrientation','portrait');
+%     
+%     ax = nsubplot(4,1,1,1);
+%     title(a.mouseList(m));
+%     ax.FontSize = 8;
+%     ax.XTick = [0:5:a.mouseDayCt(m)];    
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+%     ax.YLim = [0 1];
+% %     set(ax,'units','inches');
+% %     ax.Position = [1 1 5 1];
+%     if sum(isnan(cell2mat(a.daySummary.percentInfo(m,:)))) ~= a.mouseDayCt(m)
+%     plot(0:a.mouseDayCt(m),[0 cell2mat(a.daySummary.percentInfo(m,:))],'Color',a.mColors(m,:),'LineWidth',2,'Marker','o','MarkerFaceColor',a.mColors(m,:),'MarkerSize',3);
+%     plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+%     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+%     end
+%     ylabel({'Info choice', 'probability'}); %ylabel({'line1', 'line2','line3'},)
+% %     xlabel('Day');
+%     hold off;
+%     
+%     ax = nsubplot(4,1,2,1);
+%     ax.FontSize = 8;
+%     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
+%     ax.YLim = [0 inf];
+%     plot(cell2mat(a.daySummary.infoBigLicksEarly(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3);
+%     plot(cell2mat(a.daySummary.infoSmallLicksEarly(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3);
+%     plot(cell2mat(a.daySummary.randCLicksEarly(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',3);
+%     plot(cell2mat(a.daySummary.randDLicksEarly(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':');
+% %     plot(cell2mat(a.daySummary.randBigLicksEarly(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
+% %     plot(cell2mat(a.daySummary.randSmallLicksEarly(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
+%     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
+%     ylabel({'Early', 'lick rate'});
+% %     xlabel('Day');
+%     leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
+%     leg.Box = 'off';
+%     leg.FontWeight = 'bold';
+%     hold off;
+% 
+%     ax = nsubplot(4,1,3,1);
+%     ax.FontSize = 8;
+%     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
+%     ax.YLim = [0 inf];
+%     plot(cell2mat(a.daySummary.infoBigLicks(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3);
+%     plot(cell2mat(a.daySummary.infoSmallLicks(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3);
+%     plot(cell2mat(a.daySummary.randCLicks(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',3);
+%     plot(cell2mat(a.daySummary.randDLicks(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':');
+%     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
+%     ylabel({'Anticipatory', 'lick rate'});
+%     xlabel('Day');
+%     leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
+%     leg.Box = 'off';
+%     leg.FontWeight = 'bold';
+%     hold off;
+%     
+%     ax = nsubplot(4,1,4,1);
+% %     title(a.mouseList(m));
+%     title(a.dayCell{find(a.fileMouse == m & a.fileDay == a.mouseDayCt(m),1,'first')});
+%     ax.FontSize = 8;
+%     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
+%     ax.YLim = [0 inf];
+%     plot(cell2mat(a.daySummary.infoBigLicksWater(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3);
+%     plot(cell2mat(a.daySummary.infoSmallLicksWater(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3);
+%     plot(cell2mat(a.daySummary.randBigLicksWater(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
+%     plot(cell2mat(a.daySummary.randSmallLicksWater(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
+% %     plot(cell2mat(a.daySummary.randCLicksWater(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
+% %     plot(cell2mat(a.daySummary.randDLicksWater(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
+%     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
+%     ylabel({'Post-outcome', 'lick rate'});
+% %     xlabel('Day');
+%     leg = legend(ax,'Info-Rew','Info-No Rew','No Info - Rew','No Info - No Rew','Location','southoutside','Orientation','horizontal');
+%     leg.Box = 'off';
+%     leg.FontWeight = 'bold';
+%     hold off;
+%    
+%     saveas(fig,fullfile(pathname,['licks' a.mouseList{m}]),'pdf');
+%     close(fig);
+%     
+% end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -337,7 +521,7 @@ end
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% PLOT OUTCOMES BY MOUSE - ONLY WORKS FOR FSM, CURRENTLY SKIP
+%% PLOT OUTCOMES BY MOUSE FOR CURRENT MICE - ONLY WORKS FOR FSM, CURRENTLY SKIP
 
 % FSM mice
 a.FSMmice = zeros(a.mouseCt,1);
@@ -350,63 +534,65 @@ a.FSMmouseIdx = find(a.FSMmice);
 
 
     %% STACKED BARS
-% 
-% for m = 1:a.mouseCt
-%     if a.mouseDayCt(m) > 3
-%         for d = 1:a.mouseDayCt(m)
-%             [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
-%         end
-% 
-%         figure();
-%         fig = gcf;
-%         fig.PaperUnits = 'inches';
-%         fig.PaperPosition = [1 1 8 10];
-%         set(fig,'renderer','painters')
-%         set(fig,'PaperOrientation','landscape');
-% 
-%         ax = nsubplot(1,1,1,1);
-%         title(a.mouseList(m));
-%         ax.FontSize = 10;
-%         ylabel('Trial Outcomes (% of trials)');
-%         xlabel('Day');
-%         ax.YLim = [0 1];
-%         ax.YTick = [0:0.25:1];
-%         colormap(fig,CC);
-%         bar(outcomeCounts,'stacked');
-%         set(gca, 'ydir', 'reverse');
-%         leg = legend(ax,a.outcomeLabels,'Location','eastoutside');
-%         leg.Box = 'off';
-%         leg.FontWeight = 'bold';
-%     else
-%         figure();
-%         fig = gcf;
-%         fig.PaperUnits = 'inches';
-%         fig.PaperPosition = [1 1 8 10];
-%     %     set(fig,'PaperOrientation','landscape');
-%         set(fig,'renderer','painters')
-%         for d = 1:a.mouseDayCt(m)
-%             ax = nsubplot(a.mouseDayCt(m),1,d,1);
-%             if d==1
-%             title(a.mouseList(m));       
-%             end
-%             ax.FontSize = 10;
-%             [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
-%             bar([1:17],outcomeCounts);
-%             plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-%             plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
-%             if d == ceil(a.mouseDayCt(m)/2)
-%             ylabel('Trial Outcomes (% of trials)');
-%             end
-%             if d == a.mouseDayCt(m)
-%                 ax.XTick = [1:17];
-%             set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
-%             end
-%         end
-%     end
-% end
+
+for m = a.currentMiceNums(1):a.currentMiceNums(end)
+    if a.mouseDayCt(m) > 3
+        for d = 1:a.mouseDayCt(m)
+            [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+        end
+
+        figure();
+        fig = gcf;
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [1 1 8 10];
+        set(fig,'renderer','painters')
+        set(fig,'PaperOrientation','portrait');
+
+        ax = nsubplot(1,1,1,1);
+        title(a.mouseList(m));
+        ax.FontSize = 10;
+        ylabel('Trial Outcomes (% of trials)');
+        xlabel('Day');
+        ax.YLim = [0 1];
+        ax.YTick = [0:0.25:1];
+        colormap(fig,CC);
+        bar(outcomeCounts,'stacked');
+        set(gca, 'ydir', 'reverse');
+        leg = legend(ax,a.outcomeLabels,'Location','eastoutside');
+        leg.Box = 'off';
+        leg.FontWeight = 'bold';
+    else
+        figure();
+        fig = gcf;
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [1 1 8 10];
+    %     set(fig,'PaperOrientation','landscape');
+        set(fig,'renderer','painters')
+        for d = 1:a.mouseDayCt(m)
+            ax = nsubplot(a.mouseDayCt(m),1,d,1);
+            if d==1
+            title(a.mouseList(m));       
+            end
+            ax.FontSize = 10;
+            [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+            bar([1:17],outcomeCounts);
+            plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+            plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
+            if d == ceil(a.mouseDayCt(m)/2)
+            ylabel('Trial Outcomes (% of trials)');
+            end
+            if d == a.mouseDayCt(m)
+                ax.XTick = [1:17];
+            set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
+            end
+        end
+    end
+    saveas(fig,fullfile(pathname,['outcomesStacked' a.mouseList{m}]),'pdf');
+    close(fig);
+end
 
     %% bar plot for each day
-% for m = 15:a.mouseCt
+% for m = a.currentMiceNums(1):a.currentMiceNums(end)
 %     
 % % for m = 1:mouseCt    
 %     figure();
@@ -415,7 +601,7 @@ a.FSMmouseIdx = find(a.FSMmice);
 %     fig.PaperPosition = [1 1 8 10];
 % %     set(fig,'PaperOrientation','landscape');
 %     set(fig,'renderer','painters')
-%     for d = a.mouseDayCt(m)
+%     for d = 1:a.mouseDayCt(m)
 %         ax = nsubplot(a.mouseDayCt(m),1,d,1);
 %         if d==1
 %         title(a.mouseList(m));       
@@ -431,16 +617,18 @@ a.FSMmouseIdx = find(a.FSMmice);
 %         if d == a.mouseDayCt(m)
 %             ax.XTick = [1:17];
 %         set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
-%         end
+%         end       
 %     end
+%         saveas(fig,fullfile(pathname,['outcomes' a.mouseList{m}]),'pdf');
+%         close(fig);
+% 
 % end
 
 %%  bar plot for most recent day
 
-% for m = 15:a.mouseCt
-for m = a.FSMmouseIdx(1):a.FSMmouseIdx(end)
-    
-% for m = 1:mouseCt    
+% for m = a.FSMmouseIdx(1):a.FSMmouseIdx(end)
+%     
+for m = a.currentMiceNums(1):a.currentMiceNums(end)   
     figure();
     fig = gcf;
     fig.PaperUnits = 'inches';
@@ -449,7 +637,7 @@ for m = a.FSMmouseIdx(1):a.FSMmouseIdx(end)
     set(fig,'renderer','painters')
     for d = a.mouseDayCt(m)
         ax = nsubplot(1,1,1,1);
-        title(a.mouseList(m));       
+        title([a.mouseList(m) a.dayCell{find(a.fileMouse == m & a.fileDay == a.mouseDayCt(m),1,'first')}]);       
         ax.FontSize = 10;
         [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
         bar([1:17],outcomeCounts);
@@ -464,9 +652,8 @@ for m = a.FSMmouseIdx(1):a.FSMmouseIdx(end)
         end
     end
     
-    saveas(fig,fullfile(pathname,['outcomes' a.mouseList{m}]),'pdf');
-    close(fig);
-    
+    saveas(fig,fullfile(pathname,['outcomesMostRecentDay' a.mouseList{m}]),'pdf');
+%     close(fig);
 end
 
 
@@ -634,7 +821,7 @@ if a.choiceMouseCt > 1
     hold off;
     
     saveas(fig,fullfile(pathname,'Overall'),'pdf');
-    close(fig);
+%     close(fig);
 end
 
 %% 
@@ -659,7 +846,7 @@ perf = cumsum(ones(numToPlot,1));
 % plot(alt,'color','k','LineWidth',4);
 % hold off;
 
-%% CHOICE RANGE DATA (PRE-REVERSE)
+%% CHOICE RANGE DATA (PRE-REVERSE) - NEED TO FIX FOR FEW CHOICES!
 
 if a.choiceMouseCt > 0
     
@@ -674,91 +861,99 @@ if a.choiceMouseCt > 0
     lickAnticToPlot = [];
     rewardData = [];
     rewardToPlot = [];
-    for m = 1:a.choiceMouseCt
+    for m = a.choiceMice(1):a.choiceMice(end)
        mouseChoiceData = a.choicebyMouse{m};
+       numToPlotByMouse(m,1) = min(numToPlot,numel(mouseChoiceData));
        rxnData = a.choiceRxnByMouse{m};
        lickEarlyData = a.choiceEarlyLicksByMouse{m};
        lickAnticData = a.choiceAnticLicksByMouse{m};
        rewardData = a.choiceRewardByMouse{m};
-       choiceToPlot(m,:) = mouseChoiceData(1:numToPlot);
-       rxnToPlot(m,:) = rxnData(1:numToPlot);
-       lickEarlyToPlot(m,:) = lickEarlyData(1:numToPlot);
-       lickAnticToPlot(m,:) = lickAnticData(1:numToPlot);
-       rewardToPlot(m,:) = rewardData(1:numToPlot);
+       choiceToPlot{m,1} = mouseChoiceData(1:numToPlotByMouse(m));
+       rxnToPlot{m,1} = rxnData(1:numToPlotByMouse(m));
+       lickEarlyToPlot{m,1} = lickEarlyData(1:numToPlotByMouse(m));
+       lickAnticToPlot{m,1} = lickAnticData(1:numToPlotByMouse(m));
+       rewardToPlot{m,1} = rewardData(1:numToPlotByMouse(m));
     end
 
-    [sortedChoiceToPlot,sortIdx] = sortrows(choiceToPlot);
-    miceSortToPlot = (a.mouseList(sortIdx));
+%     [sortedChoiceToPlot,sortIdx] = sortrows(choiceToPlot);
+%     miceSortToPlot = (a.mouseList(sortIdx));
 
     %% CHOICE Pre-reverse RANGE DATA BY MOUSE (earlyJBXXX.pdf)
 
     % MAKE DYNAMIC re: trial nums, pre/post reverse
 
-%     for m = a.choiceMice(1):a.choiceMice(end)
-%         fig = figure();
-% 
-%         fig = gcf;
-%         fig.PaperUnits = 'inches';
-%         fig.PaperPosition = [0.5 0.5 7 10];
-%         set(fig,'renderer','painters');
-%         set(fig,'PaperOrientation','portrait');
-% 
-%         ax = nsubplot(5,1,1,1);
-%         ax.FontSize = 12;
-%         title(a.choiceMiceList(m));
-%         ax.XLim = [1 numToPlot];
-%         ax.YLim = [0.5 1.5];
-%         ax.XTickLabel = [];
-%         ax.YTick = [];
-%         ylabel('Choice');
-%         imagesc('XData',(1:numToPlot),'YData',(1),'CData',choiceToPlot(m,:))
-%         colormap(ax,map);
-%         % colorbar('YTick',[0.25 0.75],'TickLabels',{'No Info','Info'},'FontSize',12,'TickLength',0,'Location','northoutside');
-% 
-%         ax = nsubplot(5,1,2,1);
-%         ax.FontSize = 12;
-%         ax.XLim = [1 numToPlot];
-%         ax.YLim = [0.5 1.5];
-%         ax.XTickLabel = [];
-%         ax.YTick = [];
-%         ylabel('Reward');
-%         imagesc('XData',(1:numToPlot),'YData',(1),'CData',rewardToPlot(m,:))
-%         colormap(ax,[0 0 0; 1 1 1]);    
-% 
-%         ax = nsubplot(5,1,3,1);
-%         ax.FontSize = 12;
-%         ax.XLim = [1 numToPlot];
-%         ax.XTickLabel = [];
-%         ylabel('Reaction Time');
-%         scatter(find(choiceToPlot(m,:)==1),rxnToPlot(m,choiceToPlot(m,:)==1),'filled','markerfacecolor',map(2,:));
-%         scatter(find(choiceToPlot(m,:)==0),rxnToPlot(m,choiceToPlot(m,:)==0),'filled','markerfacecolor',map(1,:));
-% 
-%         ax = nsubplot(5,1,4,1);
-%         ax.FontSize = 12;
-%         ax.XLim = [1 numToPlot];
-%         ax.XTickLabel = [];
-%         ylabel('Early Licks');
-%         scatter(find(choiceToPlot(m,:)==1),lickEarlyToPlot(m,choiceToPlot(m,:)==1),'filled','markerfacecolor',map(2,:));
-%         scatter(find(choiceToPlot(m,:)==0),lickEarlyToPlot(m,choiceToPlot(m,:)==0),'filled','markerfacecolor',map(1,:));
-% 
-%         ax = nsubplot(5,1,5,1);
-%         ax.FontSize = 12;
-%         ax.XLim = [1 numToPlot];
-%         ylabel('Anticipatory Licks');
-%         scatter(find(choiceToPlot(m,:)==1),lickAnticToPlot(m,choiceToPlot(m,:)==1),'filled','markerfacecolor',map(2,:));
-%         scatter(find(choiceToPlot(m,:)==0),lickAnticToPlot(m,choiceToPlot(m,:)==0),'filled','markerfacecolor',map(1,:));
-%         xlabel('Choice Trial');
-%         lgd = legend('Info','No Info');
-%         lgd.FontSize = 16; lgd.Location = 'southoutside';
-%         lgd.Orientation = 'horizontal'; lgd.Box = 'off';
-%         % set(icons(:),'MarkerSize',20); %// Or whatever
-%         % icons(1).Children.MarkerSize = 20;
-% 
-%         saveas(fig,fullfile(pathname,['early' a.mouseList{m}]),'pdf');
-%         close(fig);
-%     end
+    for mm = 1:numel(a.currentChoiceMice)
+        m = a.currentChoiceMice(mm);
+        fig = figure();
 
-    %% CHOICE pre-reverse RANGE HEATMAP (heatmap.pdf)
+        fig = gcf;
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [0.5 0.5 7 10];
+        set(fig,'renderer','painters');
+        set(fig,'PaperOrientation','portrait');
+
+        ax = nsubplot(5,1,1,1);
+        ax.FontSize = 12;
+        title(a.currentChoiceMiceList(mm));
+        ax.XLim = [1 numToPlotByMouse(m)];
+        ax.YLim = [0.5 1.5];
+        ax.XTickLabel = [];
+        ax.YTick = [];
+        ylabel('Choice');
+        imagesc('XData',(1:numToPlotByMouse(m)),'YData',(1),'CData',choiceToPlot{m,1}')
+        colormap(ax,map);
+        % colorbar('YTick',[0.25 0.75],'TickLabels',{'No Info','Info'},'FontSize',12,'TickLength',0,'Location','northoutside');
+
+        ax = nsubplot(5,1,2,1);
+        ax.FontSize = 12;
+        ax.XLim = [1 numToPlotByMouse(m)];
+        ax.YLim = [0.5 1.5];
+        ax.XTickLabel = [];
+        ax.YTick = [];
+        ylabel('Reward');
+        imagesc('XData',(1:numToPlotByMouse(m)),'YData',(1),'CData',rewardToPlot{m,1}')
+        colormap(ax,[1 1 1; 0 0 0]);    
+
+        ax = nsubplot(5,1,3,1);
+        ax.FontSize = 12;
+        ax.XLim = [1 numToPlotByMouse(m)];
+        ax.XTickLabel = [];
+        ylabel('Reaction Time');
+        rxnToPlotm = [];
+        rxnToPlotm = cell2mat(rxnToPlot(m,1));
+        scatter(find(choiceToPlot{m,1}==1),rxnToPlotm(choiceToPlot{m,1}==1),'filled','markerfacecolor',map(2,:));
+        scatter(find(choiceToPlot{m,1}==0),rxnToPlotm(choiceToPlot{m,1}==0),'filled','markerfacecolor',map(1,:));
+
+        ax = nsubplot(5,1,4,1);
+        ax.FontSize = 12;
+        ax.XLim = [1 numToPlotByMouse(m)];
+        ax.XTickLabel = [];
+        ylabel('Early Licks');
+        lickEarlyToPlotm = [];
+        lickEarlyToPlotm = cell2mat(lickEarlyToPlot(m,1));
+        scatter(find(choiceToPlot{m,1}==1),lickEarlyToPlotm(choiceToPlot{m,1}==1),'filled','markerfacecolor',map(2,:));
+        scatter(find(choiceToPlot{m,1}==0),lickEarlyToPlotm(choiceToPlot{m,1}==0),'filled','markerfacecolor',map(1,:));
+
+        ax = nsubplot(5,1,5,1);
+        ax.FontSize = 12;
+        ax.XLim = [1 numToPlotByMouse(m)];
+        ylabel('Anticipatory Licks');
+        lickAnticToPlotm = [];
+        lickAnticToPlotm = cell2mat(lickAnticToPlot(m,1));
+        scatter(find(choiceToPlot{m,1}==1),lickAnticToPlotm(choiceToPlot{m,1}==1),'filled','markerfacecolor',map(2,:));
+        scatter(find(choiceToPlot{m,1}==0),lickAnticToPlotm(choiceToPlot{m,1}==0),'filled','markerfacecolor',map(1,:));
+        xlabel('Choice Trial');
+        lgd = legend('Info','No Info');
+        lgd.FontSize = 16; lgd.Location = 'southoutside';
+        lgd.Orientation = 'horizontal'; lgd.Box = 'off';
+        % set(icons(:),'MarkerSize',20); %// Or whatever
+        % icons(1).Children.MarkerSize = 20;
+
+        saveas(fig,fullfile(pathname,['early' a.mouseList{m}]),'pdf');
+%         close(fig);
+    end
+
+    %% CHOICE pre-reverse RANGE HEATMAP (heatmap.pdf) - SKIPS
 
 %     fig = figure();
 %     ax = nsubplot(1,1,1,1);
@@ -800,24 +995,24 @@ if a.choiceMouseCt > 0
     ax.FontSize = 8;
     ax.XLim = [0 1];
     ax.YLim = [0 1];
-    for m = 1:a.choiceMouseCt
+    for m = a.reverseMice(1):a.reverseMice(end)
         plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
         plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
         dy = a.prefRevCI(m,2) - a.pref(m,2) + 0.02;
-        text(a.pref(m,1),a.pref(m,2) + dy,a.choiceMiceList{m},'HorizontalAlignment','center');
+        text(a.pref(m,1),a.pref(m,2) + dy,a.reverseMiceList{m},'HorizontalAlignment','center');
     end
     scatter(a.pref(:,1),a.pref(:,2),'filled')
     plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
     plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    text(a.choiceMouseCt+2,a.overallPref,['p = ' num2str(a.overallP)])
-    patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
+    text(numel(a.reverseMice)+2,a.overallPref,['p = ' num2str(a.overallP)])
+%     patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
     ylabel({'% choice of initially informative side', 'POST-reversal'}); %{'Info choice', 'probability'}
     xlabel({'% choice of initially informative side', 'PRE-reversal'});
     title('Raw choice percentages, pre vs post-reversal');
     hold off;
 
-    saveas(fig,fullfile(pathname,'PrevsPost'),'pdf');
-    close(fig);
+%     saveas(fig,fullfile(pathname,'PrevsPost'),'pdf');
+%     close(fig);
 
     %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
 
@@ -838,15 +1033,15 @@ if a.choiceMouseCt > 0
         text(a.beta(m,1),a.beta(m,2) + 0.2,a.choiceMiceList{m},'HorizontalAlignment','center');
     end
     scatter(a.beta(:,1),a.beta(:,2),'filled')
-    plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
     ylabel({'Info preference', '(log odds biasing to currently informative side'}); %{'Info choice', 'probability'}
     xlabel({'Side bias', '(log odds biasing to initially informative side)'});
     title('Logistic Regression Analysis');
     hold off;
 
     saveas(fig,fullfile(pathname,'Regression'),'pdf');
-    close(fig);
+%     close(fig);
 
 end
 

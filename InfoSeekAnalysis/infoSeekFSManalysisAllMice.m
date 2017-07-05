@@ -1,4 +1,7 @@
 % add back lickProbDays
+
+% LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!!
+
 % add all mice aligned to reverse day & MEAN + error
 % add all mice aligned to reverse day, trial-by-trial/sliding window
 % all mice pre-reverse aligned to start & MEAN + error
@@ -222,7 +225,7 @@ for m = 1:a.mouseCt
     fileSums = [0; cumsum(mouseFileCt)];
     if mouseFileCt(m,1) > 1
         mouseInfoSideDiff = diff(infoSide(a.fileMouse == m));
-        if sum(mouseInfoSideDiff) ~= 0        
+        if ~isempty(find(mouseInfoSideDiff) ~= 0)       
 %             a.reverseFile(m,1) = max(find(mouseInfoSideDiff~=0)) + 1;
             a.reverseFile(m,1) = find(mouseInfoSideDiff~=0,1,'first') + 1;
 %             a.prereverseFiles(fileSums(m) + a.reverseFile(m,1) : fileSums(m+1)) = 0;
@@ -290,13 +293,25 @@ for m = 1:a.mouseCt
    a.choiceIISByMouse{m} = a.choice_all(ok);   
 end
 
-%% INSERT HERE
+%% CURRENT AND CHOICE AND REVERSED MICE
 
 % create list of mice with choices to cycle through and sort names
 
 a.choiceMice = find(a.choiceTrialCt>0);
 a.choiceMiceList = a.mouseList(a.choiceMice);
 a.choiceMouseCt = numel(a.choiceMice);
+a.preChoiceMice = find(a.choiceTrialCt == 0);
+
+dayDates = datetime(cell2mat(a.parameters(:,3)),'InputFormat','yyyy-MM-dd');
+today = max(dayDates);
+currentDay = a.parameters(:,3) == today;
+a.currentMice = unique(a.parameters(currentDay,2));
+[~,a.currentMiceNums] = ismember(a.currentMice,a.mouseList);
+[~,a.currentChoiceMice] = ismember(a.currentMiceNums,a.choiceMice);
+a.currentChoiceMiceList = a.mouseList(a.currentChoiceMice);
+
+a.reverseMice = find(a.reverseFile>0);
+a.reverseMiceList = a.mouseList(a.reverseMice);
 
 %% ALL PRE-REVERSE CHOICES ALIGNED TO START
 
@@ -373,25 +388,27 @@ maxChoiceAllTrials = max(a.firstReverseInChoiceTrials) + max(a.choiceAllTrialCt 
 a.commonReverse = max(a.firstReverseInChoiceTrials); % first reversed choice trial
 a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 
-if ~isempty(a.choiceMice)
-    for m = a.choiceMice(1):a.choiceMice(end) 
-       % relative to reverse start
-       % postReverse = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));
-       % preReverse = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
-
-       choices = a.choiceAllbyMouse{m};
-
-       a.choiceTrialsOrgRev(m,a.commonReverse - a.firstReverseInChoiceTrials(m,1)+1 : a.commonReverse-1) = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
-       a.choiceTrialsOrgRev(m,a.commonReverse : a.commonReverse + a.choiceAllTrialCt(m,1)-a.firstReverseInChoiceTrials(m,1)) = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));  
-    end
-end
+% if ~isempty(a.choiceMice)
+%     for m = a.choiceMice(1):a.choiceMice(end) 
+%        % relative to reverse start
+%        % postReverse = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));
+%        % preReverse = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
+% 
+%        choices = a.choiceAllbyMouse{m};
+% 
+%        a.choiceTrialsOrgRev(m,a.commonReverse - a.firstReverseInChoiceTrials(m,1)+1 : a.commonReverse-1) = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
+%        a.choiceTrialsOrgRev(m,a.commonReverse : a.commonReverse + a.choiceAllTrialCt(m,1)-a.firstReverseInChoiceTrials(m,1)) = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));  
+%     end
+% end
 
 %% MEAN CHOICES / STATS AND CHOICE RANGES
+
+% TAKE NON-REVERSE MICE OUT OF GLM CALCS
 
 trialsToCount = 500;
 
 if ~isempty(a.choiceMice)
-    for m = a.choiceMice(1):a.choiceMice(end) 
+    for m = a.reverseMice(1):a.reverseMice(end) 
 
        choicesIIS = a.choiceIISByMouse{m};
 
@@ -410,6 +427,7 @@ if ~isempty(a.choiceMice)
        [a.meanChoice(m,2),a.choiceRevCI(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
        a.meanChoice(m,3) = m;
 
+%        disp(['mouse ' num2str(m)]);
        x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
        y = a.choice_all(ok);
        [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
@@ -645,7 +663,10 @@ for m = 1:a.mouseCt
         a.daySummary.infoSmall{m,d} = sum(a.infoSmall(ok));
         a.daySummary.randBig{m,d} = sum(a.randBig(ok));
         a.daySummary.randSmall{m,d} = sum(a.randSmall(ok));
+        lastFileIdx = find(ok,1,'last');
+        a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),24};
         a.daySummary.totalRewards{m,d} = sum(a.reward(ok));
+        a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
         a.daySummary.percentInfo{m,d} = mean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1));
         a.daySummary.rxnInfoForced{m,d} = mean(a.rxn(a.infoForcedCorr & ok));
         a.daySummary.rxnInfoChoice{m,d} = mean(a.rxn(a.infoChoiceCorr & ok));

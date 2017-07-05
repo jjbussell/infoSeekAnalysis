@@ -1,6 +1,6 @@
 %% TO FIX
 
-% f is not the cumulative File Number!!!!!!!!!!!!!!!!!!
+% make variable "current" for current/added mice
 
 % trials that get started but don't get to trialParams
 % (['JB167_2017-03-14_11h-05m-02s.csv'] orig)
