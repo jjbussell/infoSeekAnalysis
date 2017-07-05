@@ -822,7 +822,7 @@ if a.choiceMouseCt > 1
     hold off;
     
     saveas(fig,fullfile(pathname,'Overall'),'pdf');
-%     close(fig);
+    close(fig);
 end
 
 %% 
@@ -951,7 +951,7 @@ if a.choiceMouseCt > 0
         % icons(1).Children.MarkerSize = 20;
 
         saveas(fig,fullfile(pathname,['early' a.mouseList{m}]),'pdf');
-%         close(fig);
+        close(fig);
     end
 
     %% CHOICE pre-reverse RANGE HEATMAP (heatmap.pdf) - SKIPS
@@ -996,11 +996,12 @@ if a.choiceMouseCt > 0
     ax.FontSize = 8;
     ax.XLim = [0 1];
     ax.YLim = [0 1];
-    for m = a.reverseMice(1):a.reverseMice(end)
+    for l = 1:numel(a.reverseMice)
+        m = a.reverseMice(l);
         plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
         plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
         dy = a.prefRevCI(m,2) - a.pref(m,2) + 0.02;
-        text(a.pref(m,1),a.pref(m,2) + dy,a.reverseMiceList{m},'HorizontalAlignment','center');
+        text(a.pref(m,1),a.pref(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
     end
     scatter(a.pref(:,1),a.pref(:,2),'filled')
     plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
@@ -1012,8 +1013,8 @@ if a.choiceMouseCt > 0
     title('Raw choice percentages, pre vs post-reversal');
     hold off;
 
-%     saveas(fig,fullfile(pathname,'PrevsPost'),'pdf');
-%     close(fig);
+    saveas(fig,fullfile(pathname,'PrevsPost'),'pdf');
+    close(fig);
 
     %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
 

@@ -207,8 +207,8 @@ a.rxnRandChoiceCorr = a.rxn(a.randChoiceCorr);
 
 % for each file
 % for each trial before last
-a.trialLengthEntries = NaN(numel(a.fileAll));
-a.trialLengthEntries(1:end-1) = a.firstCenterEntry(2:end,2)-a.goCue(1:end-1);
+% a.trialLengthEntries = NaN(numel(a.fileAll),1);
+% a.trialLengthEntries(1:end-1) = a.firstCenterEntry(2:end,2)-a.goCue(1:end-1);
 % a.trialLengthEntries = a.firstCenterEntry() - a.goCue(t);
 % for last trial
 % a.trialLengthEntries(tmax) = sum(a
