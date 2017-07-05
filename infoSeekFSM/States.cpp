@@ -364,26 +364,26 @@ void StateRewardDelay::loop(){
     change = 0;
   }
 
-  //check if time to turn buzzer on
-  if (currentTime >= lastBuzzerOff + buzzInterval) {
-    tone(buzzer,12000);
-    lastBuzzerOn = currentTime;
-    lastBuzzerOff = 1000000000000000000000;
-  }
-
-  // check if time to turn buzzer off
-  if (currentTime >= lastBuzzerOn + 20) {
-    noTone(buzzer);
-    lastBuzzerOff = currentTime;
-    lastBuzzerOn = 1000000000000000000000;
-  } 
+//  //check if time to turn buzzer on
+//  if (currentTime >= lastBuzzerOff + buzzInterval) {
+//    tone(buzzer,12000);
+//    lastBuzzerOn = currentTime;
+//    lastBuzzerOff = 1000000000000000000000;
+//  }
+//
+//  // check if time to turn buzzer off
+//  if (currentTime >= lastBuzzerOn + 20) {
+//    noTone(buzzer);
+//    lastBuzzerOff = currentTime;
+//    lastBuzzerOn = 1000000000000000000000;
+//  } 
 }
 
 void StateRewardDelay::s_finish()
 {
 //  Serial.println("end Reward delay, move to REWARD");
 
-  noTone(buzzer);
+//  noTone(buzzer);
   int port;
   port = 5;
   

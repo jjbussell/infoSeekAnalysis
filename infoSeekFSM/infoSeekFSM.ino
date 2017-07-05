@@ -101,7 +101,7 @@ int trialCt;
 int trialType;
 unsigned long currentRewardTime;
 int rewardDrops;
-int  odor;
+int odor;
 int reward;
 int water;
 int currentCenterOdor;

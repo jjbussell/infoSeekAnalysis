@@ -57,7 +57,7 @@ extern unsigned long odorDelay;
 extern unsigned long interval;
 extern unsigned long currentTime;
 extern unsigned long gracePeriod;
-extern int buzzer;
+//extern int buzzer;
 extern unsigned long bigRewardTime;
 extern unsigned long smallRewardTime;
 extern int rewardDrops;
