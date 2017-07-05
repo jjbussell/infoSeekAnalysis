@@ -366,7 +366,7 @@ void StateRewardDelay::loop(){
 
   //check if time to turn buzzer on
   if (currentTime >= lastBuzzerOff + buzzInterval) {
-    tone(buzzer,8000);
+    tone(buzzer,12000);
     lastBuzzerOn = currentTime;
     lastBuzzerOff = 1000000000000000000000;
   }

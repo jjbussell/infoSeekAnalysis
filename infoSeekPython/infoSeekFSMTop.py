@@ -6,7 +6,7 @@ import os
 
 ############ OPEN PORT
 # Open Arduino serial port
-ser = serial.Serial("COM5", 115200)   # open serial port that Arduino is using
+ser = serial.Serial("COM4", 115200)   # open serial port that Arduino is using
 print "\nSerial port open"
 sys.stdout.flush()
 
@@ -33,7 +33,7 @@ def num(s):
 ##############  SET ARDUINO PARAMETERS  ############################
 
 ##############  SET ARDUINO PARAMETERS  ############################
-mouse = 'JB175'
+mouse = 'test'
 sessionEnd = '3'
 sessionTrials = '1000000'
 imageFlag = '1'
@@ -51,8 +51,8 @@ centerOdorTime = '200' #200, 0
 startDelay = '0' #50, 0
 odorDelay = '2000' #1300, 0
 odorTime = '200'  #300, 0
-rewardDelay = '2000' #1500, 0
-bigRewardTime = '200' #100, 50 for training
+rewardDelay = '10000' #1500, 0
+bigRewardTime = '4' #100, 50 for training
 smallRewardTime = '0' #0, 50 for training
 infoRewardProb = '50' #50
 randRewardProb = '50' #50
