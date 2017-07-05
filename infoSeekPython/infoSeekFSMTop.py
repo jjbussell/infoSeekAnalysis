@@ -37,8 +37,8 @@ mouse = 'test'
 sessionEnd = '3'
 sessionTrials = '1000000'
 imageFlag = '1'
-trialTypes = '5' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = all three
-infoSide = '0' #For now control1 goes to left port (looking from inside box), as do odors 0-2==INFO
+trialTypes = '2' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = all three
+infoSide = '1' #For now control1 goes to left port (looking from inside box), as do odors 0-2==INFO
 infoOdor = '2'
 randOdor = '1'
 choiceOdor = '4'
@@ -54,8 +54,8 @@ odorTime = '200'  #300, 0
 rewardDelay = '10000' #1500, 0
 bigRewardTime = '4' #100, 50 for training
 smallRewardTime = '0' #0, 50 for training
-infoRewardProb = '50' #50
-randRewardProb = '50' #50
+infoRewardProb = '100' #50
+randRewardProb = '100' #50
 gracePeriod = '2000' #4000, 1000000000
 interval = '4000' #4500, 0
 TOU_THRESH = '15'

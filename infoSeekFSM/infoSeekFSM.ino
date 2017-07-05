@@ -74,7 +74,7 @@ int valves4[] = {30,38,36,34}; // Valves BEFORE odor bottles, odors 5-8 (TO CENT
 int valves5[] = {23,25,37,35}; // Valves AFTER odor bottles, odors 5-8 (TO CENTER PORT)
 int controls[] = {8,9,10,11,12,13}; // before1, after1, before2, after2, before3, after3
 int waterValves[] = {40, 41}; // Valves controlling water delivery; 0 = inside chamber left
-int buzzer = 4;
+int buzzer = 5;
 int button = 2; // DIGITAL
 int arduScope = 7;
 int scopeArdu = 6;
@@ -297,6 +297,7 @@ void loop() {
       touch_left        =        Serial.parseInt();
 
       unsigned long entryThreshold = 20;
+      int lickCheck = 1;
 
       rewardDropTime = 30;
       rewardPauseTime = 200;
@@ -413,8 +414,8 @@ void loop() {
             }
             else licked = 0;
             if (licked > 0){
-              Serial.print("licked ");
-              Serial.println(licked);
+//              Serial.print("licked ");
+//              Serial.println(licked);
               lickCt++;
               printer(4, licked, 0);
               licked = 0;
@@ -422,10 +423,17 @@ void loop() {
           }
 
         //// GET LICK RATE (FOR DETERMINING REWARD)
-        if (currentTime % 200 == 0){
+        if (currentTime % 1000 == 0 & lickCheck == 1){
           lickRate = lickCt - lastLickCt;
+//          Serial.print("lickRate = ");
+//          Serial.println(lickRate);
           lastLickCt = lickCt;
+          lickCheck = 0;
         }
+
+          if (currentTime % 1000 != 0 & lickCheck == 0){
+              lickCheck = 1;
+            }
 
 
 
@@ -605,9 +613,9 @@ void loop() {
             break;
 
           case DELIVER_REWARD:
-            Serial.println("DELIVER REWARD DROP");
-
-            if (rewardDrops > 0 & reward == 1 & lickRate >0){
+            if (rewardDrops > 0 & reward == 1){
+//            if (rewardDrops > 0 & reward == 1 & lickRate >0){
+              Serial.println("DELIVER REWARD DROP");
               Serial.println("water on");
               digitalWrite(water, HIGH);
               printer(7, choice, 0);
@@ -621,7 +629,9 @@ void loop() {
               digitalWrite(water, LOW);
               waterValveOpen = false;
               printer(8, choice, 0);
-              rewardDrops = rewardDrops - 1;   
+              rewardDrops = rewardDrops - 1;
+              Serial.print("rewardDrops = ");
+              Serial.println(rewardDrops);   
             }
 
             if (rewardDrops > 0){
