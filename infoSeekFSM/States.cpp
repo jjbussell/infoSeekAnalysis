@@ -354,29 +354,31 @@ void StateRewardDelay::s_setup()
 
 void StateRewardDelay::loop(){
 
-  // check if time to decrease interval
-  if (currentTime % 1000 == 0 & change == 0){
-    buzzInterval = buzzInterval - 100;
-    change = 1;
-  }
+  if (choice < 2){
+    // check if time to decrease interval
+    if (currentTime % 1000 == 0 & change == 0){
+      buzzInterval = buzzInterval - 100;
+      change = 1;
+    }
 
-  if (currentTime % 1000 != 0 & change == 1){
-    change = 0;
-  }
+    if (currentTime % 1000 != 0 & change == 1){
+      change = 0;
+    }
 
-  //check if time to turn buzzer on
-  if (currentTime >= lastBuzzerOff + buzzInterval) {
-    tone(buzzer,8000);
-    lastBuzzerOn = currentTime;
-    lastBuzzerOff = 1000000000000000000000;
-  }
+    //check if time to turn buzzer on
+    if (currentTime >= lastBuzzerOff + buzzInterval) {
+      tone(buzzer,8000);
+      lastBuzzerOn = currentTime;
+      lastBuzzerOff = 1000000000000000000000;
+    }
 
-  // check if time to turn buzzer off
-  if (currentTime >= lastBuzzerOn + 20) {
-    noTone(buzzer);
-    lastBuzzerOff = currentTime;
-    lastBuzzerOn = 1000000000000000000000;
-  } 
+    // check if time to turn buzzer off
+    if (currentTime >= lastBuzzerOn + 20) {
+      noTone(buzzer);
+      lastBuzzerOff = currentTime;
+      lastBuzzerOn = 1000000000000000000000;
+    } 
+  }
 }
 
 void StateRewardDelay::s_finish()
@@ -418,7 +420,6 @@ void StateRewardDelay::s_finish()
       rewardCount++;
       rewardDrops = currentRewardTime;
 
-      //noTone(buzzer);
       if (reward == 1) {
         rewardBigCount++;
         Serial.println("Big reward");
