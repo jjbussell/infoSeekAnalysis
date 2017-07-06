@@ -188,6 +188,8 @@ class StateRewardDelay : public TimedState {
     unsigned long buzzInterval;
     unsigned long lastBuzzerOn;
     unsigned long lastBuzzerOff;
+    int buzzCt;
+    int lastBuzzCt;
     int change;
   
   public:

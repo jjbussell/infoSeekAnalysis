@@ -348,26 +348,23 @@ void StateSideOdor::s_finish()
 void StateRewardDelay::s_setup()
 {
   Serial.println("REWARD_DELAY");
-  buzzInterval = 1000;
+  buzzInterval = rewardDelay/10;
   change = 0;
+  buzzCt = 0;
+  lastBuzzCt = 0;
 }
 
 void StateRewardDelay::loop(){
 
   if (choice < 2){
-    // check if time to decrease interval
-    if (currentTime % (rewardDelay/10) == 0 & change == 0){
-      buzzInterval = buzzInterval - 100;
-      change = 1;
-    }
-
-    if (currentTime % 1000 != 0 & change == 1){
-      change = 0;
-    }
 
     //check if time to turn buzzer on
     if (currentTime >= lastBuzzerOff + buzzInterval) {
       tone(buzzer,8000);
+//      Serial.print("t ");
+//      Serial.print(currentTime);
+//      Serial.println(" buzz");
+      buzzCt++;
       lastBuzzerOn = currentTime;
       lastBuzzerOff = 1000000000000000000000;
     }
@@ -376,8 +373,25 @@ void StateRewardDelay::loop(){
     if (currentTime >= lastBuzzerOn + 20) {
       noTone(buzzer);
       lastBuzzerOff = currentTime;
+//      Serial.print("off ");
+//      Serial.println(currentTime);
       lastBuzzerOn = 1000000000000000000000;
-    } 
+    }
+
+    // check if time to decrease interval
+    if (currentTime % (1000) == 0 & change == 0 ){
+      buzzInterval = buzzInterval - 100;
+//      Serial.print("I ");
+//      Serial.print(currentTime);
+//      Serial.print("interval ");
+//      Serial.println(buzzInterval);
+      change = 1;
+      lastBuzzCt = buzzCt;
+    }
+
+    if (currentTime % (1000) != 0 & change == 1){
+      change = 0;
+    }
   }
 }
 
