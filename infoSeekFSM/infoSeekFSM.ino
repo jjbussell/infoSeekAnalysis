@@ -299,7 +299,7 @@ void loop() {
       unsigned long entryThreshold = 20;
       int lickCheck = 1;
 
-      rewardDropTime = 30;
+      rewardDropTime = 20;
       rewardPauseTime = 200;
       
       startTime = 0;

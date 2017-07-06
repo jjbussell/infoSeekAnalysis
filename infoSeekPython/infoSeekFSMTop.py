@@ -36,7 +36,7 @@ def num(s):
 mouse = 'test'
 sessionEnd = '3'
 sessionTrials = '1000000'
-imageFlag = '1'
+imageFlag = '0'
 trialTypes = '2' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = all three
 infoSide = '1' #For now control1 goes to left port (looking from inside box), as do odors 0-2==INFO
 infoOdor = '2'
@@ -52,7 +52,7 @@ startDelay = '0' #50, 0
 odorDelay = '2000' #1300, 0
 odorTime = '200'  #300, 0
 rewardDelay = '10000' #1500, 0
-bigRewardTime = '4' #100, 50 for training
+bigRewardTime = '1' #100, 50 for training
 smallRewardTime = '0' #0, 50 for training
 infoRewardProb = '100' #50
 randRewardProb = '100' #50
