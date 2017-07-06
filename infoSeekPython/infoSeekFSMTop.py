@@ -33,31 +33,31 @@ def num(s):
 ##############  SET ARDUINO PARAMETERS  ############################
 
 ##############  SET ARDUINO PARAMETERS  ############################
-mouse = 'test'
+mouse = 'JB183'
 sessionEnd = '3'
 sessionTrials = '1000000'
 imageFlag = '0'
-trialTypes = '2' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = all three
-infoSide = '1' #For now control1 goes to left port (looking from inside box), as do odors 0-2==INFO
-infoOdor = '2'
-randOdor = '1'
-choiceOdor = '4'
-odorA = '0'
+trialTypes = '4' # 1 = choice, 2 = info, 3 = random, 4 = forced, 6 = biased 5 = all three
+infoSide = '0' #For now control1 goes to left port (looking from inside box), as do odors 0-2==INFO
+infoOdor = '3'
+randOdor = '2'
+choiceOdor = '1'
+odorA = '2'
 odorB = '3'
-odorC = '1' 
-odorD = '2'
+odorC = '0' 
+odorD = '1'
 centerDelay = '0' #0
 centerOdorTime = '200' #200, 0
 startDelay = '0' #50, 0
-odorDelay = '2000' #1300, 0
-odorTime = '200'  #300, 0
-rewardDelay = '10000' #1500, 0
+odorDelay = '1200' #1300, 0
+odorTime = '0'  #300, 0
+rewardDelay = '3000' #1500, 0
 bigRewardTime = '1' #100, 50 for training
-smallRewardTime = '0' #0, 50 for training
+smallRewardTime = '1' #0, 50 for training
 infoRewardProb = '100' #50
 randRewardProb = '100' #50
-gracePeriod = '2000' #4000, 1000000000
-interval = '4000' #4500, 0
+gracePeriod = '10000' #4000, 1000000000
+interval = '0' #4500, 0
 TOU_THRESH = '15'
 REL_THRESH = '20'
 touch_right = '4'
