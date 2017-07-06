@@ -451,7 +451,7 @@ if newData == 1
         b.trialLengthTotal = zeros(trialCt,1);
         for tt = 1:trialCt-1
             b.trialLength(tt) = b.trialStart(tt+1,1) - b.goCue(tt,2);
-            b.trialLengthEntry(tt) = b.trialStart(tt+1,1) - b.centerEntryGo(tt,3);
+            b.trialLengthEntry(tt) = b.firstCenterEntry(tt+1,2) - b.goCue(tt,2);
             b.trialLengthTotal(tt) = b.trialStart(tt+1,1) - b.trialStart(tt,1);
         end
         b.trialLength(trialCt) = NaN;

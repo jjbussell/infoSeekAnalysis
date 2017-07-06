@@ -670,6 +670,7 @@ void loop() {
                 randFCt++;
               }
               cTCount = randCCt + infoCCt + infoFCt + randFCt;
+              rewardDrops = 0;
               //  Serial.println("end reward, move to ITI");
               next_state = INTER_TRIAL_INTERVAL;
               break;
