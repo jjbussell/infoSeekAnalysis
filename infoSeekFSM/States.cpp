@@ -356,7 +356,7 @@ void StateRewardDelay::loop(){
 
   if (choice < 2){
     // check if time to decrease interval
-    if (currentTime % 1000 == 0 & change == 0){
+    if (currentTime % (rewardDelay/10) == 0 & change == 0){
       buzzInterval = buzzInterval - 100;
       change = 1;
     }

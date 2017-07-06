@@ -60,6 +60,7 @@ extern unsigned long gracePeriod;
 extern int buzzer;
 extern unsigned long bigRewardTime;
 extern unsigned long smallRewardTime;
+extern unsigned long rewardDelay;
 extern int rewardDrops;
 extern unsigned long currentRewardTime;
 extern uint16_t lickRate;
