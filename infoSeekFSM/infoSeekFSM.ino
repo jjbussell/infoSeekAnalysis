@@ -301,6 +301,7 @@ void loop() {
 
       rewardDropTime = 20;
       rewardPauseTime = 200;
+      rewardAmt = 0;
       
       startTime = 0;
       currentTime = 0;
@@ -620,6 +621,7 @@ void loop() {
               digitalWrite(water, HIGH);
               printer(7, choice, 0);
               waterValveOpen = true;
+              rewardAmt = rewardAmt + 4;
             }
 
             delay(rewardDropTime);

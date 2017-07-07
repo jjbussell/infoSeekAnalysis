@@ -438,13 +438,12 @@ void StateRewardDelay::s_finish()
         rewardBigCount++;
         Serial.println("Big reward");
         printer(15, trialType, choice);
-        rewardAmt = rewardAmt + (bigRewardTime/25);
+        
       }
       else {
         rewardSmallCount++;
         Serial.println("Small reward");
         printer(16, trialType, choice);
-        rewardAmt = rewardAmt + (smallRewardTime/25);
       }
     }
   }
