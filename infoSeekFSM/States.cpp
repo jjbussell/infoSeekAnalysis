@@ -430,7 +430,8 @@ void StateRewardDelay::s_finish()
     Serial.print("lickRate = ");
     Serial.println(lickRate);
 
-    if (port == choice && lickRate > 0){
+//    if (port == choice && lickRate > 0){
+    if (port == choice){
       rewardCount++;
       rewardDrops = currentRewardTime;
 
