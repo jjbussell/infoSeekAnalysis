@@ -412,11 +412,18 @@ if newData == 1
         b.bigRewardCt = size(b.bigRewards,1); % report
         b.smallRewardCt = size(b.smallRewards,1); % report
         b.rewardCts = b.bigRewardCt + b.smallRewardCt; % report
-        b.bigRewardTime = sessionParams(19,f);
+        b.bigRewardTime = sessionParams(19,f); % NOW DROPS (7/1/2017)
         b.smallRewardTime = sessionParams(20,f);
-        b.bigReward = (b.bigRewardTime * 40)/1000;
-        b.smallReward = (b.smallRewardTime * 40)/1000;
-        b.rewardAmount = b.bigRewardCt * (b.bigRewardTime * 40)/1000 + b.smallRewardCt * (b.smallRewardTime * 40)/1000; % report
+        
+        % need to account for drops vs time param
+        if b.bigRewardTime > 10
+            b.bigReward = (b.bigRewardTime * 40)/1000;
+            b.smallReward = (b.smallRewardTime * 40)/1000;
+        else
+            b.bigReward = b.bigRewardTime * 4; % 4 is uL/drop
+            b.smallReward = b.smallRewardTime * 4;
+        end
+        b.rewardAmount = b.bigRewardCt * b.bigReward + b.smallRewardCt * b.smallReward; % report
         
 %% REWARD TYPES
         
@@ -451,7 +458,7 @@ if newData == 1
         b.trialLengthTotal = zeros(trialCt,1);
         for tt = 1:trialCt-1
             b.trialLength(tt) = b.trialStart(tt+1,1) - b.goCue(tt,2);
-            b.trialLengthEntry(tt) = b.firstCenterEntry(tt+1,2) - b.goCue(tt,2);
+            b.trialLengthEntry(tt) = b.firstCenterEntry(tt+1,2) - b.goCue(tt,2); % THIS IS CORRECT NOW?
             b.trialLengthTotal(tt) = b.trialStart(tt+1,1) - b.trialStart(tt,1);
         end
         b.trialLength(trialCt) = NaN;

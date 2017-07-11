@@ -121,7 +121,7 @@ else % only FSM files NEED TO FIX?!?!
     a.rxn = a.rxn(a.correct);
     a.odor2 = a.trialParams(:,6);
     a.trialLength = a.trialLength(a.correct);
-    a.rewardAssigned = b.trialParams(:,5);
+    a.rewardAssigned = a.trialParams(:,5);
 end
 
 %% DAYS
@@ -350,8 +350,14 @@ today = max(dayDates);
 currentDay = a.parameters(:,3) == today;
 a.currentMice = unique(a.parameters(currentDay,2));
 [~,a.currentMiceNums] = ismember(a.currentMice,a.mouseList);
-[~,a.currentChoiceMice] = ismember(a.currentMiceNums,a.choiceMice);
-a.currentChoiceMiceList = a.mouseList(a.currentChoiceMice);
+if ~isempty(a.choiceMice)
+    [~,a.currentChoiceMice] = ismember(a.currentMiceNums,a.choiceMice);
+    a.currentChoiceMiceList = a.mouseList(a.currentChoiceMice);
+else
+    a.currentChoiceMice = [];
+    a.currentChoiceMiceList = [];
+end
+
 
 a.reverseMice = find(a.reverseFile>0);
 a.reverseMiceList = a.mouseList(a.reverseMice);
