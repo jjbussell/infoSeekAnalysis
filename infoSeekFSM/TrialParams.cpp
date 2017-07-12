@@ -128,7 +128,21 @@ int randomTrial(int trialTypes){
         break;
       case 6:
         trialPick = determineBiasedTrial();
-        break; 
+        break;
+      case 7: // forced info or choice
+        int tempPick = determineForcedTrial();
+        if (tempPick == 3){
+          trialPick = 1; 
+        }
+        else trialPick = 2;
+        break;
+      case 8: // forced rand or choice
+        int tempPick = determineForcedTrial();
+        if (tempPick == 2){
+          trialPick = 1; 
+        }
+        else trialPick = 3;
+        break;      
   }
   return trialPick;
 }
