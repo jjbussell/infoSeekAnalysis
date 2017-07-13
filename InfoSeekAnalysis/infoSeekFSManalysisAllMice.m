@@ -352,7 +352,11 @@ a.currentMice = unique(a.parameters(currentDay,2));
 [~,a.currentMiceNums] = ismember(a.currentMice,a.mouseList);
 if ~isempty(a.choiceMice)
     [~,a.currentChoiceMice] = ismember(a.currentMiceNums,a.choiceMice);
-    a.currentChoiceMiceList = a.mouseList(a.currentChoiceMice);
+    if sum(a.currentChoiceMice)>0
+        a.currentChoiceMiceList = a.mouseList(a.currentChoiceMice);
+    else
+        a.currentChoiceMiceList  = [];
+    end
 else
     a.currentChoiceMice = [];
     a.currentChoiceMiceList = [];
@@ -457,8 +461,8 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 trialsToCount = 500;
 
 if ~isempty(a.choiceMice)
-    for m = a.reverseMice(1):a.reverseMice(end) 
-
+    for k = 1:numel(a.reverseMice)
+        m = a.reverseMice(k);
        choicesIIS = a.choiceIISByMouse{m};
 
        preReverseTrials = find(a.preReverseByMouse{m} == 1,trialsToCount,'last');
@@ -475,6 +479,8 @@ if ~isempty(a.choiceMice)
        [a.meanChoice(m,1),a.choiceCI(m,1:2)] = binofit(sum(choicePreRev==1),numel(choicePreRev));
        [a.meanChoice(m,2),a.choiceRevCI(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
        a.meanChoice(m,3) = m;
+       
+       a.meanChoice = a.meanChoice(a.meanChoice(:,3)>0,:);
 
 %        disp(['mouse ' num2str(m)]);
        x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
