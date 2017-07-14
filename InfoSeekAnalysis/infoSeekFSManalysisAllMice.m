@@ -1,6 +1,26 @@
-% add back lickProbDays
+% TRIAL LENGTHS / LICKING TIME IN PORT-->how long does ITI need to be?
+    % a.centerEntryFirstTxn = first transition to center delay, but not time of
+    % entry b/c can have already entered when trial start. need
+    % b.centerEntryFirst, which doesn't get saved to a.!!! take (correct)
+    % for pre-FSM, b.firstCenterEntry (correct trials only)
 
-% LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!!
+% FOR TRIAL LENGTH, want time from goCue to next first correct center entry
+    % first correct center entries now exist--pull a.firstCenterEntry (FSM) and
+    % b.firstCenterEntry (pre-FSM)
+    % PULL IN GO CUE! FIX TRIAL LENGTH CALCS FOR FUTURE!
+
+% WANT DWELL TIME FOR REWARDED PORT ENTRY -- get entries
+
+% "checking"/out of trial flow side entries--> GET ENTRIES!!!
+
+% NEED TO SAVE ENTRIES TO a.
+
+% outcome plots - ERROR RATES!
+
+% fix lick prob days for histogram
+
+% LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!! AND LICKING AFTER TRIAL
+% "ENDS"
 
 % add all mice aligned to reverse day & MEAN + error
 % add all mice aligned to reverse day, trial-by-trial/sliding window
@@ -9,6 +29,7 @@
 % Ethan's early lick index 
 % Ethan's logit--choice, infoside, prereverse, trial type
 % table
+% graph of all entries for each trial
 
 
 clear;
@@ -85,15 +106,22 @@ if loadData == 1
     a.earlyLicks = [b.earlyLicks; c.earlyLicks];
     a.waterLicks = [b.waterLicks; c.waterLicks];
     a.outcome = [b.outcome; zeros(numel(b.fileAll),1)]; % outcome only calculated for FSM
+    a.rewardAssigned = [b.trialParams(:,5); c.rewardSize]; % rewardSize in pre-FSM, need to calc from trialParms in FSM
+    a.goCue = [b.goCue(:,2); c.goCueAll];
+    a.firstCenterEntry = [b.firstCenterEntry(:,2); c.firstCenterEntryAll];
+%     a.rewardEntries = [b.rewardEntries; allRewardEntries Stuff
+    
+    % NEED TO PULL IN CENTER ENTRIES AND REWARD ENTRIES! and GO CUE
     
     clear b; clear c;
     
-else % only FSM files
+else % only FSM files NEED TO FIX?!?!
     a.FSM = ones(numel(a.file),1);
     a.FSMall = ones(numel(a.fileAll),1);
     a.rxn = a.rxn(a.correct);
     a.odor2 = a.trialParams(:,6);
     a.trialLength = a.trialLength(a.correct);
+    a.rewardAssigned = a.trialParams(:,5);
 end
 
 %% DAYS
@@ -169,6 +197,21 @@ a.rxnInfoForcedCorr = a.rxn(a.infoForcedCorr);
 a.rxnInfoChoiceCorr = a.rxn(a.infoChoiceCorr);
 a.rxnRandForcedCorr = a.rxn(a.randForcedCorr);
 a.rxnRandChoiceCorr = a.rxn(a.randChoiceCorr);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% TRIAL LENGTH BY ENTRIES
+
+% for each file
+% for each trial before last
+% a.trialLengthEntries = NaN(numel(a.fileAll),1);
+% a.trialLengthEntries(1:end-1) = a.firstCenterEntry(2:end,2)-a.goCue(1:end-1);
+% a.trialLengthEntries = a.firstCenterEntry() - a.goCue(t);
+% for last trial
+% a.trialLengthEntries(tmax) = sum(a
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -307,8 +350,18 @@ today = max(dayDates);
 currentDay = a.parameters(:,3) == today;
 a.currentMice = unique(a.parameters(currentDay,2));
 [~,a.currentMiceNums] = ismember(a.currentMice,a.mouseList);
-[~,a.currentChoiceMice] = ismember(a.currentMiceNums,a.choiceMice);
-a.currentChoiceMiceList = a.mouseList(a.currentChoiceMice);
+if ~isempty(a.choiceMice)
+    [~,a.currentChoiceMice] = ismember(a.currentMiceNums,a.choiceMice);
+    if sum(a.currentChoiceMice)>0
+        a.currentChoiceMiceList = a.mouseList(a.currentChoiceMice);
+    else
+        a.currentChoiceMiceList  = [];
+    end
+else
+    a.currentChoiceMice = [];
+    a.currentChoiceMiceList = [];
+end
+
 
 a.reverseMice = find(a.reverseFile>0);
 a.reverseMiceList = a.mouseList(a.reverseMice);
@@ -408,8 +461,8 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 trialsToCount = 500;
 
 if ~isempty(a.choiceMice)
-    for m = a.reverseMice(1):a.reverseMice(end) 
-
+    for k = 1:numel(a.reverseMice)
+        m = a.reverseMice(k);
        choicesIIS = a.choiceIISByMouse{m};
 
        preReverseTrials = find(a.preReverseByMouse{m} == 1,trialsToCount,'last');
@@ -426,6 +479,8 @@ if ~isempty(a.choiceMice)
        [a.meanChoice(m,1),a.choiceCI(m,1:2)] = binofit(sum(choicePreRev==1),numel(choicePreRev));
        [a.meanChoice(m,2),a.choiceRevCI(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
        a.meanChoice(m,3) = m;
+       
+       a.meanChoice = a.meanChoice(a.meanChoice(:,3)>0,:);
 
 %        disp(['mouse ' num2str(m)]);
        x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];

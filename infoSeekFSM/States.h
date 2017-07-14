@@ -23,9 +23,11 @@ enum STATE_TYPE{
   WAIT_FOR_ODOR,
   SIDE_ODOR,
   REWARD_DELAY,
-  REWARD,
+  DELIVER_REWARD,
   INTER_TRIAL_INTERVAL,
   TIMEOUT,
+  REWARD_PAUSE,
+  REWARD_COMPLETE
 };
 
 extern STATE_TYPE next_state;
@@ -55,6 +57,13 @@ extern unsigned long odorDelay;
 extern unsigned long interval;
 extern unsigned long currentTime;
 extern unsigned long gracePeriod;
+extern int buzzer;
+extern unsigned long bigRewardTime;
+extern unsigned long smallRewardTime;
+extern unsigned long rewardDelay;
+extern int rewardDrops;
+extern unsigned long currentRewardTime;
+extern uint16_t lickRate;
 
 
 class StateWaitForTrial : public TimedState {
@@ -174,20 +183,17 @@ class StateSideOdor : public TimedState {
 class StateRewardDelay : public TimedState {
   protected:
     void s_setup();
+    void loop();
     void s_finish();
+    unsigned long buzzInterval;
+    unsigned long lastBuzzerOn;
+    unsigned long lastBuzzerOff;
+    int buzzCt;
+    int lastBuzzCt;
+    int change;
   
   public:
     StateRewardDelay(unsigned long d) : TimedState(d) { };
-};
-
-class StateReward : public TimedState {
-  protected:
-    void s_setup();
-    void s_finish();
-    void loop();
-  
-  public:
-    StateReward(unsigned long d) : TimedState(d) { };
 };
 
 class StateTimeout : public TimedState {
@@ -197,6 +203,15 @@ class StateTimeout : public TimedState {
   
   public:
     StateTimeout(unsigned long d) : TimedState(d) { };
+};
+
+class StateRewardPause : public TimedState{
+  protected:
+    void s_setup();
+    void s_finish();
+
+  public:
+    StateRewardPause(unsigned long d) : TimedState(d) { };
 };
 
 #endif

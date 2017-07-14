@@ -1,7 +1,5 @@
 %% TO FIX
 
-% make variable "current" for current/added mice
-
 % trials that get started but don't get to trialParams
 % (['JB167_2017-03-14_11h-05m-02s.csv'] orig)
 
@@ -274,14 +272,14 @@ if newData == 1
 % 1 = info, 0 = rand, 2 = none (timeout), 3 = incorrect (2 and 3 are errors)
 % in trials during grace period changes, 2 == chose during grace
 
-        b.choices = data(data(:,3) == 11, [1 2 4]);
-        b.chose = ismember(b.trialNums,b.choices(:,2));
+        choices = data(data(:,3) == 11, [1 2 4]);
+        b.chose = ismember(b.trialNums,choices(:,2));
         b.choseTrialCt = sum(b.chose);
         
         b.choice = nan(trialCt,4);
         b.choice(:,1) = ff; 
         b.choice(:,3) = b.trialNums;
-        b.choice(b.chose,[2 4]) = b.choices(:,[1 3]);
+        b.choice(b.chose,[2 4]) = choices(:,[1 3]);
         b.choice(~b.chose,4) = 2;
         
         % set choice time for non-choosing trials to max of response
@@ -300,9 +298,9 @@ if newData == 1
         
         b.choiceCorr = b.choice(b.correct,4);
 
-        b.gotToChoose = ismember(b.goCue(:,3),b.choice(:,3));
+        gotToChoose = ismember(b.goCue(:,3),b.choice(:,3));
         b.rxn = NaN(trialCt,1);
-        b.rxn(b.gotToChoose) = b.choiceTime - b.goCue(b.gotToChoose,2);             
+        b.rxn(gotToChoose) = b.choiceTime - b.goCue(gotToChoose,2);             
         
 %% CENTER ENTRY FIRST AND FOR GO CUE
         
@@ -330,7 +328,7 @@ if newData == 1
             end
             
             if ~isempty(b.centerEntries(:,3) == r) & ~isempty(find(b.txn3_4(:,3) == r))
-                b.firstCenterEntryTxn(r,1) = b.txn3_4(find(b.txn3_4(:,3) == r,1,'first'),2);
+                b.firstCenterEntryTxn(r,1) = b.txn3_4(find(b.txn3_4(:,3) == r,1,'first'),2); % FIRST CORRECT CENTER ENTRY
             else
                 b.firstCenterEntryTxn(r,1) = 0;
             end
@@ -339,10 +337,10 @@ if newData == 1
             centerEntryFirstDiff(centerEntryFirstDiff < 0) = inf;
             [centerEntryFirstVal, centerEntryFirstIdx] = min(centerEntryFirstDiff);
             if ~isinf(centerEntryFirstVal)
-                b.centerEntryFirst(r,:) = b.centerEntries(centerEntryFirstIdx,:);
+                b.firstCenterEntry(r,:) = b.centerEntries(centerEntryFirstIdx,:);
                 b.centerEntries(centerEntryFirstIdx,3) = r;
             else
-                b.centerEntryFirst(r,:) = [ff totalTime r 0 0 0 0 0];
+                b.firstCenterEntry(r,:) = [ff totalTime r 0 0 0 0 0];
             end
             
             b.centerEntryCt(r,2) = sum(b.centerEntries(:,3) == r);            
@@ -354,8 +352,6 @@ if newData == 1
         b.centerDwell = b.centerExitGo(:,2) - b.centerEntryGo(:,2);
         b.centerDwell = [zeros(size(b.centerDwell,1),1) b.centerDwell];
         b.centerDwell(:,1) = ff;
-        
-        b.centerEntryGoCorr = b.centerEntryGo(b.correct,:);
                 
 %% REWARD ENTRIES
 
@@ -416,11 +412,18 @@ if newData == 1
         b.bigRewardCt = size(b.bigRewards,1); % report
         b.smallRewardCt = size(b.smallRewards,1); % report
         b.rewardCts = b.bigRewardCt + b.smallRewardCt; % report
-        b.bigRewardTime = sessionParams(19,f);
+        b.bigRewardTime = sessionParams(19,f); % NOW DROPS (7/1/2017)
         b.smallRewardTime = sessionParams(20,f);
-        b.bigReward = (b.bigRewardTime * 40)/1000;
-        b.smallReward = (b.smallRewardTime * 40)/1000;
-        b.rewardAmount = b.bigRewardCt * (b.bigRewardTime * 40)/1000 + b.smallRewardCt * (b.smallRewardTime * 40)/1000; % report
+        
+        % need to account for drops vs time param
+        if b.bigRewardTime > 10
+            b.bigReward = (b.bigRewardTime * 40)/1000;
+            b.smallReward = (b.smallRewardTime * 40)/1000;
+        else
+            b.bigReward = b.bigRewardTime * 4; % 4 is uL/drop
+            b.smallReward = b.smallRewardTime * 4;
+        end
+        b.rewardAmount = b.bigRewardCt * b.bigReward + b.smallRewardCt * b.smallReward; % report
         
 %% REWARD TYPES
         
@@ -455,7 +458,7 @@ if newData == 1
         b.trialLengthTotal = zeros(trialCt,1);
         for tt = 1:trialCt-1
             b.trialLength(tt) = b.trialStart(tt+1,1) - b.goCue(tt,2);
-            b.trialLengthEntry(tt) = b.trialStart(tt+1,1) - b.centerEntryGo(tt,3);
+            b.trialLengthEntry(tt) = b.firstCenterEntry(tt+1,2) - b.goCue(tt,2); % THIS IS CORRECT NOW?
             b.trialLengthTotal(tt) = b.trialStart(tt+1,1) - b.trialStart(tt,1);
         end
         b.trialLength(trialCt) = NaN;
@@ -612,7 +615,7 @@ if newData == 1
 % CONSUMMATORY LICKS CAN BE FROM AN INCORRECT ENTRY OR AN ENTRY TECHNICALLY
 % IN THE NEXT TRIAL!!
 
-        b.goCueCorr = b.goCue(b.correct,:);
+        goCueCorr = b.goCue(b.correct,:);
 
         b.licks = [];
         b.licks = data(data(:,3) == 4 & data(:,4) > 0,[1 2 4]);        
@@ -649,8 +652,8 @@ if newData == 1
                     else
                         b.licks(l,12) = rand;  % choice port
                     end
-                    if ~isnan(b.goCueCorr(lickTrialIdx,2))
-                        b.licks(l,13) = b.licks(l,2) - b.goCueCorr(lickTrialIdx,2); % time from go cue
+                    if ~isnan(goCueCorr(lickTrialIdx,2))
+                        b.licks(l,13) = b.licks(l,2) - goCueCorr(lickTrialIdx,2); % time from go cue
                     else b.licks(l,13) = nan;
                     end
                 end
@@ -765,6 +768,7 @@ if newData == 1
             a.centerEntryGo = [a.centerEntryGo; b.centerEntryGo];
             a.centerExitGo = [a.centerExitGo; b.centerExitGo];
             a.centerEntryCt = [a.centerEntryCt; b.centerEntryCt];
+            a.firstCenterEntry = [a.firstCenterEntry; b.firstCenterEntry];
             a.firstCenterEntryTxn = [a.firstCenterEntryTxn; b.firstCenterEntryTxn];
             a.centerDwell = [a.centerDwell; b.centerDwell];            
             a.goCue = [a.goCue; b.goCue];
