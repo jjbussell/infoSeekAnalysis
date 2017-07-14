@@ -1,3 +1,24 @@
+%         for f = 1:a.numFiles
+%             firstCenterEntry = [];
+%             goCue = [];
+%             trialLengthCenterEntry = [];
+%             firstCenterEntry = a.firstCenterEntry(a.firstCenterEntry(:,1)==f,:);
+%             goCue = a.goCue(a.goCue(:,1)==f,:);
+%             for tt = 1:a.trialCts(f)-1
+%                 if firstCenterEntry(tt+1,2)>0
+%                     trialLengthCenterEntry(tt,1) = firstCenterEntry(tt+1,2) - goCue(tt,2);
+%                 else
+%                     trialLengthCenterEntry(tt,1) = NaN;
+%                 end
+%             end
+%             trialLengthCenterEntry(a.trialCts(f),1) = NaN;
+%             if f == 1
+%                 a.trialLengthCenterEntry = trialLengthCenterEntry;
+%             else
+%                 a.trialLengthCenterEntry = [a.trialLengthCenterEntry; trialLengthCenterEntry];
+%             end
+%         end
+
 % TRIAL LENGTHS / LICKING TIME IN PORT-->how long does ITI need to be?
     % a.centerEntryFirstTxn = first transition to center delay, but not time of
     % entry b/c can have already entered when trial start. need
