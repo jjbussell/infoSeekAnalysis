@@ -41,11 +41,12 @@ numToPlot = 200;
 
 a.mColors = linspecer(a.mouseCt);
 
-a.mChoiceColors = linspecer(a.choiceMouseCt);
+a.mReverseColors = linspecer(numel(a.reverseMice));
 
-if ~isempty(a.choiceMice)
+
+if ~isempty(a.reverseMice)
     % sort plotting colors
-    a.sortedColors = a.mChoiceColors(a.sortedChoice(:,3),:);
+    a.sortedColors = a.mReverseColors(a.sortIdx,:);
 end
 
 map = linspecer(2);

@@ -416,12 +416,16 @@ if newData == 1
         b.smallRewardTime = sessionParams(20,f);
         
         % need to account for drops vs time param
-        if b.bigRewardTime > 10
+        if b.bigRewardTime == 30
+            b.bigReward = 4;
+            b.smallReward = 4;
+        else if b.bigRewardTime > 10
             b.bigReward = (b.bigRewardTime * 40)/1000;
             b.smallReward = (b.smallRewardTime * 40)/1000;
         else
             b.bigReward = b.bigRewardTime * 4; % 4 is uL/drop
             b.smallReward = b.smallRewardTime * 4;
+            end
         end
         b.rewardAmount = b.bigRewardCt * b.bigReward + b.smallRewardCt * b.smallReward; % report
         
