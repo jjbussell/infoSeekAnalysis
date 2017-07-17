@@ -131,6 +131,7 @@ if loadData == 1
     a.goCue = [b.goCue(:,2); c.goCueAll];
     a.firstCenterEntry = [b.firstCenterEntry(:,2); c.firstCenterEntryAll];
 %     a.rewardEntries = [b.rewardEntries; allRewardEntries Stuff
+    a.deletedFiles = b.deletedFiles;
     
     % NEED TO PULL IN CENTER ENTRIES AND REWARD ENTRIES! and GO CUE
     
@@ -143,6 +144,7 @@ else % only FSM files NEED TO FIX?!?!
     a.odor2 = a.trialParams(:,6);
     a.trialLength = a.trialLength(a.correct);
     a.rewardAssigned = a.trialParams(:,5);
+    a.deletedFiles = a.deletedFiles;
 end
 
 %% DAYS
@@ -251,6 +253,9 @@ end
 a.dayCell = a.parameters(:,3); % names
 a.miceCell = a.parameters(:,2); % names
 
+a.dayCell(a.deletedFiles) = [];
+a.miceCell(a.deletedFiles) = [];
+
 for m = 1:a.mouseCt
    mouseFileIdx = strcmp(a.miceCell,a.mouseList{m});
    a.mouseDays{m} = unique(a.dayCell(mouseFileIdx));
@@ -258,8 +263,13 @@ for m = 1:a.mouseCt
 end
 
 for fm = 1:a.numFiles
+   if ismember(fm,a.deletedFiles)
+       a.fileMouse(fm) = NaN;
+       a.fileDay(fm) = NaN;
+   else
    a.fileMouse(fm) = find(strcmp(a.parameters(fm,2),a.mouseList));
    a.fileDay(fm) = find(strcmp(a.parameters(fm,3),a.mouseDays{1,a.fileMouse(fm)})); 
+   end
 end
 
 a.mouseDay = zeros(sum(a.corrTrialCt),1);
