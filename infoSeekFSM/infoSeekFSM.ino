@@ -614,7 +614,7 @@ void loop() {
             break;
 
           case DELIVER_REWARD:
-            if (rewardDrops > 0 & reward == 1){
+            if (rewardDrops > 0){
 //            if (rewardDrops > 0 & reward == 1 & lickRate >0){
               Serial.println("DELIVER REWARD DROP");
               Serial.println("water on");

@@ -434,6 +434,8 @@ void StateRewardDelay::s_finish()
     if (port == choice){
       rewardCount++;
       rewardDrops = currentRewardTime;
+      Serial.print("reward drops = ");
+      Serial.println(rewardDrops);
 
       if (reward == 1) {
         rewardBigCount++;
