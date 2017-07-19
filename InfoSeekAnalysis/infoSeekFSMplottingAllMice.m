@@ -43,10 +43,12 @@ a.mColors = linspecer(a.mouseCt);
 
 a.mReverseColors = linspecer(numel(a.reverseMice));
 
+a.mChoiceColors = linspecer(numel(a.choiceMice));
 
-if ~isempty(a.reverseMice)
+
+if ~isempty(a.choiceMice)
     % sort plotting colors
-    a.sortedColors = a.mReverseColors(a.sortIdx,:);
+    a.sortedColors = a.mChoiceColors(a.sortIdx,:);
 end
 
 map = linspecer(2);
@@ -90,7 +92,8 @@ a.choiceLabels = {'ChoiceInfoBig','ChoiceInfoSmall','ChoiceRandBig',...
 
 %% PLOT DAY SUMMARIES BY MOUSE FOR CURRENT MICE
 
-for m = a.currentMiceNums(1):a.currentMiceNums(end)
+for mm = 1:numel(a.currentMiceNums)
+    m=a.currentMiceNums(mm);
 % for m = 1:a.mouseCt
     figure();
     
@@ -222,11 +225,11 @@ for m = a.currentMiceNums(1):a.currentMiceNums(end)
     ax = nsubplot(4,2,3,2);
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
-    ax.YLim = [6000 20000];
-    plot(cell2mat(a.daySummary.trialLengthInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.trialLengthInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3,'LineStyle',':');
-    plot(cell2mat(a.daySummary.trialLengthRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.trialLengthRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3,'LineStyle',':');
+%     ax.YLim = [6000 20000];
+    plot(cell2mat(a.daySummary.trialLengthEntryInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
+    plot(cell2mat(a.daySummary.trialLengthEntryInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3,'LineStyle',':');
+    plot(cell2mat(a.daySummary.trialLengthEntryRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
+    plot(cell2mat(a.daySummary.trialLengthEntryRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3,'LineStyle',':');
     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
     ylabel({'Trial', 'duration (ms)'});
 %     xlabel('Day');
@@ -238,7 +241,7 @@ for m = a.currentMiceNums(1):a.currentMiceNums(end)
     ax = nsubplot(4,2,4,2);
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
-    ax.YLim = [0 0.5];
+%     ax.YLim = [0 0.5];
     plot(cell2mat(a.daySummary.rewardRateInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
     plot(cell2mat(a.daySummary.rewardRateInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerEdgeColor',purple,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
     plot(cell2mat(a.daySummary.rewardRateRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
@@ -445,7 +448,8 @@ end
 %% SUMMARIES CHOICE + LICKING FOR CURRENT MICE - SKIPS
 
 % for m = 1:a.mouseCt
-% for m = a.currentMiceNums(1):a.currentMiceNums(end)
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
 %     figure();
 %     
 %     fig = gcf;
@@ -551,7 +555,8 @@ a.FSMmouseIdx = find(a.FSMmice);
 
     %% STACKED BARS
 
-for m = a.currentMiceNums(1):a.currentMiceNums(end)
+for mm = 1:numel(a.currentMiceNums)
+    m=a.currentMiceNums(mm);
     if a.mouseDayCt(m) > 3
         for d = 1:a.mouseDayCt(m)
             [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
@@ -608,7 +613,8 @@ for m = a.currentMiceNums(1):a.currentMiceNums(end)
 end
 
     %% bar plot for each day
-% for m = a.currentMiceNums(1):a.currentMiceNums(end)
+% for for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
 %     
 % % for m = 1:mouseCt    
 %     figure();
@@ -644,7 +650,8 @@ end
 
 % for m = a.FSMmouseIdx(1):a.FSMmouseIdx(end)
 %     
-for m = a.currentMiceNums(1):a.currentMiceNums(end)   
+for mm = 1:numel(a.currentMiceNums)
+    m=a.currentMiceNums(mm); 
     figure();
     fig = gcf;
     fig.PaperUnits = 'inches';
@@ -898,8 +905,13 @@ if a.choiceMouseCt > 0
 
     % MAKE DYNAMIC re: trial nums, pre/post reverse
 
+if sum(a.currentChoiceMice>0)
     for mm = 1:numel(a.currentChoiceMice)
         m = a.currentChoiceMice(mm);
+        
+% if sum(a.choiceMice>0)
+%     for mm = 1:numel(a.choiceMice)
+%         m = a.choiceMice(mm);        
         fig = figure();
 
         fig = gcf;
@@ -968,6 +980,7 @@ if a.choiceMouseCt > 0
         saveas(fig,fullfile(pathname,['early' a.mouseList{m}]),'pdf');
         close(fig);
     end
+end
 
     %% CHOICE pre-reverse RANGE HEATMAP (heatmap.pdf) - SKIPS
 

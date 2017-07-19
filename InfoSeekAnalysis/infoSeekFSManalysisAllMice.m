@@ -19,17 +19,6 @@
 %             end
 %         end
 
-% TRIAL LENGTHS / LICKING TIME IN PORT-->how long does ITI need to be?
-    % a.centerEntryFirstTxn = first transition to center delay, but not time of
-    % entry b/c can have already entered when trial start. need
-    % b.centerEntryFirst, which doesn't get saved to a.!!! take (correct)
-    % for pre-FSM, b.firstCenterEntry (correct trials only)
-
-% FOR TRIAL LENGTH, want time from goCue to next first correct center entry
-    % first correct center entries now exist--pull a.firstCenterEntry (FSM) and
-    % b.firstCenterEntry (pre-FSM)
-    % PULL IN GO CUE! FIX TRIAL LENGTH CALCS FOR FUTURE!
-
 % WANT DWELL TIME FOR REWARDED PORT ENTRY -- get entries
 
 % "checking"/out of trial flow side entries--> GET ENTRIES!!!
@@ -43,13 +32,14 @@
 % LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!! AND LICKING AFTER TRIAL
 % "ENDS"
 
+% Ethan's early lick index 
+% Ethan's logit--choice, infoside, prereverse, trial type
+% table
+
 % add all mice aligned to reverse day & MEAN + error
 % add all mice aligned to reverse day, trial-by-trial/sliding window
 % all mice pre-reverse aligned to start & MEAN + error
 % all mice pre-reverse aligned to start, trial-by-trial/sliding window
-% Ethan's early lick index 
-% Ethan's logit--choice, infoside, prereverse, trial type
-% table
 % graph of all entries for each trial
 
 
@@ -130,6 +120,7 @@ if loadData == 1
     a.rewardAssigned = [b.trialParams(:,5); c.rewardSize]; % rewardSize in pre-FSM, need to calc from trialParms in FSM
     a.goCue = [b.goCue(:,2); c.goCueAll];
     a.firstCenterEntry = [b.firstCenterEntry(:,2); c.firstCenterEntryAll];
+    a.trialLengthCenterEntry = [b.trialLengthCenterEntry(b.correct); c.trialLengthCenterEntry(c.correctAll==1)];
 %     a.rewardEntries = [b.rewardEntries; allRewardEntries Stuff
     if exist('a.deletedFiles')
         a.deletedFiles = b.deletedFiles;
@@ -145,6 +136,7 @@ else % only FSM files NEED TO FIX?!?!
     a.rxn = a.rxn(a.correct);
     a.odor2 = a.trialParams(:,6);
     a.trialLength = a.trialLength(a.correct);
+    a.trialLengthCenterEntry = a.trialLengthCenterEntry(a.correct);
     a.rewardAssigned = a.trialParams(:,5);
     if exist('a.deletedFiles')
     a.deletedFiles = a.deletedFiles;
@@ -230,18 +222,7 @@ a.rxnRandChoiceCorr = a.rxn(a.randChoiceCorr);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% TRIAL LENGTH BY ENTRIES
 
-% for each file
-% for each trial before last
-% a.trialLengthEntries = NaN(numel(a.fileAll),1);
-% a.trialLengthEntries(1:end-1) = a.firstCenterEntry(2:end,2)-a.goCue(1:end-1);
-% a.trialLengthEntries = a.firstCenterEntry() - a.goCue(t);
-% for last trial
-% a.trialLengthEntries(tmax) = sum(a
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%
 a.mouseList = unique(a.mouse);
@@ -499,36 +480,51 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 
 trialsToCount = 500;
 
+a.meanChoice = NaN(a.choiceMice(a.choiceMouseCt),3);
+a.choiceCI = NaN(a.choiceMice(a.choiceMouseCt),2);
+a.prefCI = NaN(a.choiceMice(a.choiceMouseCt),2);
+a.pref = NaN(a.choiceMice(a.choiceMouseCt),3);
+
 if ~isempty(a.choiceMice)
-    for k = 1:numel(a.reverseMice)
-        m = a.reverseMice(k);
+%     for k = 1:numel(a.reverseMice)
+%        m = a.reverseMice(k);
+       
+   for mm = 1:a.choiceMouseCt
+       m = a.choiceMice(mm);
+       
        choicesIIS = a.choiceIISByMouse{m};
 
        preReverseTrials = find(a.preReverseByMouse{m} == 1,trialsToCount,'last');
-       postReverseTrials = find(a.preReverseByMouse{m} == 0,trialsToCount,'last');
-
        [a.pref(m,1),a.prefCI(m,1:2)] = binofit(sum(choicesIIS(preReverseTrials)==1),numel(choicesIIS(preReverseTrials)));
-       [a.pref(m,2),a.prefRevCI(m,1:2)] = binofit(sum(choicesIIS(postReverseTrials)==1),numel(choicesIIS(postReverseTrials)));
+
+       if ismember(m,a.reverseMice)
+         postReverseTrials = find(a.preReverseByMouse{m} == 0,trialsToCount,'last');
+         [a.pref(m,2),a.prefRevCI(m,1:2)] = binofit(sum(choicesIIS(postReverseTrials)==1),numel(choicesIIS(postReverseTrials)));
+       end
 
        ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
 
        choicePreRev = a.choice_all(ok & a.preReverse == 1);
-       choicePostRev = a.choice_all(ok & reverseFlag);
 
        [a.meanChoice(m,1),a.choiceCI(m,1:2)] = binofit(sum(choicePreRev==1),numel(choicePreRev));
-       [a.meanChoice(m,2),a.choiceRevCI(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
-       a.meanChoice(m,3) = m;
        
-       a.meanChoice = a.meanChoice(a.meanChoice(:,3)>0,:);
+       if ismember(m,a.reverseMice)
+         choicePostRev = a.choice_all(ok & reverseFlag);
+         [a.meanChoice(m,2),a.choiceRevCI(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
+           x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
+           y = a.choice_all(ok);
+           [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
+           a.beta(m,:) = a.stats(m).beta;
+           a.betaP(m,:) = a.stats(m).p;
+       end
+       
+       a.meanChoice(m,3) = m;
+ 
+   end
 
-%        disp(['mouse ' num2str(m)]);
-       x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
-       y = a.choice_all(ok);
-       [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
-       a.beta(m,:) = a.stats(m).beta;
-       a.betaP(m,:) = a.stats(m).p;
-    end
-
+    a.meanChoice = a.meanChoice(a.meanChoice(:,3)>0,:);
+    a.choiceCI = a.choiceCI(a.choiceCI(:,1)>0,:);
+   
     allChoices = a.choiceCorr(a.choiceCorrTrials & a.preReverse == 1);
     [a.overallPref,a.overallCI] = binofit(sum(allChoices == 1),numel(allChoices));
     clear allChoices;
@@ -623,7 +619,7 @@ end
 %% SORT BY INFO PREFERENCE
 if ~isempty(a.choiceMice)
     [a.sortedChoice,a.sortIdx] = sortrows(a.meanChoice,1);
-    a.sortedMouseList = a.choiceMiceList(a.sortIdx);
+    a.sortedMouseList = a.mouseList(a.sortIdx);
     a.sortedCI = a.choiceCI(a.sortIdx,:);
 
     %% STATS
@@ -792,14 +788,18 @@ for m = 1:a.mouseCt
         a.daySummary.trialLengthInfoChoice{m,d} = nansum(a.trialLength(a.infoChoiceCorr == 1 & ok == 1))/sum(~isnan(a.trialLength(a.infoChoiceCorr == 1 & ok == 1)));
         a.daySummary.trialLengthRandForced{m,d} = nansum(a.trialLength(a.randForcedCorr == 1 & ok == 1))/sum(~isnan(a.trialLength(a.randForcedCorr == 1 & ok == 1)));
         a.daySummary.trialLengthRandChoice{m,d} = nansum(a.trialLength(a.randChoiceCorr == 1 & ok == 1))/sum(~isnan(a.trialLength(a.randChoiceCorr == 1 & ok == 1)));
+        a.daySummary.trialLengthEntryInfoForced{m,d} = nansum(a.trialLengthCenterEntry(a.infoForcedCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntry(a.infoForcedCorr == 1 & ok == 1)));
+        a.daySummary.trialLengthEntryInfoChoice{m,d} = nansum(a.trialLengthCenterEntry(a.infoChoiceCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntry(a.infoChoiceCorr == 1 & ok == 1)));
+        a.daySummary.trialLengthEntryRandForced{m,d} = nansum(a.trialLengthCenterEntry(a.randForcedCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntry(a.randForcedCorr == 1 & ok == 1)));
+        a.daySummary.trialLengthEntryRandChoice{m,d} = nansum(a.trialLengthCenterEntry(a.randChoiceCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntry(a.randChoiceCorr == 1 & ok == 1)));        
         a.daySummary.rewardInfoForced{m,d} = sum(a.reward(a.infoForcedCorr == 1 & ok == 1))/sum(a.infoForcedCorr(ok));
         a.daySummary.rewardInfoChoice{m,d} = sum(a.reward(a.infoChoiceCorr == 1 & ok == 1))/sum(a.infoChoiceCorr(ok));
         a.daySummary.rewardRandForced{m,d} = sum(a.reward(a.randForcedCorr == 1 & ok == 1))/sum(a.randForcedCorr(ok));
         a.daySummary.rewardRandChoice{m,d} = sum(a.reward(a.randChoiceCorr == 1 & ok == 1))/sum(a.randChoiceCorr(ok));
-        a.daySummary.rewardRateInfoForced{m,d} = sum(a.reward(a.infoForcedCorr == 1 & ok == 1)) / nansum(a.trialLength(a.infoForcedCorr == 1 & ok == 1))*1000;
-        a.daySummary.rewardRateInfoChoice{m,d} = sum(a.reward(a.infoChoiceCorr == 1 & ok == 1)) / nansum(a.trialLength(a.infoChoiceCorr == 1 & ok == 1))*1000;
-        a.daySummary.rewardRateRandForced{m,d} = sum(a.reward(a.randForcedCorr == 1 & ok == 1)) / nansum(a.trialLength(a.randForcedCorr == 1 & ok == 1))*1000;
-        a.daySummary.rewardRateRandChoice{m,d} = sum(a.reward(a.randChoiceCorr == 1 & ok == 1)) / nansum(a.trialLength(a.randChoiceCorr == 1 & ok == 1))*1000;        
+        a.daySummary.rewardRateInfoForced{m,d} = sum(a.reward(a.infoForcedCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntry(a.infoForcedCorr == 1 & ok == 1))*1000;
+        a.daySummary.rewardRateInfoChoice{m,d} = sum(a.reward(a.infoChoiceCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntry(a.infoChoiceCorr == 1 & ok == 1))*1000;
+        a.daySummary.rewardRateRandForced{m,d} = sum(a.reward(a.randForcedCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntry(a.randForcedCorr == 1 & ok == 1))*1000;
+        a.daySummary.rewardRateRandChoice{m,d} = sum(a.reward(a.randChoiceCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntry(a.randChoiceCorr == 1 & ok == 1))*1000;        
     end
 end
 
