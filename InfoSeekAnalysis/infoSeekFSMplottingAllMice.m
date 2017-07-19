@@ -1073,7 +1073,54 @@ end
     saveas(fig,fullfile(pathname,'Regression'),'pdf');
 %     close(fig);
 
-end
+
+    %% EARLY LICKS
+    
+    
+    bothSig = a.preRevEarlyLicks(:,3)<0.05 & a.postRevEarlyLicks(:,3)<0.05;
+    preSig = a.preRevEarlyLicks(:,3)<0.05;
+    postSig = a.postRevEarlyLicks(:,3)<0.05;
+
+    for m = 1:a.mouseCt
+        if bothSig(m) == 1
+            sig(m) = 1;
+        else if preSig(m) == 1
+                sig(m) = 2;
+            else if postSig(m) == 1
+                    sig(m) = 2;
+                else sig(m) = 3;
+                end
+            end
+        end
+    end
+    
+    fig = figure();
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+    ax.XLim = [-1 1];
+    ax.YLim = [-1 1];
+    for l = 1:numel(a.reverseMice)
+        m = a.reverseMice(l);
+        dy = 0.02;
+        text(a.earlyLickIdx(m,1),a.earlyLickIdx(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
+    end
+    plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    scatter(a.earlyLickIdx(sig==1,1),a.earlyLickIdx(sig==1,2),'filled','r');
+    scatter(a.earlyLickIdx(sig==2,1),a.earlyLickIdx(sig==2,2),'filled','k');
+    scatter(a.earlyLickIdx(sig==3,1),a.earlyLickIdx(sig==3,2),'filled',[0.2 0.2 0.2]);
+    ylabel('POST-reversal (initial info side vs other side)');
+    xlabel('PRE-reversal (initial info side vs other side)');
+    title({'Pre-odor2 lick indices, pre vs post-reversal', '(-1 = lick more for initial no info side)'});
+    hold off;
+% 
+%     saveas(fig,fullfile(pathname,'PrevsPost'),'pdf');
+%     close(fig);
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

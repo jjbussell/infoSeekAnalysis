@@ -710,13 +710,22 @@ a.earlyLickIdx = (a.initInfoLicks - a.initNoInfoLicks)/(a.initInfoLicks + a.init
 for m=1:a.mouseCt
    ok = a.mice(:,m) == 1;
    % pre-reverse, INFO
-   a.preRevEarlyLicks(m,1) = mean(a.earlyLicks(a.initinfoside_info == 1 & a.preReverse == 1 & ok == 1));
+   a.preRevEarlyLicks(m,1) = mean(a.earlyLicks(a.choice_all == 1 & a.preReverse == 1 & ok == 1));
    % pre-reverse, NO INFO
-   a.preRevEarlyLicks(m,2) = mean(a.earlyLicks(a.initinfoside_info == -1 & a.preReverse == 1 & ok == 1));
+   a.preRevEarlyLicks(m,2) = mean(a.earlyLicks(a.choice_all == 0 & a.preReverse == 1 & ok == 1));
+   % pre-reverse diff p-val
+   [~,a.preRevEarlyLicks(m,3)] = ttest2(a.earlyLicks(a.choice_all == 1 & a.preReverse == 1 & ok == 1),a.earlyLicks(a.choice_all == 0 & a.preReverse == 1 & ok == 1));
    % post-reverse, INFO
-   a.postRevEarlyLicks(m,1) = mean(a.earlyLicks(a.initinfoside_info == 1 & reverseFlag & ok == 1));
+   a.postRevEarlyLicks(m,1) = mean(a.earlyLicks(a.choice_all == 1 == 1 & reverseFlag & ok == 1));
    % post-reverse, NO INFO
-   a.postRevEarlyLicks(m,2) = mean(a.earlyLicks(a.initinfoside_info == -1 & reverseFlag & ok == 1));
+   a.postRevEarlyLicks(m,2) = mean(a.earlyLicks(a.choice_all == 0 & reverseFlag & ok == 1));
+   % post-reverse diff p-val
+   [~,a.postRevEarlyLicks(m,3)] = ttest2(a.earlyLicks(a.choice_all == 1 == 1 & reverseFlag & ok == 1),a.earlyLicks(a.choice_all == 0 & reverseFlag & ok == 1));
+   
+   % pre-reverse
+   a.earlyLickIdx(m,1) = (a.preRevEarlyLicks(m,1)-a.preRevEarlyLicks(m,2))/(a.preRevEarlyLicks(m,1)+a.preRevEarlyLicks(m,2));
+   % post-reverse
+   a.earlyLickIdx(m,2) = (a.postRevEarlyLicks(m,1)-a.postRevEarlyLicks(m,2))/(a.postRevEarlyLicks(m,1)+a.postRevEarlyLicks(m,2)); 
 end
 
 % [(mean licks to initial-info side) - (mean licks to initial-noinfo side)]
