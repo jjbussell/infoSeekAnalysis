@@ -12,9 +12,7 @@
 
 % scatter of initial vs reversal pref for IIS in diff bins (# trials,
 % days)--> NEED TO FIX BINNING/numToPlot? GET DAYS!!!
-% early lick index/other lick index
-% correlation side/info bias-->REGRESSION--OK
-% correlation rxn time/early licks (normalize to time?) -- TALK TO ETHAN
+% correlation rxn time
 % AGAIN - need to throw out bad rxn time trials and days
 
 % sliding window (adjustable) of mean choice + CI from start through reversal
@@ -61,6 +59,7 @@ plots = [1 1; 1 2; 2 1; 2 2];
 purple = [121 32 196] ./ 255;
 orange = [251 139 6] ./ 255;
 cornflower = [100 149 237] ./ 255;
+grey = [17 17 17];
 
 CC = [0.2,0.2,0.2; %choice no choice
     0.984313725490196,0.545098039215686,0.0235294117647059; %choice info big
@@ -900,7 +899,7 @@ if a.choiceMouseCt > 0
 
 %     [sortedChoiceToPlot,sortIdx] = sortrows(choiceToPlot);
 %     miceSortToPlot = (a.mouseList(sortIdx));
-
+end
     %% CHOICE Pre-reverse RANGE DATA BY MOUSE (earlyJBXXX.pdf)
 
     % MAKE DYNAMIC re: trial nums, pre/post reverse
@@ -1075,24 +1074,29 @@ end
 
 
     %% EARLY LICKS
-    
-    
+
     bothSig = a.preRevEarlyLicks(:,3)<0.05 & a.postRevEarlyLicks(:,3)<0.05;
-    preSig = a.preRevEarlyLicks(:,3)<0.05;
-    postSig = a.postRevEarlyLicks(:,3)<0.05;
 
     for m = 1:a.mouseCt
         if bothSig(m) == 1
-            sig(m) = 1;
-        else if preSig(m) == 1
-                sig(m) = 2;
-            else if postSig(m) == 1
+            if a.preRevEarlyLicks(m,1)>a.preRevEarlyLicks(m,2)
+                if a.postRevEarlyLicks(m,1)>a.preRevEarlyLicks(m,2)
                     sig(m) = 2;
-                else sig(m) = 3;
+                else
+                    sig(m) = 3;
+                end
+            else if a.preRevEarlyLicks(m,1)<a.preRevEarlyLicks(m,2)
+                    if a.postRevEarlyLicks(m,1)<a.postRevEarlyLicks(m,2)
+                        sig(m) = 1;
+                    else
+                        sig(m) = 3;
+                    end
                 end
             end
+        else sig(m) = 4;
         end
     end
+
     
     fig = figure();
     fig.PaperUnits = 'inches';
@@ -1111,16 +1115,89 @@ end
     end
     plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
     plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    scatter(a.earlyLickIdx(sig==1,1),a.earlyLickIdx(sig==1,2),'filled','r');
-    scatter(a.earlyLickIdx(sig==2,1),a.earlyLickIdx(sig==2,2),'filled','k');
-    scatter(a.earlyLickIdx(sig==3,1),a.earlyLickIdx(sig==3,2),'filled',[0.2 0.2 0.2]);
+    scatter(a.earlyLickIdx(sig==1,1),a.earlyLickIdx(sig==1,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
+    scatter(a.earlyLickIdx(sig==2,1),a.earlyLickIdx(sig==2,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
+    scatter(a.earlyLickIdx(sig==3,1),a.earlyLickIdx(sig==3,2),'filled','MarkerEdgeColor','none','MarkerFaceColor','k');
+    scatter(a.earlyLickIdx(sig==4,1),a.earlyLickIdx(sig==4,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',[.8 .8 .8]);
     ylabel('POST-reversal (initial info side vs other side)');
     xlabel('PRE-reversal (initial info side vs other side)');
     title({'Pre-odor2 lick indices, pre vs post-reversal', '(-1 = lick more for initial no info side)'});
     hold off;
-% 
-%     saveas(fig,fullfile(pathname,'PrevsPost'),'pdf');
-%     close(fig);
+
+    saveas(fig,fullfile(pathname,'PrevsPostEarlyLicks'),'pdf');
+    close(fig);
+
+
+    %%  EARLY LICK BAR GRAPHS 
+    
+    % sort order
+%     preSig = a.preRevEarlyLicks(:,3)<0.05;
+%     preDiff = a.preRevEarlyLicks(:,2)-a.preRevEarlyLicks(:,1);
+%     postSig = a.postRevEarlyLicks(:,3)<0.05;
+%     postDiff = a.postRevEarlyLicks(:,2)-a.postRevEarlyLicks(:,1);
+%     
+%     sorts = [preSig preDiff postSig postDiff];
+%     sorts2 = [preDiff postDiff];
+%     
+%     [sortsSorted,earlyLickSortIdx] = sortrows(sorts2);
+%     
+%     
+%     fig = figure();
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0.5 0.5 10 7];
+%     set(fig,'renderer','painters');
+%     set(fig,'PaperOrientation','landscape');
+%     
+%     for m = 1:a.mouseCt
+%         earlyLickSortVal = earlyLickSortIdx(m);
+%         ax = subplot(a.mouseCt/4,a.mouseCt/8,earlyLickSortVal);
+%         if ~isnan(a.postRevEarlyLicks(m,1))
+%             bar(1:4,[a.preRevEarlyLicks(m,2),a.preRevEarlyLicks(m,1),a.postRevEarlyLicks(m,2),a.postRevEarlyLicks(m,1)]);
+%         else
+%             bar(1:4,[a.preRevEarlyLicks(m,2),a.preRevEarlyLicks(m,1),0,0]);
+%         end
+%     end
+
+    [a.sortedEarlyLickIdx,a.earlyLickSortIdx] = sortrows(a.earlyLickIdx(a.reverseMice),1);
+    a.completeSig = a.preRevEarlyLicks(a.reverseMice,3);
+    a.sortedLickMouseList = a.reverseMiceList(a.earlyLickSortIdx);
+    a.sortedSig = a.completeSig(a.earlyLickSortIdx);
+    a.completeRevSig = a.postRevEarlyLicks(a.reverseMice,3);
+    a.sortedRevSig = a.completeRevSig(a.earlyLickSortIdx);
+    a.completeRevLickIdx = a.earlyLickIdx(a.reverseMice,2);
+    a.sortedRevEarlyLickIdx = a.completeRevLickIdx(a.earlyLickSortIdx);
+    
+    fig = figure();
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+    ax = nsubplot(2,1,1,1);
+    ax.FontSize = 8;
+    ax.YLim = [-1 1];
+    ax.XTick = [1:numel(a.reverseMice)];
+    ax.XTickLabel = [a.sortedLickMouseList];
+    bar(find(a.sortedSig<0.05),a.sortedEarlyLickIdx(a.sortedSig<0.05,1)*-1,'k');
+    bar(find(a.sortedSig>=0.05),a.sortedEarlyLickIdx(a.sortedSig>=0.05,1)*-1,'EdgeColor',[.8 .8 .8],'FaceColor',[.8 .8 .8]);
+    ylabel('Pre-odor2 lick index');
+    xlabel('Mouse');
+    title({'Pre-odor2 lick indices, PRE-reveral', '(1 = lick more for initial noInfo side)'});
+
+%     ax = nsubplot(2,1,2,1);
+%     ax.FontSize = 8;
+%     ax.YLim = [-1 1];
+%     ax.XTick = [1:numel(a.reverseMice)];
+%     ax.XTickLabel = [a.sortedLickMouseList];
+%     bar(find(a.sortedRevSig<0.05),a.sortedRevEarlyLickIdx(a.sortedRevSig<0.05,1)*-1,'k');
+%     bar(find(a.sortedRevSig>=0.05),a.sortedRevEarlyLickIdx(a.sortedRevSig>=0.05,1)*-1,'EdgeColor',[.8 .8 .8],'FaceColor',[.8 .8 .8]);
+%     ylabel('Pre-odor2 lick index');
+%     xlabel('Mouse');
+%     hold off;   
+    
+    saveas(fig,fullfile(pathname,'EarlyLickIndex'),'pdf');
+    close(fig);
+    
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

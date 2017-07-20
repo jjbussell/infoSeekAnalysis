@@ -96,7 +96,8 @@ if loadData == 1
     a.files = cell2struct(e,fn,1);
 
     a.fileAll = [b.fileAll; c.fileAll + b.numFiles];
-    a.correct = [b.correct; c.correctAll];     
+    a.correct = [b.correct; c.correct];
+    a.choiceType = [b.choiceType; c.trialTypeAll];
     a.infoForced = [b.infoForced; c.infoForced];
     a.randForced = [b.randForced; c.randForced];
     a.choiceTrials = [b.choiceTrials; c.choice];    
@@ -104,6 +105,7 @@ if loadData == 1
     a.type = [b.type; c.type];
     a.mouse = [b.mouse; c.mouse];
     a.mouseAll = [b.mouseAll; c.mouseAll];
+    a.choice = [b.choice(:,4); c.portChoiceAll];
     a.choiceCorr = [b.choiceCorr; c.info];
     a.choiceTypeCorr = [b.choiceTypeCorr; c.trialType];
         c.rxn = c.firstRewardEntry - c.goCue;
@@ -111,12 +113,13 @@ if loadData == 1
     a.rxn  = [b.rxn(b.correct); c.rxn];
     a.odor2 = [b.trialParams(:,6); c.odor2];
     a.reward = [b.reward; c.reward];
+    a.rewarded = [b.rewarded; c.complete];
     a.trialLength = [b.trialLength(b.correct); c.trialLength];
     a.anticipatoryLicks = [b.anticipatoryLicks; c.anticipatoryLicks];
     a.betweenLicks = [b.betweenLicks; c.betweenLicks];
     a.earlyLicks = [b.earlyLicks; c.earlyLicks];
     a.waterLicks = [b.waterLicks; c.waterLicks];
-    a.outcome = [b.outcome; zeros(numel(b.fileAll),1)]; % outcome only calculated for FSM
+    a.outcome = [b.outcome; zeros(numel(c.fileAll),1)]; % outcome only calculated for FSM
     a.rewardAssigned = [b.trialParams(:,5); c.rewardSize]; % rewardSize in pre-FSM, need to calc from trialParms in FSM
     a.goCue = [b.goCue(:,2); c.goCueAll];
     a.firstCenterEntry = [b.firstCenterEntry(:,2); c.firstCenterEntryAll];
@@ -370,6 +373,8 @@ today = max(dayDates);
 currentDay = a.parameters(:,3) == today;
 a.currentMice = unique(a.parameters(currentDay,2));
 [~,a.currentMiceNums] = ismember(a.currentMice,a.mouseList);
+a.completeMice = find(~ismember(a.mouseList,a.currentMice));
+a.completeMouseList = a.mouseList(a.completeMice);
 if ~isempty(a.choiceMice)
     [~,a.currentChoiceMice] = ismember(a.currentMiceNums,a.choiceMice);
     if sum(a.currentChoiceMice)>0

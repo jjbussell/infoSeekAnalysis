@@ -460,15 +460,15 @@ if newData == 1
 % 2. centerEntryGo can start before trial starts
 
         b.trialLength = zeros(trialCt,1);
-        b.trialLengthEntry = zeros(trialCt,1);
+        b.trialLengthCenterEntry = zeros(trialCt,1);
         b.trialLengthTotal = zeros(trialCt,1);
         for tt = 1:trialCt-1
             b.trialLength(tt) = b.trialStart(tt+1,1) - b.goCue(tt,2);
-            b.trialLengthEntry(tt) = b.firstCenterEntry(tt+1,2) - b.goCue(tt,2); % THIS IS CORRECT NOW?
+            b.trialLengthCenterEntry(tt) = b.firstCenterEntry(tt+1,2) - b.goCue(tt,2); % THIS IS CORRECT NOW?
             b.trialLengthTotal(tt) = b.trialStart(tt+1,1) - b.trialStart(tt,1);
         end
         b.trialLength(trialCt) = NaN;
-        b.trialLengthEntry(trialCt) = NaN;
+        b.trialLengthCenterEntry(trialCt) = NaN;
         b.trialLengthTotal(trialCt) = NaN;
         
  %% CHOICE TRIAL TYPES
@@ -806,7 +806,7 @@ if newData == 1
             a.rewardPortTime = [a.rewardPortTime; b.rewardPortTime];
             a.betweenLicks = [a.betweenLicks; b.betweenLicks];
             a.trialLength = [a.trialLength; b.trialLength];
-            a.trialLengthEntry = [a.trialLengthEntry; b.trialLengthEntry];
+            a.trialLengthCenterEntry = [a.trialLengthCenterEntry; b.trialLengthCenterEntry];
             a.trialLengthTotal = [a.trialLengthTotal; b.trialLengthTotal];
             a.bigRewards = [a.bigRewards; b.bigRewards];
             a.smallRewards = [a.smallRewards; b.smallRewards];
