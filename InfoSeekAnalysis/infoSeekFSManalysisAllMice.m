@@ -96,12 +96,14 @@ if loadData == 1
     a.files = cell2struct(e,fn,1);
 
     a.fileAll = [b.fileAll; c.fileAll + b.numFiles];
+    a.trialAll = [b.trialNums; c.trialAll];
     a.correct = [b.correct; c.correct];
     a.choiceType = [b.choiceType; c.trialTypeAll];
     a.infoForced = [b.infoForced; c.infoForced];
     a.randForced = [b.randForced; c.randForced];
     a.choiceTrials = [b.choiceTrials; c.choice];    
-    a.file = [b.file; c.file + b.numFiles]; 
+    a.file = [b.file; c.file + b.numFiles];
+    a.trial = [b.corrTrials; c.trial];
     a.type = [b.type; c.type];
     a.mouse = [b.mouse; c.mouse];
     a.mouseAll = [b.mouseAll; c.mouseAll];
@@ -113,7 +115,7 @@ if loadData == 1
     a.rxn  = [b.rxn(b.correct); c.rxn];
     a.odor2 = [b.trialParams(:,6); c.odor2];
     a.reward = [b.reward; c.reward];
-    a.rewarded = [b.rewarded; c.complete];
+    a.rewarded = [b.rewarded; zeros(numel(c.fileAll),1)];
     a.trialLength = [b.trialLength(b.correct); c.trialLength];
     a.anticipatoryLicks = [b.anticipatoryLicks; c.anticipatoryLicks];
     a.betweenLicks = [b.betweenLicks; c.betweenLicks];
@@ -136,6 +138,8 @@ if loadData == 1
 else % only FSM files NEED TO FIX?!?!
     a.FSM = ones(numel(a.file),1);
     a.FSMall = ones(numel(a.fileAll),1);
+    a.trialAll = a.trialNums;
+    a.trial = a.corrTrials;
     a.rxn = a.rxn(a.correct);
     a.odor2 = a.trialParams(:,6);
     a.trialLength = a.trialLength(a.correct);

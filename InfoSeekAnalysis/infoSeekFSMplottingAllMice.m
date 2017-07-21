@@ -266,6 +266,7 @@ for mm = 1:numel(a.currentMiceNums)
 
    
     saveas(fig,fullfile(pathname,a.mouseList{m}),'pdf');
+    saveas(fig,fullfile(pathname,a.mouseList{m}),'epsc');
 %     close(fig);
     
 end
@@ -843,7 +844,7 @@ if a.choiceMouseCt > 1
     hold off;
     
     saveas(fig,fullfile(pathname,'Overall'),'pdf');
-    close(fig);
+%     close(fig);
 end
 
 %% 
@@ -1041,7 +1042,7 @@ end
     hold off;
 
     saveas(fig,fullfile(pathname,'PrevsPost'),'pdf');
-    close(fig);
+%     close(fig);
 
     %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
 
@@ -1070,7 +1071,7 @@ end
     hold off;
 
     saveas(fig,fullfile(pathname,'Regression'),'pdf');
-%     close(fig);
+    close(fig);
 
 
     %% EARLY LICKS
@@ -1125,7 +1126,7 @@ end
     hold off;
 
     saveas(fig,fullfile(pathname,'PrevsPostEarlyLicks'),'pdf');
-    close(fig);
+%     close(fig);
 
 
     %%  EARLY LICK BAR GRAPHS 
@@ -1184,19 +1185,19 @@ end
     xlabel('Mouse');
     title({'Pre-odor2 lick indices, PRE-reveral', '(1 = lick more for initial noInfo side)'});
 
-%     ax = nsubplot(2,1,2,1);
-%     ax.FontSize = 8;
-%     ax.YLim = [-1 1];
-%     ax.XTick = [1:numel(a.reverseMice)];
-%     ax.XTickLabel = [a.sortedLickMouseList];
-%     bar(find(a.sortedRevSig<0.05),a.sortedRevEarlyLickIdx(a.sortedRevSig<0.05,1)*-1,'k');
-%     bar(find(a.sortedRevSig>=0.05),a.sortedRevEarlyLickIdx(a.sortedRevSig>=0.05,1)*-1,'EdgeColor',[.8 .8 .8],'FaceColor',[.8 .8 .8]);
-%     ylabel('Pre-odor2 lick index');
-%     xlabel('Mouse');
-%     hold off;   
+    ax = nsubplot(2,1,2,1);
+    ax.FontSize = 8;
+    ax.YLim = [-1 1];
+    ax.XTick = [1:numel(a.reverseMice)];
+    ax.XTickLabel = [a.sortedLickMouseList];
+    bar(find(a.sortedRevSig<0.05),a.sortedRevEarlyLickIdx(a.sortedRevSig<0.05,1)*-1,'k');
+    bar(find(a.sortedRevSig>=0.05),a.sortedRevEarlyLickIdx(a.sortedRevSig>=0.05,1)*-1,'EdgeColor',[.8 .8 .8],'FaceColor',[.8 .8 .8]);
+    ylabel('Pre-odor2 lick index');
+    xlabel('Mouse');
+    hold off;   
     
     saveas(fig,fullfile(pathname,'EarlyLickIndex'),'pdf');
-    close(fig);
+%     close(fig);
     
 
 %%
