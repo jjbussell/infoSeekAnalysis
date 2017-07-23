@@ -695,45 +695,11 @@ for mm = 1:sum(a.FSMmice)
         randCorr{m,d} = sum(ismember(outcomes,randCorrCodes))/(sum(ismember(outcomes,randCorrCodes))+sum(ismember(outcomes,randIncorrCodes)));
         randIncorr{m,d} = sum(ismember(outcomes,randIncorrCodes))/(sum(ismember(outcomes,randCorrCodes))+sum(ismember(outcomes,randIncorrCodes)));
     end
-% end 
+    
+end
 
-%     figure();
-%     fig = gcf;
-%     fig.PaperUnits = 'inches';
-%     fig.PaperPosition = [1 1 8 10];
-%     set(fig,'renderer','painters')
-%     set(fig,'PaperOrientation','portrait');
-% 
-%     ax = nsubplot(4,1,1,1);
-%     title(a.mouseList(m));
-%     ax.FontSize = 10;
-%     ylabel('% info trials)');
-%     xlabel('Day');
-%     plot([1:a.mouseDayCt(m)],cell2mat(infoCorr(m,:)),'Color',purple,'LineWidth',2);
-%     plot([1:a.mouseDayCt(m)],cell2mat(infoIncorr(m,:)),'Color',purple,'LineStyle','--','LineWidth',2);
-%     
-%     ax = nsubplot(4,1,2,1);
-%     ax.FontSize = 10;
-%     ylabel('% no info trials)');
-%     xlabel('Day');
-%     plot([1:a.mouseDayCt(m)],cell2mat(randCorr(m,:)),'Color',orange,'LineWidth',2);
-%     plot([1:a.mouseDayCt(m)],cell2mat(randIncorr(m,:)),'Color',orange,'LineStyle','--','LineWidth',2);
-%     
-%     ax = nsubplot(4,1,3,1);
-%     ax.FontSize = 10;
-%     ylabel('Reward Delay (s)');
-%     xlabel('Day');
-%     scatter([1:a.mouseDayCt(m)],cell2mat(a.daySummary.rewardDelay(m,:)),50,'filled','MarkerFaceColor','k'); 
-%     
-%     ax = nsubplot(4,1,4,1);
-%     ax.FontSize = 10;
-%     ylabel('Reward Probability');
-%     xlabel('Day');
-% %     plot([1:a.mouseDayCt(m)],cell2mat(a.daySummary.infoBigProb(m,:)),'Color','k','LineWidth',2);    
-%     scatter([1:a.mouseDayCt(m)],cell2mat(a.daySummary.infoBigProb(m,:)),50,'filled','MarkerFaceColor','k');
-% 
-%     saveas(fig,fullfile(pathname,['errors' a.mouseList{m}]),'pdf');
-% %     close(fig);
+for mm = 16:19
+    m=a.FSMmouseIdx(mm);
 
     figure();
     fig = gcf;
@@ -742,10 +708,32 @@ for mm = 1:sum(a.FSMmice)
     set(fig,'renderer','painters')
     set(fig,'PaperOrientation','portrait');
 
-    ax = nsubplot(4,1,1,1);
-    scatter(cell2mat(a.daySummary.rewardDelay(m,:)),cell2mat(randIncorr(m,:)));
-    hold on;
+    ax = nsubplot(3,1,1,1);
+    title(a.mouseList(m));
+    ax.FontSize = 10;
+    ylabel('% info trials)');
+    xlabel('Day');
+    plot([1:6],cell2mat(infoCorr(m,7:12)),'Color',purple,'LineWidth',2);
+    plot([1:6],cell2mat(infoIncorr(m,7:12)),'Color',purple,'LineStyle','--','LineWidth',2);
     
+    ax = nsubplot(3,1,2,1);
+    ax.FontSize = 10;
+    ylabel('% no info trials)');
+    xlabel('Day');
+    plot([1:6],cell2mat(randCorr(m,7:12)),'Color',orange,'LineWidth',2);
+    plot([1:6],cell2mat(randIncorr(m,7:12)),'Color',orange,'LineStyle','--','LineWidth',2);
+    
+    ax = nsubplot(3,1,3,1);
+    ax.FontSize = 10;
+    ylabel('Reward Probability');
+    xlabel('Day');
+%     plot([1:a.mouseDayCt(m)],cell2mat(a.daySummary.infoBigProb(m,:)),'Color','k','LineWidth',2);    
+    scatter([1:6],cell2mat(a.daySummary.infoBigProb(m,7:12)),50,'filled','MarkerFaceColor','k');
+
+    saveas(fig,fullfile(pathname,['errors' a.mouseList{m}]),'pdf');
+%     close(fig);
+
+   
 end
 
 
