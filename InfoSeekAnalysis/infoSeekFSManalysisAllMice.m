@@ -708,13 +708,15 @@ for m = 1:a.mouseCt
 end
 
 
-%% EARLY LICKS BY REVERSAL
+%% EARLY LICKS AND REACTION SPEED BY REVERSAL
 
 % NEED TO FINISH
 
+a.rxnSpeed = 1/a.rxn;
+
 a.initInfoLicks = mean(a.earlyLicks(a.initinfoside_info == 1));
 a.initNoInfoLicks = mean(a.earlyLicks(a.initinfoside_info == -1));
-a.earlyLickIdx = (a.initInfoLicks - a.initNoInfoLicks)/(a.initInfoLicks + a.initNoInfoLicks);
+% a.earlyLickIdx = (a.initInfoLicks - a.initNoInfoLicks)/(a.initInfoLicks + a.initNoInfoLicks);
 
 for m=1:a.mouseCt
    ok = a.mice(:,m) == 1;
