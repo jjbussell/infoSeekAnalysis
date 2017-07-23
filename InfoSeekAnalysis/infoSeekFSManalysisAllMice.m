@@ -122,6 +122,7 @@ if loadData == 1
     a.earlyLicks = [b.earlyLicks; c.earlyLicks];
     a.waterLicks = [b.waterLicks; c.waterLicks];
     a.outcome = [b.outcome; zeros(numel(c.fileAll),1)]; % outcome only calculated for FSM
+    a.finalOutcome = [b.finalOutcome; c.finalOutcome]; % outcome only calculated for FSM
     a.rewardAssigned = [b.trialParams(:,5); c.rewardSize]; % rewardSize in pre-FSM, need to calc from trialParms in FSM
     a.goCue = [b.goCue(:,2); c.goCueAll];
     a.firstCenterEntry = [b.firstCenterEntry(:,2); c.firstCenterEntryAll];
@@ -773,6 +774,7 @@ for m = 1:a.mouseCt
         a.daySummary.randSmall{m,d} = sum(a.randSmall(ok));
         lastFileIdx = find(ok,1,'last');
         a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),24};
+        a.daySummary.rewardDelay{m,d} = a.parameters{a.file(lastFileIdx),21};
         a.daySummary.totalRewards{m,d} = sum(a.reward(ok));
         a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
         a.daySummary.percentInfo{m,d} = mean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1));

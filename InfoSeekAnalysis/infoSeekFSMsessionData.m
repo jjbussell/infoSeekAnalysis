@@ -616,6 +616,107 @@ if newData == 1
             end  
         end
         
+%% FINAL OUTCOME (not present type) FOR ALL TRIALS
+
+b.finalOutcome = NaN(numel(trialCt),1);
+
+for t = 1:size(b.trialStart,1)
+    % choice 1 = info, 0 = rand, 3 = wrong, 2 = no choice
+    
+
+    if ~isempty(find(b.file == b.fileAll(t) & b.corrTrials == b.trialNums(t)))
+        corrIdx = find(b.file == b.fileAll(t) & b.corrTrials == b.trialNums(t));
+    end
+    % CHOICE TRIALS
+    if b.choiceType(t) == 1
+        % NO CHOICE
+        if b.choice(t,4) == 2
+            b.finalOutcome(t,1) = 1; % choice no choice;
+        % INFO    
+        elseif b.choice(t,4) == 1
+            % BIG
+            if b.trialParams(corrIdx,5) == 1
+                if b.rewarded(t) == 1
+                    b.finalOutcome(t,1) = 2; % choice info big
+                else b.finalOutcome(t,1) = 3; % choice info big NP
+                end
+            % SMALL
+            elseif b.trialParams(corrIdx,5) == 0
+                if b.rewarded(t) == 1
+                    b.finalOutcome(t,1) = 4; % choice info small
+                else b.finalOutcome(t,1) = 5; % choice info small NP
+                end
+            end
+        % RANDOM
+        elseif b.choice(t,4) == 0
+            % BIG
+            if b.trialParams(corrIdx,5) == 1
+                if b.rewarded(t) == 1
+                    b.finalOutcome(t,1) = 6; % choice rand big
+                else b.finalOutcome(t,1) = 7; % choice rand big NP
+                end
+            % SMALL
+            elseif b.trialParams(corrIdx,5) == 0
+                if b.rewarded(t) == 1
+                    b.finalOutcome(t,1) = 8; % choice rand small
+                else b.finalOutcome(t,1) = 9; % choice rand small NP
+                end
+            end
+        end
+
+    % INFO TRIALS
+    elseif b.choiceType(t) == 2
+        % NO CHOICE
+        if b.choice(t,4) == 2
+            b.finalOutcome(t,1) = 10; % info no choice;  
+        % CORRECT
+        elseif b.choice(t,4) == 1
+            % BIG
+            if b.trialParams(corrIdx,5) == 1
+                if b.rewarded(t) == 1
+                    b.finalOutcome(t,1) = 11; % info big
+                else b.finalOutcome(t,1) = 12; % info big NP
+                end
+            % SMALL
+            elseif b.trialParams(corrIdx,5) == 0
+                if b.rewarded(t) == 1
+                    b.finalOutcome(t,1) = 13; % info small
+                else b.finalOutcome(t,1) = 14; % info small NP
+                end
+            end
+        % INCORRECT
+        else %a.choice(t,4) == 3 
+            b.finalOutcome(t,1) = 15; % info incorrect (went rand)
+        end
+
+    % RAND TRIALS
+    elseif b.choiceType(t) == 3
+        % NO CHOICE
+        if b.choice(t,4) == 2
+            b.finalOutcome(t,1) = 16; % rand no choice;  
+        % CORRECT
+        elseif b.choice(t,4) == 0
+            % BIG
+            if b.trialParams(corrIdx,5) == 1
+                if b.rewarded(t) == 1
+                    b.finalOutcome(t,1) = 17; % rand big
+                else b.finalOutcome(t,1) = 18; % rand big NP
+                end
+            % SMALL
+            elseif b.trialParams(corrIdx,5) == 0
+                if b.rewarded(t) == 1
+                    b.finalOutcome(t,1) = 19; % rand small
+                else b.finalOutcome(t,1) = 20; % rand small NP
+                end
+            end
+        % INCORRECT
+        else %b.choice(t,4) == 3 
+            b.finalOutcome(t,1) = 21; % rand incorrect (went info)
+        end
+    end  
+    
+end
+        
 %% LICKING
         
 % CONSUMMATORY LICKS CAN BE FROM AN INCORRECT ENTRY OR AN ENTRY TECHNICALLY
