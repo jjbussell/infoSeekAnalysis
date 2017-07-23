@@ -679,6 +679,75 @@ for mm = 1:numel(a.currentMiceNums)
 %     close(fig);
 end
 
+%% FINAL OUTCOME (error plots) ACROSS DAYS
+
+infoCorrCodes = [11 13 14];
+infoIncorrCodes = [10 12 15];
+randCorrCodes = [17 19];
+randIncorrCodes = [16 18 20 21];
+
+for mm = 1:sum(a.FSMmice)
+    m=a.FSMmouseIdx(mm);
+    for d = 1:a.mouseDayCt(m)
+        outcomes = a.daySummary.finalOutcome{m,d};
+        infoCorr{m,d} = sum(ismember(outcomes,infoCorrCodes))/(sum(ismember(outcomes,infoCorrCodes))+sum(ismember(outcomes,infoIncorrCodes)));
+        infoIncorr{m,d} = sum(ismember(outcomes,infoIncorrCodes))/(sum(ismember(outcomes,infoCorrCodes))+sum(ismember(outcomes,infoIncorrCodes)));
+        randCorr{m,d} = sum(ismember(outcomes,randCorrCodes))/(sum(ismember(outcomes,randCorrCodes))+sum(ismember(outcomes,randIncorrCodes)));
+        randIncorr{m,d} = sum(ismember(outcomes,randIncorrCodes))/(sum(ismember(outcomes,randCorrCodes))+sum(ismember(outcomes,randIncorrCodes)));
+    end
+% end 
+
+%     figure();
+%     fig = gcf;
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [1 1 8 10];
+%     set(fig,'renderer','painters')
+%     set(fig,'PaperOrientation','portrait');
+% 
+%     ax = nsubplot(4,1,1,1);
+%     title(a.mouseList(m));
+%     ax.FontSize = 10;
+%     ylabel('% info trials)');
+%     xlabel('Day');
+%     plot([1:a.mouseDayCt(m)],cell2mat(infoCorr(m,:)),'Color',purple,'LineWidth',2);
+%     plot([1:a.mouseDayCt(m)],cell2mat(infoIncorr(m,:)),'Color',purple,'LineStyle','--','LineWidth',2);
+%     
+%     ax = nsubplot(4,1,2,1);
+%     ax.FontSize = 10;
+%     ylabel('% no info trials)');
+%     xlabel('Day');
+%     plot([1:a.mouseDayCt(m)],cell2mat(randCorr(m,:)),'Color',orange,'LineWidth',2);
+%     plot([1:a.mouseDayCt(m)],cell2mat(randIncorr(m,:)),'Color',orange,'LineStyle','--','LineWidth',2);
+%     
+%     ax = nsubplot(4,1,3,1);
+%     ax.FontSize = 10;
+%     ylabel('Reward Delay (s)');
+%     xlabel('Day');
+%     scatter([1:a.mouseDayCt(m)],cell2mat(a.daySummary.rewardDelay(m,:)),50,'filled','MarkerFaceColor','k'); 
+%     
+%     ax = nsubplot(4,1,4,1);
+%     ax.FontSize = 10;
+%     ylabel('Reward Probability');
+%     xlabel('Day');
+% %     plot([1:a.mouseDayCt(m)],cell2mat(a.daySummary.infoBigProb(m,:)),'Color','k','LineWidth',2);    
+%     scatter([1:a.mouseDayCt(m)],cell2mat(a.daySummary.infoBigProb(m,:)),50,'filled','MarkerFaceColor','k');
+% 
+%     saveas(fig,fullfile(pathname,['errors' a.mouseList{m}]),'pdf');
+% %     close(fig);
+
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [1 1 8 10];
+    set(fig,'renderer','painters')
+    set(fig,'PaperOrientation','portrait');
+
+    ax = nsubplot(4,1,1,1);
+    scatter(cell2mat(a.daySummary.rewardDelay(m,:)),cell2mat(randIncorr(m,:)));
+    hold on;
+    
+end
+
 
     %% OVERALL
 % for m=1:a.mouseCt 
@@ -1012,7 +1081,7 @@ end
 
 %% PREFERENCES AND REGRESSION BASED ON TRIALS TO COUNT IN ANALYSIS (not range above)
 
-    %% CHOICE PREF PRE- VS POST-REVERSAL FOR TRIALS TO COUNT (prevspost.pdf)
+    %% CHOICE PREF REL IIS PRE- VS POST-REVERSAL FOR TRIALS TO COUNT (prevspost.pdf)
 
     fig = figure();
     fig.PaperUnits = 'inches';
@@ -1041,7 +1110,38 @@ end
     title('Raw choice percentages, pre vs post-reversal');
     hold off;
 
-    saveas(fig,fullfile(pathname,'PrevsPost'),'pdf');
+    saveas(fig,fullfile(pathname,'PrevsPostIIS'),'pdf');
+%     close(fig);
+
+%% 
+    fig = figure();
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+    ax.XLim = [0 1];
+    ax.YLim = [0 1];
+    for l = 1:numel(a.reverseMice)
+        m = a.reverseMice(l);
+        plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,3) a.prefRevCI(m,4)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+        plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,4) a.pref(m,4)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+        dy = a.prefRevCI(m,4) - a.pref(m,4) + 0.02;
+        text(a.pref(m,1),a.pref(m,4) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
+    end
+    scatter(a.pref(:,1),a.pref(:,4),'filled','k')
+    plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+%     text(numel(a.reverseMice)+2,a.overallPref,['p = ' num2str(a.overallP)])
+%     patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
+    ylabel({'% choice of informative side', 'POST-reversal'}); %{'Info choice', 'probability'}
+    xlabel({'% choice of informative side', 'PRE-reversal'});
+    title('Raw choice percentages, pre vs post-reversal');
+    hold off;
+
+    saveas(fig,fullfile(pathname,'PrevsPostNewSide'),'pdf');
 %     close(fig);
 
     %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
@@ -1197,6 +1297,61 @@ end
     hold off;   
     
     saveas(fig,fullfile(pathname,'EarlyLickIndex'),'pdf');
+%     close(fig);
+
+
+    %% REACTION SPEED
+
+    bothSig = a.preRevRxnSpeed(:,3)<0.05 & a.postRevRxnSpeed(:,3)<0.05;
+
+    for m = 1:a.mouseCt
+        if bothSig(m) == 1
+            if a.preRevRxnSpeed(m,1)>a.preRevRxnSpeed(m,2)
+                if a.postRevRxnSpeed(m,1)>a.preRevRxnSpeed(m,2)
+                    sig(m) = 1;
+                else
+                    sig(m) = 3;
+                end
+            else if a.preRevRxnSpeed(m,1)<a.preRevRxnSpeed(m,2)
+                    if a.postRevRxnSpeed(m,1)<a.postRevRxnSpeed(m,2)
+                        sig(m) = 2;
+                    else
+                        sig(m) = 3;
+                    end
+                end
+            end
+        else sig(m) = 4;
+        end
+    end
+
+    
+    fig = figure();
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+    ax.XLim = [-.3 .3];
+    ax.YLim = [-.3 .3];
+    for l = 1:numel(a.reverseMice)
+        m = a.reverseMice(l);
+        dy = 0.02;
+        text(a.rxnSpeedIdx(m,1),a.rxnSpeedIdx(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
+    end
+    plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    scatter(a.rxnSpeedIdx(sig==1,1),a.rxnSpeedIdx(sig==1,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
+    scatter(a.rxnSpeedIdx(sig==2,1),a.rxnSpeedIdx(sig==2,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
+    scatter(a.rxnSpeedIdx(sig==3,1),a.rxnSpeedIdx(sig==3,2),'filled','MarkerEdgeColor','none','MarkerFaceColor','k');
+    scatter(a.rxnSpeedIdx(sig==4,1),a.rxnSpeedIdx(sig==4,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',[.8 .8 .8]);
+    ylabel('POST-reversal (info side vs other side)');
+    xlabel('PRE-reversal (info side vs other side)');
+    title({'Reaction speed indices, pre vs post-reversal', '(1 = faster reaction for info side)'});
+    hold off;
+
+    saveas(fig,fullfile(pathname,'PrevsPostRxn'),'pdf');
 %     close(fig);
     
 

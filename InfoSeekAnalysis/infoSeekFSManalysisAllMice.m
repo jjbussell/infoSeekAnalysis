@@ -220,10 +220,10 @@ a.choiceTypeCtsCorr = [sum(a.infoForcedCorr) sum(a.randForcedCorr) sum(a.infoCho
 
 % by trial type
 
-a.rxnInfoForcedCorr = a.rxn(a.infoForcedCorr);
-a.rxnInfoChoiceCorr = a.rxn(a.infoChoiceCorr);
-a.rxnRandForcedCorr = a.rxn(a.randForcedCorr);
-a.rxnRandChoiceCorr = a.rxn(a.randChoiceCorr);
+% a.rxnInfoForcedCorr = a.rxn(a.infoForcedCorr);
+% a.rxnInfoChoiceCorr = a.rxn(a.infoChoiceCorr);
+% a.rxnRandForcedCorr = a.rxn(a.randForcedCorr);
+% a.rxnRandChoiceCorr = a.rxn(a.randChoiceCorr);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -503,6 +503,7 @@ if ~isempty(a.choiceMice)
        m = a.choiceMice(mm);
        
        choicesIIS = a.choiceIISByMouse{m};
+       choices = a.choiceAllbyMouse{m};
 
        preReverseTrials = find(a.preReverseByMouse{m} == 1,trialsToCount,'last');
        [a.pref(m,1),a.prefCI(m,1:2)] = binofit(sum(choicesIIS(preReverseTrials)==1),numel(choicesIIS(preReverseTrials)));
@@ -510,6 +511,7 @@ if ~isempty(a.choiceMice)
        if ismember(m,a.reverseMice)
          postReverseTrials = find(a.preReverseByMouse{m} == 0,trialsToCount,'last');
          [a.pref(m,2),a.prefRevCI(m,1:2)] = binofit(sum(choicesIIS(postReverseTrials)==1),numel(choicesIIS(postReverseTrials)));
+         [a.pref(m,4),a.prefRevCI(m,3:4)] = binofit(sum(choices(postReverseTrials)==1),numel(choices(postReverseTrials)));
        end
 
        ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
@@ -713,32 +715,83 @@ end
 
 % NEED TO FINISH
 
-a.rxnSpeed = 1/a.rxn;
+% use trials to count
 
-a.initInfoLicks = mean(a.earlyLicks(a.initinfoside_info == 1));
-a.initNoInfoLicks = mean(a.earlyLicks(a.initinfoside_info == -1));
+a.rxnSpeed = 1./a.rxn;
+
+a.goodRxn = a.rxn<8000 & a.rxn>100;
+
+% a.initInfoLicks = mean(a.earlyLicks(a.initinfoside_info == 1));
+% a.initNoInfoLicks = mean(a.earlyLicks(a.initinfoside_info == -1));
 % a.earlyLickIdx = (a.initInfoLicks - a.initNoInfoLicks)/(a.initInfoLicks + a.initNoInfoLicks);
+% 
+% for m=1:a.mouseCt
+%    ok = a.mice(:,m) == 1 & a.forcedCorrTrials == 1;
+%    % pre-reverse, INFO
+%    a.preRevEarlyLicks(m,1) = mean(a.earlyLicks(a.choice_all == 1 & a.preReverse == 1 & ok == 1));
+%    a.preRevRxnSpeed(m,1) = mean(a.rxn(a.choice_all == 1 & a.preReverse == 1 & ok == 1));
+%    % pre-reverse, NO INFO
+%    a.preRevEarlyLicks(m,2) = mean(a.earlyLicks(a.choice_all == 0 & a.preReverse == 1 & ok == 1));
+%    a.preRevRxnSpeed(m,2) = mean(a.rxn(a.choice_all == 0 & a.preReverse == 1 & ok == 1));
+%    % pre-reverse diff p-val
+%    [~,a.preRevEarlyLicks(m,3)] = ttest2(a.earlyLicks(a.choice_all == 1 & a.preReverse == 1 & ok == 1),a.earlyLicks(a.choice_all == 0 & a.preReverse == 1 & ok == 1));
+%    [~,a.preRevRxnSpeed(m,3)] = ttest2(a.rxn(a.choice_all == 1 & a.preReverse == 1 & ok == 1),a.rxn(a.choice_all == 0 & a.preReverse == 1 & ok == 1));
+%    % post-reverse, INITIAL INFO
+%    a.postRevEarlyLicks(m,1) = mean(a.earlyLicks(a.choice_all == 1 & reverseFlag & ok == 1));
+%    a.postRevRxnSpeed(m,1) = mean(a.rxn(a.choice_all == 1 & reverseFlag & ok == 1));
+%    % post-reverse, INITIAL NO INFO
+%    a.postRevEarlyLicks(m,2) = mean(a.earlyLicks(a.choice_all == 0 & reverseFlag & ok == 1));
+%    a.postRevRxnSpeed(m,2) = mean(a.rxn(a.choice_all == 0 & reverseFlag & ok == 1));
+%    % post-reverse diff p-val
+%    [~,a.postRevEarlyLicks(m,3)] = ttest2(a.earlyLicks(a.choice_all == 1 == 1 & reverseFlag & ok == 1),a.earlyLicks(a.choice_all == 0 & reverseFlag & ok == 1));
+%    [~,a.postRevRxnSpeed(m,3)] = ttest2(a.rxn(a.choice_all == 1 == 1 & reverseFlag & ok == 1),a.rxn(a.choice_all == 0 & reverseFlag & ok == 1));
+%    
+%    % pre-reverse
+%    a.earlyLickIdx(m,1) = (a.preRevEarlyLicks(m,1)-a.preRevEarlyLicks(m,2))/(a.preRevEarlyLicks(m,1)+a.preRevEarlyLicks(m,2));
+%    a.rxnSpeedIdx(m,1) = (a.preRevRxnSpeed(m,1)-a.preRevRxnSpeed(m,2))/(a.preRevRxnSpeed(m,1)+a.preRevRxnSpeed(m,2));
+%    % post-reverse
+%    a.earlyLickIdx(m,2) = (a.postRevEarlyLicks(m,1)-a.postRevEarlyLicks(m,2))/(a.postRevEarlyLicks(m,1)+a.postRevEarlyLicks(m,2));
+%    a.rxnSpeedIdx(m,2) = (a.postRevRxnSpeed(m,1)-a.postRevRxnSpeed(m,2))/(a.postRevRxnSpeed(m,1)+a.postRevRxnSpeed(m,2)); 
+% end
 
+% RELATIVE TO CURRENT INFO SIDE
 for m=1:a.mouseCt
-   ok = a.mice(:,m) == 1;
+   ok1 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.preReverse == 1;
+   okInfoPreRev = find(ok==1,500,'last');
+   ok2 = a.mice(:,m) == 1 & a.randForcedCorr == 1 & a.preReverse == 1;
+   okRandPreRev = find(ok2==1,500,'last');
+   ok3 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.preReverse == 0;
+   okInfoPostRev = find(ok3==1,500,'last');
+   ok4 = a.mice(:,m) == 1 & a.randForcedCorr == 1 & a.preReverse == 0;
+   okRandPostRev = find(ok4==1,500,'last');
    % pre-reverse, INFO
-   a.preRevEarlyLicks(m,1) = mean(a.earlyLicks(a.choice_all == 1 & a.preReverse == 1 & ok == 1));
+   a.preRevEarlyLicks(m,1) = mean(a.earlyLicks(okInfoPreRev));
+   a.preRevRxnSpeed(m,1) = mean(a.rxnSpeed(okInfoPreRev));
    % pre-reverse, NO INFO
-   a.preRevEarlyLicks(m,2) = mean(a.earlyLicks(a.choice_all == 0 & a.preReverse == 1 & ok == 1));
+   a.preRevEarlyLicks(m,2) = mean(a.earlyLicks(okRandPreRev));
+   a.preRevRxnSpeed(m,2) = mean(a.rxnSpeed(okRandPreRev));
    % pre-reverse diff p-val
-   [~,a.preRevEarlyLicks(m,3)] = ttest2(a.earlyLicks(a.choice_all == 1 & a.preReverse == 1 & ok == 1),a.earlyLicks(a.choice_all == 0 & a.preReverse == 1 & ok == 1));
+   [~,a.preRevEarlyLicks(m,3)] = ttest2(a.earlyLicks(okInfoPreRev),a.earlyLicks(okRandPreRev));
+   [~,a.preRevRxnSpeed(m,3)] = ttest2(a.rxnSpeed(okInfoPreRev),a.rxnSpeed(okRandPreRev));
    % post-reverse, INFO
-   a.postRevEarlyLicks(m,1) = mean(a.earlyLicks(a.choice_all == 1 == 1 & reverseFlag & ok == 1));
+   a.postRevEarlyLicks(m,1) = mean(a.earlyLicks(okInfoPostRev));
+   a.postRevRxnSpeed(m,1) = mean(a.rxnSpeed(okInfoPostRev));
    % post-reverse, NO INFO
-   a.postRevEarlyLicks(m,2) = mean(a.earlyLicks(a.choice_all == 0 & reverseFlag & ok == 1));
+   a.postRevEarlyLicks(m,2) = mean(a.earlyLicks(okRandPostRev));
+   a.postRevRxnSpeed(m,2) = mean(a.rxnSpeed(okRandPostRev));
    % post-reverse diff p-val
-   [~,a.postRevEarlyLicks(m,3)] = ttest2(a.earlyLicks(a.choice_all == 1 == 1 & reverseFlag & ok == 1),a.earlyLicks(a.choice_all == 0 & reverseFlag & ok == 1));
+   [~,a.postRevEarlyLicks(m,3)] = ttest2(a.earlyLicks(okInfoPostRev),a.earlyLicks(okRandPostRev));
+   [~,a.postRevRxnSpeed(m,3)] = ttest2(a.rxnSpeed(okInfoPostRev),a.rxnSpeed(okRandPostRev));
    
    % pre-reverse
    a.earlyLickIdx(m,1) = (a.preRevEarlyLicks(m,1)-a.preRevEarlyLicks(m,2))/(a.preRevEarlyLicks(m,1)+a.preRevEarlyLicks(m,2));
+   a.rxnSpeedIdx(m,1) = (a.preRevRxnSpeed(m,1)-a.preRevRxnSpeed(m,2))/(a.preRevRxnSpeed(m,1)+a.preRevRxnSpeed(m,2));
    % post-reverse
-   a.earlyLickIdx(m,2) = (a.postRevEarlyLicks(m,1)-a.postRevEarlyLicks(m,2))/(a.postRevEarlyLicks(m,1)+a.postRevEarlyLicks(m,2)); 
+   a.earlyLickIdx(m,2) = (a.postRevEarlyLicks(m,1)-a.postRevEarlyLicks(m,2))/(a.postRevEarlyLicks(m,1)+a.postRevEarlyLicks(m,2));
+   a.rxnSpeedIdx(m,2) = (a.postRevRxnSpeed(m,1)-a.postRevRxnSpeed(m,2))/(a.postRevRxnSpeed(m,1)+a.postRevRxnSpeed(m,2)); 
 end
+
+
 
 % [(mean licks to initial-info side) - (mean licks to initial-noinfo side)]
 % / [(mean licks to initial-info side) + (mean licks to initial-noinfo side)]
@@ -758,6 +811,7 @@ for m = 1:a.mouseCt
         % OUTCOMES (all trials)        
         if sum(a.FSMall(a.miceAll(:,m) == 1)>0)
             a.daySummary.outcome{m,d} = a.outcome(a.mouseDayAll == d & a.miceAll(:,m) == 1);
+            a.daySummary.finalOutcome{m,d} = a.finalOutcome(a.mouseDayAll == d & a.miceAll(:,m) == 1);
         end
         
         % OTHER (correct trials)
