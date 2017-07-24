@@ -757,7 +757,7 @@ a.goodRxn = a.rxn<8000 & a.rxn>100;
 % RELATIVE TO CURRENT INFO SIDE
 for m=1:a.mouseCt
    ok1 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.preReverse == 1;
-   okInfoPreRev = find(ok==1,500,'last');
+   okInfoPreRev = find(ok1==1,500,'last');
    ok2 = a.mice(:,m) == 1 & a.randForcedCorr == 1 & a.preReverse == 1;
    okRandPreRev = find(ok2==1,500,'last');
    ok3 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.preReverse == 0;
