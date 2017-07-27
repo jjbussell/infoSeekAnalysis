@@ -805,18 +805,23 @@ end
         b.betweenLicks = [];
                
         if b.corrTrialCt >0 
-        for t = 1:b.corrTrialCt
-           trialNum = b.corrTrials(t,1);
-           b.allLickCt(t,1) = sum(b.licks(:,3) == trialNum);
-           b.lickCt(t,1) = sum(b.corrLicks(:,3) == trialNum);
-           b.anticipatoryLicks(t,1) = sum(anticipateTrialNums == trialNum);
-           b.earlyLicks(t,1) = sum(earlyTrialNums == trialNum);
-           b.betweenLicks(t,1) = sum(betweenTrialNums == trialNum);
-           b.waterLicks(t,1) = sum(waterLicksTrialNums == trialNum);
-        end
+            for t = 1:b.corrTrialCt
+               trialNum = b.corrTrials(t,1);
+               b.allLickCt(t,1) = sum(b.licks(:,3) == trialNum);
+               b.lickCt(t,1) = sum(b.corrLicks(:,3) == trialNum);
+               b.anticipatoryLicks(t,1) = sum(anticipateTrialNums == trialNum);
+               b.earlyLicks(t,1) = sum(earlyTrialNums == trialNum);
+               b.betweenLicks(t,1) = sum(betweenTrialNums == trialNum);
+               b.waterLicks(t,1) = sum(waterLicksTrialNums == trialNum);
+            end
         else
-            b.lickCt = 0;
-            b.allLickCt 
+            b.lickCt = [];
+            b.allLickCt = [];
+            b.anticipatoryLicks = [];
+            b.earlyLicks = [];
+            b.betweetnLicks = [];
+            b.waterLicks = [];
+        end
         
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -934,6 +939,7 @@ end
             a.choiceTypeCorr = [a.choiceTypeCorr; b.choiceTypeCorr];
             a.choiceCorr = [a.choiceCorr; b.choiceCorr];
             a.outcome = [a.outcome; b.outcome];
+            a.finalOutcome = [a.finalOutcome; b.finalOutcome];
             a.type = [a.type; b.type];
             
         end

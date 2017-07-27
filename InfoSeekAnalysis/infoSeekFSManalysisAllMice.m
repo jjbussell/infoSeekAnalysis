@@ -380,8 +380,9 @@ a.currentMice = unique(a.parameters(currentDay,2));
 [~,a.currentMiceNums] = ismember(a.currentMice,a.mouseList);
 a.completeMice = find(~ismember(a.mouseList,a.currentMice));
 a.completeMouseList = a.mouseList(a.completeMice);
-if ~isempty(a.choiceMice)
-    [~,a.currentChoiceMice] = ismember(a.currentMiceNums,a.choiceMice);
+if ~isempty(a.choiceMice)    
+    currentChoiceFlag = ismember(a.currentMiceNums,a.choiceMice);
+    a.currentChoiceMice = a.currentMiceNums(currentChoiceFlag);
     if sum(a.currentChoiceMice)>0
         a.currentChoiceMiceList = a.mouseList(a.currentChoiceMice);
     else
@@ -490,12 +491,13 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 
 trialsToCount = 500;
 
-a.meanChoice = NaN(a.choiceMice(a.choiceMouseCt),3);
-a.choiceCI = NaN(a.choiceMice(a.choiceMouseCt),2);
-a.prefCI = NaN(a.choiceMice(a.choiceMouseCt),2);
-a.pref = NaN(a.choiceMice(a.choiceMouseCt),3);
-
 if ~isempty(a.choiceMice)
+    
+    a.meanChoice = NaN(a.choiceMice(a.choiceMouseCt),3);
+    a.choiceCI = NaN(a.choiceMice(a.choiceMouseCt),2);
+    a.prefCI = NaN(a.choiceMice(a.choiceMouseCt),2);
+    a.pref = NaN(a.choiceMice(a.choiceMouseCt),3);
+    
 %     for k = 1:numel(a.reverseMice)
 %        m = a.reverseMice(k);
        

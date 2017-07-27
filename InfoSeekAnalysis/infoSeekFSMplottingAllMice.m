@@ -78,6 +78,28 @@ CC = [0.2,0.2,0.2; %choice no choice
     0.8,0.8,0.8; %rand NP
     0.0,0.0,0.0]; %rand incorrect
 
+CCfinal = [0.2,0.2,0.2; %choice no choice
+    0.984313725490196,0.545098039215686,0.0235294117647059; %choice info big
+    245/255,222/255,179/255; % choice info big NP
+    1, 0.8, 0.0; %choice info small
+    244/255, 164/255, 96/255; %choice info small NP
+    0.474509803921569,0.125490196078431,0.768627450980392; %choice rand big
+    171/255,130/255,1; % choice rand big NP
+    0.9490, 0.8, 1.0; %choicerandsmall
+    238/255,224/255,229/255; %choicerandNPsmall
+    0.6,0.6,0.6; %info no choice
+    0,1,0; %info big
+    152/255,251/255,152/255;% info big NP
+    1,0,1; %infosmall
+    1,192/255,203/255; %info small not present
+    0.0,0.0,0.0; %infoincorrect
+    0.2,0.2,0.2;% rand no choice
+    0,0,1; %rand big
+    135/255,206/255,1; % rand big NP
+    0,1,1; %rand small
+    187/255,1,1; %rand small NP
+    0.0,0.0,0.0]; %rand incorrect
+
 a.outcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoSmall','ChoiceInfoNP','ChoiceRandBig',...
     'ChoiceRandSmall','ChoiceRandNP','InfoNoChoice','InfoBig','InfoSmall',...
     'InfoNP','InfoIncorrect','RandNoChoice','RandBig','RandSmall','RandNP',...
@@ -85,6 +107,15 @@ a.outcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoSmall','ChoiceInf
 
 a.choiceLabels = {'ChoiceInfoBig','ChoiceInfoSmall','ChoiceRandBig',...
     'ChoiceRandSmall','InfoBig','InfoSmall','RandBig','RandSmall'};
+
+a.finalOutcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoBigNP',...
+    'ChoiceInfoSmall','ChoiceInfoSmallNP','ChoiceRandBig','ChoiceRandBigNP',...
+    'ChoiceRandSmall','ChoiceRandSmallNP','InfoNoChoice','InfoBig',...
+    'InfoBigNP','InfoSmall','InfoSmallNP','InfoIncorrect','RandNoChoice',...
+    'RandBig','RandBigNP','RandSmall','RandSmallNP',...
+    'RandIncorrect'};
+
+%%
 
  pathname=uigetdir('','Choose save directory');
 
@@ -121,7 +152,7 @@ for mm = 1:numel(a.currentMiceNums)
         hold off;
     else
         ax.XTick = [0:5:a.mouseDayCt(m)];
-        ax.XLim = [1 a.mouseDayCt(m)]; 
+%         ax.XLim = [1 a.mouseDayCt(m)]; 
         plot(1:a.mouseDayCt(m),cell2mat(a.daySummary.infoBigProb(m,:)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
         for d = 1:a.mouseDayCt(m)
         text(d+0.1,a.daySummary.infoBigProb{m,d}+10,[num2str(a.daySummary.totalTrials{m,d}),' trials'],'Fontsize',5);
@@ -265,7 +296,7 @@ for mm = 1:numel(a.currentMiceNums)
 
    
     saveas(fig,fullfile(pathname,a.mouseList{m}),'pdf');
-    saveas(fig,fullfile(pathname,a.mouseList{m}),'epsc');
+%     saveas(fig,fullfile(pathname,a.mouseList{m}),'epsc');
 %     close(fig);
     
 end
@@ -554,62 +585,66 @@ a.FSMmouseIdx = find(a.FSMmice);
 
     %% STACKED BARS
 
-% for mm = 1:numel(a.currentMiceNums)
-%     m=a.currentMiceNums(mm);
-%     if a.mouseDayCt(m) > 3
-%         for d = 1:a.mouseDayCt(m)
-%             [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
-%         end
-% 
-%         figure();
-%         fig = gcf;
-%         fig.PaperUnits = 'inches';
-%         fig.PaperPosition = [1 1 8 10];
-%         set(fig,'renderer','painters')
-%         set(fig,'PaperOrientation','portrait');
-% 
-%         ax = nsubplot(1,1,1,1);
-%         title(a.mouseList(m));
-%         ax.FontSize = 10;
-%         ylabel('Trial Outcomes (% of trials)');
-%         xlabel('Day');
-%         ax.YLim = [0 1];
-%         ax.YTick = [0:0.25:1];
-%         colormap(fig,CC);
-%         bar(outcomeCounts,'stacked');
-%         set(gca, 'ydir', 'reverse');
-%         leg = legend(ax,a.outcomeLabels,'Location','eastoutside');
-%         leg.Box = 'off';
-%         leg.FontWeight = 'bold';
-%     else
-%         figure();
-%         fig = gcf;
-%         fig.PaperUnits = 'inches';
-%         fig.PaperPosition = [1 1 8 10];
-%     %     set(fig,'PaperOrientation','landscape');
-%         set(fig,'renderer','painters')
-%         for d = 1:a.mouseDayCt(m)
-%             ax = nsubplot(a.mouseDayCt(m),1,d,1);
-%             if d==1
-%             title(a.mouseList(m));       
-%             end
-%             ax.FontSize = 10;
-%             [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
-%             bar([1:17],outcomeCounts);
-%             plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-%             plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
-%             if d == ceil(a.mouseDayCt(m)/2)
-%             ylabel('Trial Outcomes (% of trials)');
-%             end
-%             if d == a.mouseDayCt(m)
-%                 ax.XTick = [1:17];
-%             set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
-%             end
-%         end
-%     end
-%     saveas(fig,fullfile(pathname,['outcomesStacked' a.mouseList{m}]),'pdf');
+for mm = 1:numel(a.currentMiceNums)
+    m=a.currentMiceNums(mm);
+    outcomeCounts = [];
+    outcomeBins = [];
+    
+    if a.mouseDayCt(m) > 3
+        for d = 1:a.mouseDayCt(m)
+            [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.finalOutcome{m,d},[0.5:1:21.5],'Normalization','probability');
+        end
+
+        figure();
+        fig = gcf;
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [1 1 8 10];
+        set(fig,'renderer','painters')
+        set(fig,'PaperOrientation','portrait');
+
+        ax = nsubplot(1,1,1,1);
+        title(a.mouseList(m));
+        ax.FontSize = 10;
+        ylabel('Trial Outcomes (% of trials)');
+        xlabel('Day');
+        ax.YLim = [0 1];
+        ax.YTick = [0:0.25:1];
+        ax.XTickLabel = ['Legend'; [1:a.mouseDayCt(m)'];
+        colormap(fig,CCfinal);
+        bar([ones(1,21)/21; outcomeCounts],'stacked');
+        set(gca, 'ydir', 'reverse');
+        legend(ax,a.finalOutcomeLabels,'Location','eastoutside');
+        leg.Box = 'off';
+        leg.FontWeight = 'bold';
+    else
+        figure();
+        fig = gcf;
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [1 1 8 10];
+    %     set(fig,'PaperOrientation','landscape');
+        set(fig,'renderer','painters')
+        for d = 1:a.mouseDayCt(m)
+            ax = nsubplot(a.mouseDayCt(m),1,d,1);
+            if d==1
+            title(a.mouseList(m));       
+            end
+            ax.FontSize = 10;
+            [outcomeCounts,outcomeBins] = histcounts(a.daySummary.finalOutcome{m,d},[0.5:1:17.5],'Normalization','probability');
+            bar([1:17],outcomeCounts);
+            plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+            plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
+            if d == ceil(a.mouseDayCt(m)/2)
+            ylabel('Trial Outcomes (% of trials)');
+            end
+            if d == a.mouseDayCt(m)
+                ax.XTick = [1:17];
+            set(gca,'XTickLabel',a.finalOutcomeLabels,'XTickLabelRotation',35)
+            end
+        end
+    end
+    saveas(fig,fullfile(pathname,['outcomesStacked' a.mouseList{m}]),'pdf');
 %     close(fig);
-% end
+end
 
     %% bar plot for each day
 % for for mm = 1:numel(a.currentMiceNums)
@@ -732,152 +767,152 @@ end
 % %     close(fig);
 % end
 
-for mm = 1:4
-    kb = [23 24 25 26];
-    m=kb(mm);
-    randIncorrData(mm,:) = cell2mat(randIncorr(m,7:12));
-    infoIncorrData(mm,:) = cell2mat(infoIncorr(m,7:12));
-end
-
-kbMice = a.reverseMice(~ismember(a.reverseMice,kb));
-compMice = [17 18 19 20];
-
-for mm = 1:numel(compMice)
-    m = compMice(mm);
-    randIncorrAllData(mm,:) = cell2mat(randIncorr(m,a.reverseDay(m)-1));
-    infoIncorrAllData(mm,:) = cell2mat(infoIncorr(m,a.reverseDay(m)-1));
-end
-
-meanRandIncorr = mean(randIncorrData);
-stdRandIncorr = sem(randIncorrData);
-semRandPlus = meanRandIncorr + stdRandIncorr;
-semRandMinus = meanRandIncorr - stdRandIncorr;
-meanInfoIncorr = mean(infoIncorrData);
-stdInfoIncorr = sem(infoIncorrData);
-semInfoPlus = meanInfoIncorr + stdInfoIncorr;
-semInfoMinus = meanInfoIncorr - stdInfoIncorr;
-
-meanAllRandIncorr = mean(randIncorrAllData(:,1));
-stdAllRandIncorr = sem(randIncorrAllData(:,1));
-semRandAllPlus = meanAllRandIncorr + stdAllRandIncorr;
-semRandAllMinus = meanAllRandIncorr - stdAllRandIncorr;
-meanAllInfoIncorr = mean(infoIncorrAllData(:,1));
-stdAllInfoIncorr = sem(infoIncorrAllData(:,1));
-semInfoAllPlus = meanAllInfoIncorr + stdAllInfoIncorr;
-semInfoAllMinus = meanAllInfoIncorr - stdAllInfoIncorr;
-
-
-
-    figure();
-    fig = gcf;
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [1 1 8 10];
-    set(fig,'renderer','painters')
-    set(fig,'PaperOrientation','portrait');
-    
-    ax = nsubplot(3,1,1,1);
-    ax.FontSize = 10;
-    ylabel('Reward Probability (%)');
-    xlabel('Day');
-%     plot([1:a.mouseDayCt(m)],cell2mat(a.daySummary.infoBigProb(m,:)),'Color','k','LineWidth',2);    
-    bar([1:7],[50 cell2mat(a.daySummary.infoBigProb(23,7:12))],'k');
-
-    ax = nsubplot(3,1,2,1);
-    title('No Info Errors');
-    ax.FontSize = 10;
-    ylabel('% error on no info trials)');
-    xlabel('Day');
-    ax.XLim = [0 8];
-    ax.YLim = [0 .5];
-for mm = 1:4
-    kb = [23 24 25 26];
-    m=kb(mm);
-%     plot([0:7],[NaN cell2mat(randIncorr(m,7:12)) NaN],'Color',orange,'LineStyle','--','LineWidth',2);  
-    p = patch([[2:7] fliplr([2:7])], [semRandMinus,fliplr(semRandPlus)],[0.8 0.8 0.8]);
-    p.EdgeColor = 'none';
-    plot([1:8],nanmean([NaN(4,1) randIncorrData NaN(4,1)],1),'Color',orange,'LineWidth',4);
-    scatter(1,meanAllRandIncorr,'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
-    plot([1 1],[semRandAllPlus semRandAllMinus]);
-end
-
-    ax = nsubplot(3,1,3,1);
-    title('Info Errors');
-    ax.FontSize = 10;
-    ylabel('% error on info trials)');
-    xlabel('Day');
-    ax.YLim = [0 .5];
-    ax.XLim = [0 7];
-for mm = 1:4
-    kb = [23 24 25 26];
-    m=kb(mm);
-%     plot([0:7],[NaN cell2mat(infoIncorr(m,7:12)) NaN],'Color',purple,'LineStyle','--','LineWidth',2);
-    p = patch([[2:7] fliplr([2:7])], [semInfoMinus,fliplr(semInfoPlus)],[0.8 0.8 0.8]);
-    p.EdgeColor = 'none';
-    plot([1:8],nanmean([NaN(4,1) infoIncorrData NaN(4,1)],1),'Color',purple,'LineWidth',4);
-    scatter(1,meanAllInfoIncorr,'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
-    plot([1 1],[semInfoAllPlus semInfoAllMinus]);
-end
-    hold off;
-
-    saveas(fig,fullfile(pathname,['errors']),'pdf');
-%     close(fig);
-
-for mm = 1:numel(kb)
-   m = kb(mm);
-   infoMeanLength(mm,1) = nanmean(a.trialLengthCenterEntry(a.mice(:,m)==1 & a.infoForcedCorr==1));
-   randMeanLength(mm,1) = nanmean(a.trialLengthCenterEntry(a.mice(:,m)==1 & a.randForcedCorr==1));
-   [~,lengthSig(mm,1)] = ttest2(a.trialLengthCenterEntry(a.mice(:,m)==1 & a.infoForcedCorr==1),a.trialLengthCenterEntry(a.mice(:,m)==1 & a.randForcedCorr==1));
-    
-end
-
-
-figure();
-fig = gcf;
-fig.PaperUnits = 'inches';
-fig.PaperPosition = [1 1 8 10];
-set(fig,'renderer','painters')
-set(fig,'PaperOrientation','portrait');
-
-ax = nsubplot(1,1,1,1);
-ax.FontSize = 10;
-ax.YLim = [15000 25000];
-ylabel('Trial Length');
-xlabel('Mouse');
-b = bar([1:4],[infoMeanLength randMeanLength])
-b(1).FaceColor = purple;
-b(2).FaceColor = orange;
-b(1).EdgeColor = 'none';
-b(2).EdgeColor = 'none';
-saveas(fig,fullfile(pathname,['errorLengths']),'pdf');
+% for mm = 1:4
+%     kb = [23 24 25 26];
+%     m=kb(mm);
+%     randIncorrData(mm,:) = cell2mat(randIncorr(m,7:12));
+%     infoIncorrData(mm,:) = cell2mat(infoIncorr(m,7:12));
+% end
+% 
+% kbMice = a.reverseMice(~ismember(a.reverseMice,kb));
+% compMice = [17 18 19 20];
+% 
+% for mm = 1:numel(compMice)
+%     m = compMice(mm);
+%     randIncorrAllData(mm,:) = cell2mat(randIncorr(m,a.reverseDay(m)-1));
+%     infoIncorrAllData(mm,:) = cell2mat(infoIncorr(m,a.reverseDay(m)-1));
+% end
+% 
+% meanRandIncorr = mean(randIncorrData);
+% stdRandIncorr = sem(randIncorrData);
+% semRandPlus = meanRandIncorr + stdRandIncorr;
+% semRandMinus = meanRandIncorr - stdRandIncorr;
+% meanInfoIncorr = mean(infoIncorrData);
+% stdInfoIncorr = sem(infoIncorrData);
+% semInfoPlus = meanInfoIncorr + stdInfoIncorr;
+% semInfoMinus = meanInfoIncorr - stdInfoIncorr;
+% 
+% meanAllRandIncorr = mean(randIncorrAllData(:,1));
+% stdAllRandIncorr = sem(randIncorrAllData(:,1));
+% semRandAllPlus = meanAllRandIncorr + stdAllRandIncorr;
+% semRandAllMinus = meanAllRandIncorr - stdAllRandIncorr;
+% meanAllInfoIncorr = mean(infoIncorrAllData(:,1));
+% stdAllInfoIncorr = sem(infoIncorrAllData(:,1));
+% semInfoAllPlus = meanAllInfoIncorr + stdAllInfoIncorr;
+% semInfoAllMinus = meanAllInfoIncorr - stdAllInfoIncorr;
+% 
+% 
+% 
+%     figure();
+%     fig = gcf;
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [1 1 8 10];
+%     set(fig,'renderer','painters')
+%     set(fig,'PaperOrientation','portrait');
+%     
+%     ax = nsubplot(3,1,1,1);
+%     ax.FontSize = 10;
+%     ylabel('Reward Probability (%)');
+%     xlabel('Day');
+% %     plot([1:a.mouseDayCt(m)],cell2mat(a.daySummary.infoBigProb(m,:)),'Color','k','LineWidth',2);    
+%     bar([1:7],[50 cell2mat(a.daySummary.infoBigProb(23,7:12))],'k');
+% 
+%     ax = nsubplot(3,1,2,1);
+%     title('No Info Errors');
+%     ax.FontSize = 10;
+%     ylabel('% error on no info trials)');
+%     xlabel('Day');
+%     ax.XLim = [0 8];
+%     ax.YLim = [0 .5];
+% for mm = 1:4
+%     kb = [23 24 25 26];
+%     m=kb(mm);
+% %     plot([0:7],[NaN cell2mat(randIncorr(m,7:12)) NaN],'Color',orange,'LineStyle','--','LineWidth',2);  
+%     p = patch([[2:7] fliplr([2:7])], [semRandMinus,fliplr(semRandPlus)],[0.8 0.8 0.8]);
+%     p.EdgeColor = 'none';
+%     plot([1:8],nanmean([NaN(4,1) randIncorrData NaN(4,1)],1),'Color',orange,'LineWidth',4);
+%     scatter(1,meanAllRandIncorr,'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
+%     plot([1 1],[semRandAllPlus semRandAllMinus]);
+% end
+% 
+%     ax = nsubplot(3,1,3,1);
+%     title('Info Errors');
+%     ax.FontSize = 10;
+%     ylabel('% error on info trials)');
+%     xlabel('Day');
+%     ax.YLim = [0 .5];
+%     ax.XLim = [0 7];
+% for mm = 1:4
+%     kb = [23 24 25 26];
+%     m=kb(mm);
+% %     plot([0:7],[NaN cell2mat(infoIncorr(m,7:12)) NaN],'Color',purple,'LineStyle','--','LineWidth',2);
+%     p = patch([[2:7] fliplr([2:7])], [semInfoMinus,fliplr(semInfoPlus)],[0.8 0.8 0.8]);
+%     p.EdgeColor = 'none';
+%     plot([1:8],nanmean([NaN(4,1) infoIncorrData NaN(4,1)],1),'Color',purple,'LineWidth',4);
+%     scatter(1,meanAllInfoIncorr,'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
+%     plot([1 1],[semInfoAllPlus semInfoAllMinus]);
+% end
+%     hold off;
+% 
+%     saveas(fig,fullfile(pathname,['errors']),'pdf');
+% %     close(fig);
+% 
+% for mm = 1:numel(kb)
+%    m = kb(mm);
+%    infoMeanLength(mm,1) = nanmean(a.trialLengthCenterEntry(a.mice(:,m)==1 & a.infoForcedCorr==1));
+%    randMeanLength(mm,1) = nanmean(a.trialLengthCenterEntry(a.mice(:,m)==1 & a.randForcedCorr==1));
+%    [~,lengthSig(mm,1)] = ttest2(a.trialLengthCenterEntry(a.mice(:,m)==1 & a.infoForcedCorr==1),a.trialLengthCenterEntry(a.mice(:,m)==1 & a.randForcedCorr==1));
+%     
+% end
+% 
+% 
+% figure();
+% fig = gcf;
+% fig.PaperUnits = 'inches';
+% fig.PaperPosition = [1 1 8 10];
+% set(fig,'renderer','painters')
+% set(fig,'PaperOrientation','portrait');
+% 
+% ax = nsubplot(1,1,1,1);
+% ax.FontSize = 10;
+% ax.YLim = [15000 25000];
+% ylabel('Trial Length');
+% xlabel('Mouse');
+% b = bar([1:4],[infoMeanLength randMeanLength])
+% b(1).FaceColor = purple;
+% b(2).FaceColor = orange;
+% b(1).EdgeColor = 'none';
+% b(2).EdgeColor = 'none';
+% saveas(fig,fullfile(pathname,['errorLengths']),'pdf');
 
 %% ERROR MICE PREFERENCES
 
-fig = figure();    
-fig = gcf;
-fig.PaperUnits = 'inches';
-fig.PaperPosition = [0.5 0.5 10 7];
-set(fig,'renderer','painters');
-set(fig,'PaperOrientation','landscape');
-
-ax = nsubplot(1,1,1,1);
-ax.FontSize = 8;
-%     ax.XTick = [1:a.choiceMouseCt+1];
-% ax.YTick = [0 0.25 0.50 0.75 1];
-%     ax.XTickLabel = [a.sortedMouseList; 'Mean'];
-ax.YLim = [0 1];
-for mm = 1:4
-    kb = [17 18 19 20];
-    m=kb(mm);
-    bar(m,a.meanChoice(m,1),'facecolor',[0.3 0.3 0.3],'edgecolor','none');
-    errorbar(m,a.meanChoice(m,1),a.meanChoice(m,1) - a.choiceCI(m,1),a.choiceCI(m,2) - a.meanChoice(m,1),'LineStyle','none','LineWidth',2,'Color','k');
-end
-plot([-10000000 1000000],[0.5 0.5],'k','yliminclude','off','xliminclude','off');
-ylabel('Info side preference');
-xlabel('Mouse');
-hold off;
-
-    saveas(fig,fullfile(pathname,'ErrorMicePrefs'),'pdf');
-    close(fig);
+% fig = figure();    
+% fig = gcf;
+% fig.PaperUnits = 'inches';
+% fig.PaperPosition = [0.5 0.5 10 7];
+% set(fig,'renderer','painters');
+% set(fig,'PaperOrientation','landscape');
+% 
+% ax = nsubplot(1,1,1,1);
+% ax.FontSize = 8;
+% %     ax.XTick = [1:a.choiceMouseCt+1];
+% % ax.YTick = [0 0.25 0.50 0.75 1];
+% %     ax.XTickLabel = [a.sortedMouseList; 'Mean'];
+% ax.YLim = [0 1];
+% for mm = 1:4
+%     kb = [17 18 19 20];
+%     m=kb(mm);
+%     bar(m,a.meanChoice(m,1),'facecolor',[0.3 0.3 0.3],'edgecolor','none');
+%     errorbar(m,a.meanChoice(m,1),a.meanChoice(m,1) - a.choiceCI(m,1),a.choiceCI(m,2) - a.meanChoice(m,1),'LineStyle','none','LineWidth',2,'Color','k');
+% end
+% plot([-10000000 1000000],[0.5 0.5],'k','yliminclude','off','xliminclude','off');
+% ylabel('Info side preference');
+% xlabel('Mouse');
+% hold off;
+% 
+%     saveas(fig,fullfile(pathname,'ErrorMicePrefs'),'pdf');
+%     close(fig);
 
 
     %% OVERALL
@@ -1213,154 +1248,154 @@ end
 
 %% PREFERENCES AND REGRESSION BASED ON TRIALS TO COUNT IN ANALYSIS (not range above)
 
-    %% CHOICE PREF REL IIS PRE- VS POST-REVERSAL FOR TRIALS TO COUNT (prevspost.pdf)
-
-    fig = figure();
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0.5 0.5 10 7];
-    set(fig,'renderer','painters');
-    set(fig,'PaperOrientation','landscape');
-
-    ax = nsubplot(1,1,1,1);
-    ax.FontSize = 8;
-    ax.XLim = [0 1];
-    ax.YLim = [0 1];
-    for l = 1:numel(a.reverseMice)
-        m = a.reverseMice(l);
-        plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
-        plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
-        dy = a.prefRevCI(m,2) - a.pref(m,2) + 0.02;
-        text(a.pref(m,1),a.pref(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
-    end
-    scatter(a.pref(:,1),a.pref(:,2),'filled')
-    plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    text(numel(a.reverseMice)+2,a.overallPref,['p = ' num2str(a.overallP)])
-%     patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
-    ylabel({'% choice of initially informative side', 'POST-reversal'}); %{'Info choice', 'probability'}
-    xlabel({'% choice of initially informative side', 'PRE-reversal'});
-    title('Raw choice percentages, pre vs post-reversal');
-    hold off;
-
-    saveas(fig,fullfile(pathname,'PrevsPostIIS'),'pdf');
-%     close(fig);
-
-%% 
-    fig = figure();
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0.5 0.5 10 7];
-    set(fig,'renderer','painters');
-    set(fig,'PaperOrientation','landscape');
-
-    ax = nsubplot(1,1,1,1);
-    ax.FontSize = 8;
-    ax.XLim = [0 1];
-    ax.YLim = [0 1];
-    for l = 1:numel(a.reverseMice)
-        m = a.reverseMice(l);
-        plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,3) a.prefRevCI(m,4)],'color',[0.2 0.2 0.2],'linewidth',0.25);
-        plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,4) a.pref(m,4)],'color',[0.2 0.2 0.2],'linewidth',0.25);
-        dy = a.prefRevCI(m,4) - a.pref(m,4) + 0.02;
-        text(a.pref(m,1),a.pref(m,4) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
-    end
-    scatter(a.pref(:,1),a.pref(:,4),'filled','k')
-    plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-%     text(numel(a.reverseMice)+2,a.overallPref,['p = ' num2str(a.overallP)])
-%     patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
-    ylabel({'% choice of informative side', 'POST-reversal'}); %{'Info choice', 'probability'}
-    xlabel({'% choice of informative side', 'PRE-reversal'});
-    title('Raw choice percentages, pre vs post-reversal');
-    hold off;
-
-    saveas(fig,fullfile(pathname,'PrevsPostNewSide'),'pdf');
-%     close(fig);
-
-    %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
-    
-    % NEED TO FIX LABELS/M!!!!!!
-
-    fig = figure();
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0.5 0.5 10 7];
-    set(fig,'renderer','painters');
-    set(fig,'PaperOrientation','landscape');
-
-    ax = nsubplot(1,1,1,1);
-    ax.FontSize = 8;
-    ax.XLim = [-10 10];
-    ax.YLim = [-10 10];
-    for m = 1:a.choiceMouseCt
+%     %% CHOICE PREF REL IIS PRE- VS POST-REVERSAL FOR TRIALS TO COUNT (prevspost.pdf)
+% 
+%     fig = figure();
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0.5 0.5 10 7];
+%     set(fig,'renderer','painters');
+%     set(fig,'PaperOrientation','landscape');
+% 
+%     ax = nsubplot(1,1,1,1);
+%     ax.FontSize = 8;
+%     ax.XLim = [0 1];
+%     ax.YLim = [0 1];
+%     for l = 1:numel(a.reverseMice)
+%         m = a.reverseMice(l);
 %         plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
 %         plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
-%         dy = a.beta(m,2) - a.betaCI(m,2) + 0.02;
-        text(a.beta(m,1),a.beta(m,2) + 0.2,a.choiceMiceList{m},'HorizontalAlignment','center');
-    end
-    scatter(a.beta(:,1),a.beta(:,2),'filled','FaceColor','k')
-    plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    ylabel({'Info preference', '(log odds biasing to currently informative side'}); %{'Info choice', 'probability'}
-    xlabel({'Side bias', '(log odds biasing to initially informative side)'});
-    title('Logistic Regression Analysis');
-    hold off;
-
-    saveas(fig,fullfile(pathname,'Regression'),'pdf');
-%     close(fig);
-
-
-    %% EARLY LICKS
-
-    bothSig = a.preRevEarlyLicks(:,3)<0.05 & a.postRevEarlyLicks(:,3)<0.05;
-
-    for m = 1:a.mouseCt
-        if bothSig(m) == 1
-            if a.preRevEarlyLicks(m,1)>a.preRevEarlyLicks(m,2)
-                if a.postRevEarlyLicks(m,1)>a.preRevEarlyLicks(m,2)
-                    sig(m) = 2;
-                else
-                    sig(m) = 3;
-                end
-            else if a.preRevEarlyLicks(m,1)<a.preRevEarlyLicks(m,2)
-                    if a.postRevEarlyLicks(m,1)<a.postRevEarlyLicks(m,2)
-                        sig(m) = 1;
-                    else
-                        sig(m) = 3;
-                    end
-                end
-            end
-        else sig(m) = 4;
-        end
-    end
-
-    
-    fig = figure();
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0.5 0.5 10 7];
-    set(fig,'renderer','painters');
-    set(fig,'PaperOrientation','landscape');
-
-    ax = nsubplot(1,1,1,1);
-    ax.FontSize = 8;
-    ax.XLim = [-1 1];
-    ax.YLim = [-1 1];
-    for l = 1:numel(a.reverseMice)
-        m = a.reverseMice(l);
-        dy = 0.02;
-        text(a.earlyLickIdx(m,1),a.earlyLickIdx(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
-    end
-    plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    scatter(a.earlyLickIdx(sig==1,1),a.earlyLickIdx(sig==1,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
-    scatter(a.earlyLickIdx(sig==2,1),a.earlyLickIdx(sig==2,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
-    scatter(a.earlyLickIdx(sig==3,1),a.earlyLickIdx(sig==3,2),'filled','MarkerEdgeColor','none','MarkerFaceColor','k');
-    scatter(a.earlyLickIdx(sig==4,1),a.earlyLickIdx(sig==4,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',[.8 .8 .8]);
-    ylabel('POST-reversal (info side vs other side)');
-    xlabel('PRE-reversal (info side vs other side)');
-    title({'Pre-odor2 lick indices, pre vs post-reversal', '(-1 = lick more for no info side)'});
-    hold off;
-
-    saveas(fig,fullfile(pathname,'PrevsPostEarlyLicks'),'pdf');
-%     close(fig);
+%         dy = a.prefRevCI(m,2) - a.pref(m,2) + 0.02;
+%         text(a.pref(m,1),a.pref(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
+%     end
+%     scatter(a.pref(:,1),a.pref(:,2),'filled')
+%     plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+%     plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+%     text(numel(a.reverseMice)+2,a.overallPref,['p = ' num2str(a.overallP)])
+% %     patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
+%     ylabel({'% choice of initially informative side', 'POST-reversal'}); %{'Info choice', 'probability'}
+%     xlabel({'% choice of initially informative side', 'PRE-reversal'});
+%     title('Raw choice percentages, pre vs post-reversal');
+%     hold off;
+% 
+%     saveas(fig,fullfile(pathname,'PrevsPostIIS'),'pdf');
+% %     close(fig);
+% 
+% %% 
+%     fig = figure();
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0.5 0.5 10 7];
+%     set(fig,'renderer','painters');
+%     set(fig,'PaperOrientation','landscape');
+% 
+%     ax = nsubplot(1,1,1,1);
+%     ax.FontSize = 8;
+%     ax.XLim = [0 1];
+%     ax.YLim = [0 1];
+%     for l = 1:numel(a.reverseMice)
+%         m = a.reverseMice(l);
+%         plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,3) a.prefRevCI(m,4)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+%         plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,4) a.pref(m,4)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+%         dy = a.prefRevCI(m,4) - a.pref(m,4) + 0.02;
+%         text(a.pref(m,1),a.pref(m,4) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
+%     end
+%     scatter(a.pref(:,1),a.pref(:,4),'filled','k')
+%     plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+%     plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% %     text(numel(a.reverseMice)+2,a.overallPref,['p = ' num2str(a.overallP)])
+% %     patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
+%     ylabel({'% choice of informative side', 'POST-reversal'}); %{'Info choice', 'probability'}
+%     xlabel({'% choice of informative side', 'PRE-reversal'});
+%     title('Raw choice percentages, pre vs post-reversal');
+%     hold off;
+% 
+%     saveas(fig,fullfile(pathname,'PrevsPostNewSide'),'pdf');
+% %     close(fig);
+% 
+%     %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
+%     
+%     % NEED TO FIX LABELS/M!!!!!!
+% 
+%     fig = figure();
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0.5 0.5 10 7];
+%     set(fig,'renderer','painters');
+%     set(fig,'PaperOrientation','landscape');
+% 
+%     ax = nsubplot(1,1,1,1);
+%     ax.FontSize = 8;
+%     ax.XLim = [-10 10];
+%     ax.YLim = [-10 10];
+%     for m = 1:a.choiceMouseCt
+% %         plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+% %         plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+% %         dy = a.beta(m,2) - a.betaCI(m,2) + 0.02;
+%         text(a.beta(m,1),a.beta(m,2) + 0.2,a.choiceMiceList{m},'HorizontalAlignment','center');
+%     end
+%     scatter(a.beta(:,1),a.beta(:,2),'filled','FaceColor','k')
+%     plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+%     plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+%     ylabel({'Info preference', '(log odds biasing to currently informative side'}); %{'Info choice', 'probability'}
+%     xlabel({'Side bias', '(log odds biasing to initially informative side)'});
+%     title('Logistic Regression Analysis');
+%     hold off;
+% 
+%     saveas(fig,fullfile(pathname,'Regression'),'pdf');
+% %     close(fig);
+% 
+% 
+%     %% EARLY LICKS
+% 
+%     bothSig = a.preRevEarlyLicks(:,3)<0.05 & a.postRevEarlyLicks(:,3)<0.05;
+% 
+%     for m = 1:a.mouseCt
+%         if bothSig(m) == 1
+%             if a.preRevEarlyLicks(m,1)>a.preRevEarlyLicks(m,2)
+%                 if a.postRevEarlyLicks(m,1)>a.preRevEarlyLicks(m,2)
+%                     sig(m) = 2;
+%                 else
+%                     sig(m) = 3;
+%                 end
+%             else if a.preRevEarlyLicks(m,1)<a.preRevEarlyLicks(m,2)
+%                     if a.postRevEarlyLicks(m,1)<a.postRevEarlyLicks(m,2)
+%                         sig(m) = 1;
+%                     else
+%                         sig(m) = 3;
+%                     end
+%                 end
+%             end
+%         else sig(m) = 4;
+%         end
+%     end
+% 
+%     
+%     fig = figure();
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0.5 0.5 10 7];
+%     set(fig,'renderer','painters');
+%     set(fig,'PaperOrientation','landscape');
+% 
+%     ax = nsubplot(1,1,1,1);
+%     ax.FontSize = 8;
+%     ax.XLim = [-1 1];
+%     ax.YLim = [-1 1];
+%     for l = 1:numel(a.reverseMice)
+%         m = a.reverseMice(l);
+%         dy = 0.02;
+%         text(a.earlyLickIdx(m,1),a.earlyLickIdx(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
+%     end
+%     plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+%     plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+%     scatter(a.earlyLickIdx(sig==1,1),a.earlyLickIdx(sig==1,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
+%     scatter(a.earlyLickIdx(sig==2,1),a.earlyLickIdx(sig==2,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
+%     scatter(a.earlyLickIdx(sig==3,1),a.earlyLickIdx(sig==3,2),'filled','MarkerEdgeColor','none','MarkerFaceColor','k');
+%     scatter(a.earlyLickIdx(sig==4,1),a.earlyLickIdx(sig==4,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',[.8 .8 .8]);
+%     ylabel('POST-reversal (info side vs other side)');
+%     xlabel('PRE-reversal (info side vs other side)');
+%     title({'Pre-odor2 lick indices, pre vs post-reversal', '(-1 = lick more for no info side)'});
+%     hold off;
+% 
+%     saveas(fig,fullfile(pathname,'PrevsPostEarlyLicks'),'pdf');
+% %     close(fig);
 
 
     %%  EARLY LICK BAR GRAPHS 
@@ -1393,45 +1428,45 @@ end
 %         end
 %     end
 
-    [a.sortedEarlyLickIdx,a.earlyLickSortIdx] = sortrows(a.earlyLickIdx(a.reverseMice),1);
-    a.completeSig = a.preRevEarlyLicks(a.reverseMice,3);
-    a.sortedLickMouseList = a.reverseMiceList(a.earlyLickSortIdx);
-    a.sortedSig = a.completeSig(a.earlyLickSortIdx);
-    a.completeRevSig = a.postRevEarlyLicks(a.reverseMice,3);
-    a.sortedRevSig = a.completeRevSig(a.earlyLickSortIdx);
-    a.completeRevLickIdx = a.earlyLickIdx(a.reverseMice,2);
-    a.sortedRevEarlyLickIdx = a.completeRevLickIdx(a.earlyLickSortIdx);
-    
-    fig = figure();
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0.5 0.5 10 7];
-    set(fig,'renderer','painters');
-    set(fig,'PaperOrientation','landscape');
-
-    ax = nsubplot(2,1,1,1);
-    ax.FontSize = 8;
-    ax.YLim = [-1 1];
-    ax.XTick = [1:numel(a.reverseMice)];
-    ax.XTickLabel = [a.sortedLickMouseList];
-    bar(find(a.sortedSig<0.05),a.sortedEarlyLickIdx(a.sortedSig<0.05,1),'k');
-    bar(find(a.sortedSig>=0.05),a.sortedEarlyLickIdx(a.sortedSig>=0.05,1),'EdgeColor',[.8 .8 .8],'FaceColor',[.8 .8 .8]);
-    ylabel('Pre-odor2 lick index');
-    xlabel('Mouse');
-    title({'Pre-odor2 lick indices, PRE-reveral', '(1 = lick more for initial noInfo side)'});
-
-    ax = nsubplot(2,1,2,1);
-    ax.FontSize = 8;
-    ax.YLim = [-1 1];
-    ax.XTick = [1:numel(a.reverseMice)];
-    ax.XTickLabel = [a.sortedLickMouseList];
-    bar(find(a.sortedRevSig<0.05),a.sortedRevEarlyLickIdx(a.sortedRevSig<0.05,1),'k');
-    bar(find(a.sortedRevSig>=0.05),a.sortedRevEarlyLickIdx(a.sortedRevSig>=0.05,1),'EdgeColor',[.8 .8 .8],'FaceColor',[.8 .8 .8]);
-    ylabel('Pre-odor2 lick index');
-    xlabel('Mouse');
-    hold off;   
-    
-    saveas(fig,fullfile(pathname,'EarlyLickIndex'),'pdf');
-%     close(fig);
+%     [a.sortedEarlyLickIdx,a.earlyLickSortIdx] = sortrows(a.earlyLickIdx(a.reverseMice),1);
+%     a.completeSig = a.preRevEarlyLicks(a.reverseMice,3);
+%     a.sortedLickMouseList = a.reverseMiceList(a.earlyLickSortIdx);
+%     a.sortedSig = a.completeSig(a.earlyLickSortIdx);
+%     a.completeRevSig = a.postRevEarlyLicks(a.reverseMice,3);
+%     a.sortedRevSig = a.completeRevSig(a.earlyLickSortIdx);
+%     a.completeRevLickIdx = a.earlyLickIdx(a.reverseMice,2);
+%     a.sortedRevEarlyLickIdx = a.completeRevLickIdx(a.earlyLickSortIdx);
+%     
+%     fig = figure();
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0.5 0.5 10 7];
+%     set(fig,'renderer','painters');
+%     set(fig,'PaperOrientation','landscape');
+% 
+%     ax = nsubplot(2,1,1,1);
+%     ax.FontSize = 8;
+%     ax.YLim = [-1 1];
+%     ax.XTick = [1:numel(a.reverseMice)];
+%     ax.XTickLabel = [a.sortedLickMouseList];
+%     bar(find(a.sortedSig<0.05),a.sortedEarlyLickIdx(a.sortedSig<0.05,1),'k');
+%     bar(find(a.sortedSig>=0.05),a.sortedEarlyLickIdx(a.sortedSig>=0.05,1),'EdgeColor',[.8 .8 .8],'FaceColor',[.8 .8 .8]);
+%     ylabel('Pre-odor2 lick index');
+%     xlabel('Mouse');
+%     title({'Pre-odor2 lick indices, PRE-reveral', '(1 = lick more for initial noInfo side)'});
+% 
+%     ax = nsubplot(2,1,2,1);
+%     ax.FontSize = 8;
+%     ax.YLim = [-1 1];
+%     ax.XTick = [1:numel(a.reverseMice)];
+%     ax.XTickLabel = [a.sortedLickMouseList];
+%     bar(find(a.sortedRevSig<0.05),a.sortedRevEarlyLickIdx(a.sortedRevSig<0.05,1),'k');
+%     bar(find(a.sortedRevSig>=0.05),a.sortedRevEarlyLickIdx(a.sortedRevSig>=0.05,1),'EdgeColor',[.8 .8 .8],'FaceColor',[.8 .8 .8]);
+%     ylabel('Pre-odor2 lick index');
+%     xlabel('Mouse');
+%     hold off;   
+%     
+%     saveas(fig,fullfile(pathname,'EarlyLickIndex'),'pdf');
+% %     close(fig);
 
 
     %% REACTION SPEED
@@ -1486,7 +1521,7 @@ end
     hold off;
 
     saveas(fig,fullfile(pathname,'PrevsPostRxn'),'pdf');
-%     close(fig);
+    close(fig);
     
 
 %%
