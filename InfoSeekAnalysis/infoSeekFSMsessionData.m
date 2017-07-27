@@ -804,6 +804,7 @@ end
         b.rewardPortTime = [];
         b.betweenLicks = [];
                
+        if b.corrTrialCt >0 
         for t = 1:b.corrTrialCt
            trialNum = b.corrTrials(t,1);
            b.allLickCt(t,1) = sum(b.licks(:,3) == trialNum);
@@ -812,7 +813,10 @@ end
            b.earlyLicks(t,1) = sum(earlyTrialNums == trialNum);
            b.betweenLicks(t,1) = sum(betweenTrialNums == trialNum);
            b.waterLicks(t,1) = sum(waterLicksTrialNums == trialNum);
-        end        
+        end
+        else
+            b.lickCt = 0;
+            b.allLickCt 
         
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
