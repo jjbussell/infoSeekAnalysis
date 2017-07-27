@@ -36,7 +36,6 @@ numToPlot = 200;
 
 %% PLOTTING COLORS
 
-
 a.mColors = linspecer(a.mouseCt);
 
 a.mReverseColors = linspecer(numel(a.reverseMice));
@@ -823,6 +822,34 @@ end
     saveas(fig,fullfile(pathname,['errors']),'pdf');
 %     close(fig);
 
+for mm = 1:numel(kb)
+   m = kb(mm);
+   infoMeanLength(mm,1) = nanmean(a.trialLengthCenterEntry(a.mice(:,m)==1 & a.infoForcedCorr==1));
+   randMeanLength(mm,1) = nanmean(a.trialLengthCenterEntry(a.mice(:,m)==1 & a.randForcedCorr==1));
+   [~,lengthSig(mm,1)] = ttest2(a.trialLengthCenterEntry(a.mice(:,m)==1 & a.infoForcedCorr==1),a.trialLengthCenterEntry(a.mice(:,m)==1 & a.randForcedCorr==1));
+    
+end
+
+
+figure();
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [1 1 8 10];
+set(fig,'renderer','painters')
+set(fig,'PaperOrientation','portrait');
+
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 10;
+ax.YLim = [15000 25000];
+ylabel('Trial Length');
+xlabel('Mouse');
+b = bar([1:4],[infoMeanLength randMeanLength])
+b(1).FaceColor = purple;
+b(2).FaceColor = orange;
+b(1).EdgeColor = 'none';
+b(2).EdgeColor = 'none';
+saveas(fig,fullfile(pathname,['errorLengths']),'pdf');
+
 %% ERROR MICE PREFERENCES
 
 fig = figure();    
@@ -839,7 +866,7 @@ ax.FontSize = 8;
 %     ax.XTickLabel = [a.sortedMouseList; 'Mean'];
 ax.YLim = [0 1];
 for mm = 1:4
-    kb = [17 18 19 20]
+    kb = [17 18 19 20];
     m=kb(mm);
     bar(m,a.meanChoice(m,1),'facecolor',[0.3 0.3 0.3],'edgecolor','none');
     errorbar(m,a.meanChoice(m,1),a.meanChoice(m,1) - a.choiceCI(m,1),a.choiceCI(m,2) - a.meanChoice(m,1),'LineStyle','none','LineWidth',2,'Color','k');
