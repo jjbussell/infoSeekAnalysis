@@ -112,7 +112,10 @@ if loadData == 1
     a.choiceTypeCorr = [b.choiceTypeCorr; c.trialType];
         c.rxn = c.firstRewardEntry - c.goCue;
         c.rxn(c.firstRewardEntry == 0) = NaN;
+        c.rxnAll = c.firstRewardEntryAll - c.goCueAll;
+        c.rxnAll(c.firstRewardEntryAll == 0) = NaN;
     a.rxn  = [b.rxn(b.correct); c.rxn];
+    a.rxnAll = [b.rxn; c.rxnAll];
     a.odor2 = [b.trialParams(:,6); c.odor2];
     a.reward = [b.reward; c.reward];
     a.rewarded = [b.rewarded; zeros(numel(c.fileAll),1)];
@@ -142,6 +145,7 @@ else % only FSM files NEED TO FIX?!?!
     a.trialAll = a.trialNums;
     a.trial = a.corrTrials;
     a.rxn = a.rxn(a.correct);
+    a.rxnAll = a.rxn;
     a.odor2 = a.trialParams(:,6);
     a.trialLength = a.trialLength(a.correct);
     a.trialLengthCenterEntry = a.trialLengthCenterEntry(a.correct);
@@ -651,6 +655,16 @@ for m = 1:a.mouseCt
        a.choiceTypeSizesmouseDays(d,:,m) = [sum(a.infoForcedCorr(ok)) sum(a.infoChoiceCorr(ok)) sum(a.randForcedCorr(ok)) sum(a.randChoiceCorr(ok))];
     end
 end
+
+%% FSM MICE
+% FSM mice
+a.FSMmice = zeros(a.mouseCt,1);
+for m = 1:a.mouseCt
+    if sum(a.FSM(a.mice(:,m) == 1)) > 0
+        a.FSMmice(m,1) = 1;
+    end
+end
+a.FSMmouseIdx = find(a.FSMmice);
 
 %% LICK INDEX
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

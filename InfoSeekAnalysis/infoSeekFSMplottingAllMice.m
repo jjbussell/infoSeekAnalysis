@@ -566,21 +566,58 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% CHOICE TRAINING PLOTS
+
+% CHOICE TRIANING MICE
+a.choiceTrainingMice = zeros(a.mouseCt,1);
+for m = 1:a.mouseCt
+    mouseFiles = strcmp(a.mouseList(m),a.parameters(:,2));
+    if sum([sum(cell2mat(a.parameters(mouseFiles,7)) == 7) sum(cell2mat(a.parameters(mouseFiles,7)) == 8)]) > 0
+        a.choiceTrainingMice(m) = 1;
+    end    
+end
+a.choiceTrainingMiceIdx = find(a.choiceTrainingMice);
+
+% a.choiceTraining = zeros(numel(a.FSMall),1);
+% for t = 1:numel(a.choiceTraining)
+%     if a.parameters(a.fileAll,7) == 7 | a.parameters(a.fileAll,7) == 8
+%         a.choiceTraining(t,1) = 1;
+%     end
+% end
+
+for mm = 1:numel(a.choiceTrainingMiceIdx)
+    m = a.choiceTrainingMiceIdx(mm);
+    
+    ok = a.mice(:,m) == 1;
+
+    figure();
+
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+% use rxnAll, need by choice/side/info/rand and forced/choice
+% 1 = info, 0 = rand, 2 = none (timeout), 3 = incorrect (2 and 3 are errors)
+
+    
+    plot(find(ok & a.choiceTypeCorr==2),a.rxn(ok & a.choiceTypeCorr == 2),'LineStyle','none','Marker','o');
+    hold on;
+    blockSwitches = find(diff(a.file(ok)));
+    for d = 1: numel(unique(a.file(ok)))-1
+        plot([blockSwitches(d)+0.5 blockSwitches(d)+0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',1); 
+    end
+    
+end
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% PLOT OUTCOMES BY MOUSE FOR CURRENT MICE - ONLY WORKS FOR FSM, CURRENTLY SKIP
-
-% FSM mice
-a.FSMmice = zeros(a.mouseCt,1);
-for m = 1:a.mouseCt
-    if sum(a.FSM(a.mice(:,m) == 1)) > 0
-        a.FSMmice(m,1) = 1;
-    end
-end
-a.FSMmouseIdx = find(a.FSMmice);
 
 
     %% STACKED BARS
@@ -594,14 +631,13 @@ for mm = 1:numel(a.currentMiceNums)
         for d = 1:a.mouseDayCt(m)
             [outcomeCounts(d,:),outcomeBins(d,:)] = histcounts(a.daySummary.finalOutcome{m,d},[0.5:1:21.5],'Normalization','probability');
         end
-
         figure();
         fig = gcf;
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [1 1 8 10];
         set(fig,'renderer','painters')
         set(fig,'PaperOrientation','portrait');
-
+        
         ax = nsubplot(1,1,1,1);
         title(a.mouseList(m));
         ax.FontSize = 10;
@@ -609,13 +645,16 @@ for mm = 1:numel(a.currentMiceNums)
         xlabel('Day');
         ax.YLim = [0 1];
         ax.YTick = [0:0.25:1];
-        ax.XTickLabel = ['Legend'; [1:a.mouseDayCt(m)'];
+%         ax.XLim = [0 a.mouseDayCt(m)];
+        ax.XTick = [1:a.mouseDayCt(m)+1];
+        ax.XTickLabel = [1:a.mouseDayCt(m) string('Legend')];
         colormap(fig,CCfinal);
-        bar([ones(1,21)/21; outcomeCounts],'stacked');
+        bar([outcomeCounts; ones(1,21)/21],'stacked');
         set(gca, 'ydir', 'reverse');
-        legend(ax,a.finalOutcomeLabels,'Location','eastoutside');
-        leg.Box = 'off';
-        leg.FontWeight = 'bold';
+        lgd = legend(ax,a.finalOutcomeLabels,'Location','eastoutside');
+        lgd.Box = 'off';
+        lgd.FontWeight = 'bold';
+
     else
         figure();
         fig = gcf;
@@ -684,34 +723,34 @@ end
 
 % for m = a.FSMmouseIdx(1):a.FSMmouseIdx(end)
 %     
-for mm = 1:numel(a.currentMiceNums)
-    m=a.currentMiceNums(mm); 
-    figure();
-    fig = gcf;
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [1 1 10 7];
-    set(fig,'PaperOrientation','landscape');
-    set(fig,'renderer','painters')
-    for d = a.mouseDayCt(m)
-        ax = nsubplot(1,1,1,1);
-        title([a.mouseList(m) a.dayCell{find(a.fileMouse == m & a.fileDay == a.mouseDayCt(m),1,'first')}]);       
-        ax.FontSize = 10;
-        [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
-        bar([1:17],outcomeCounts);
-        plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-        plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
-        if d == ceil(a.mouseDayCt(m)/2)
-        ylabel('Trial Outcomes (% of trials)');
-        end
-        if d == a.mouseDayCt(m)
-            ax.XTick = [1:17];
-        set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
-        end
-    end
-    
-    saveas(fig,fullfile(pathname,['outcomesMostRecentDay' a.mouseList{m}]),'pdf');
-%     close(fig);
-end
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm); 
+%     figure();
+%     fig = gcf;
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [1 1 10 7];
+%     set(fig,'PaperOrientation','landscape');
+%     set(fig,'renderer','painters')
+%     for d = a.mouseDayCt(m)
+%         ax = nsubplot(1,1,1,1);
+%         title([a.mouseList(m) a.dayCell{find(a.fileMouse == m & a.fileDay == a.mouseDayCt(m),1,'first')}]);       
+%         ax.FontSize = 10;
+%         [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+%         bar([1:17],outcomeCounts);
+%         plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+%         plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
+%         if d == ceil(a.mouseDayCt(m)/2)
+%         ylabel('Trial Outcomes (% of trials)');
+%         end
+%         if d == a.mouseDayCt(m)
+%             ax.XTick = [1:17];
+%         set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
+%         end
+%     end
+%     
+%     saveas(fig,fullfile(pathname,['outcomesMostRecentDay' a.mouseList{m}]),'pdf');
+% %     close(fig);
+% end
 
 %% FINAL OUTCOME (error plots) ACROSS DAYS
 
@@ -731,7 +770,7 @@ for mm = 1:sum(a.FSMmice)
     end
 end
 
-% for mm = 16:19
+% for mm = 1:sum(a.FSMmice)
 %     m=a.FSMmouseIdx(mm);
 % 
 %     figure();
