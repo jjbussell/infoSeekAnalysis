@@ -566,50 +566,59 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% CHOICE TRAINING PLOTS
-
-% CHOICE TRIANING MICE
-a.choiceTrainingMice = zeros(a.mouseCt,1);
-for m = 1:a.mouseCt
-    mouseFiles = strcmp(a.mouseList(m),a.parameters(:,2));
-    if sum([sum(cell2mat(a.parameters(mouseFiles,7)) == 7) sum(cell2mat(a.parameters(mouseFiles,7)) == 8)]) > 0
-        a.choiceTrainingMice(m) = 1;
-    end    
-end
-a.choiceTrainingMiceIdx = find(a.choiceTrainingMice);
-
-% a.choiceTraining = zeros(numel(a.FSMall),1);
-% for t = 1:numel(a.choiceTraining)
-%     if a.parameters(a.fileAll,7) == 7 | a.parameters(a.fileAll,7) == 8
-%         a.choiceTraining(t,1) = 1;
-%     end
+% %% CHOICE TRAINING PLOTS
+% 
+% % CHOICE TRIANING MICE
+% a.choiceTrainingMice = zeros(a.mouseCt,1);
+% for m = 1:a.mouseCt
+%     mouseFiles = strcmp(a.mouseList(m),a.parameters(:,2));
+%     if sum([sum(cell2mat(a.parameters(mouseFiles,7)) == 7) sum(cell2mat(a.parameters(mouseFiles,7)) == 8)]) > 0
+%         a.choiceTrainingMice(m) = 1;
+%     end    
 % end
-
-for mm = 1:numel(a.choiceTrainingMiceIdx)
-    m = a.choiceTrainingMiceIdx(mm);
-    
-    ok = a.mice(:,m) == 1;
-
-    figure();
-
-    fig = gcf;
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0.5 0.5 10 7];
-    set(fig,'renderer','painters');
-    set(fig,'PaperOrientation','landscape');
-
-% use rxnAll, need by choice/side/info/rand and forced/choice
-% 1 = info, 0 = rand, 2 = none (timeout), 3 = incorrect (2 and 3 are errors)
-
-    
-    plot(find(ok & a.choiceTypeCorr==2),a.rxn(ok & a.choiceTypeCorr == 2),'LineStyle','none','Marker','o');
-    hold on;
-    blockSwitches = find(diff(a.file(ok)));
-    for d = 1: numel(unique(a.file(ok)))-1
-        plot([blockSwitches(d)+0.5 blockSwitches(d)+0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',1); 
-    end
-    
-end
+% a.choiceTrainingMiceIdx = find(a.choiceTrainingMice);
+% 
+% a.choiceTrainingFiles = cell2mat(a.parameters(:,7)) == 7 | cell2mat(a.parameters(:,7)) == 8;
+% 
+% % a.choiceTraining = zeros(numel(a.FSMall),1);
+% % for t = 1:numel(a.choiceTraining)
+% %     if a.parameters(a.fileAll,7) == 7 | a.parameters(a.fileAll,7) == 8
+% %         a.choiceTraining(t,1) = 1;
+% %     end
+% % end
+% 
+% for mm = 1:numel(a.choiceTrainingMiceIdx)
+%     m = a.choiceTrainingMiceIdx(mm);
+%     
+%     % & ismember(a.fileAll,find(a.choiceTrainingFiles))    
+%     ok = a.miceAll(:,m) ;
+%     
+%     okTrials = numel(find(ok));
+%     blockSwitches = find(diff(a.file(ok)));
+%     okTypes = a.choiceType(ok);
+%     okChoice = a.choice(ok);
+%     okRxn = a.rxn(ok);
+% 
+%     figure();
+% 
+%     fig = gcf;
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0.5 0.5 10 7];
+%     set(fig,'renderer','painters');
+%     set(fig,'PaperOrientation','landscape');
+%     hold on;
+% 
+% % use rxnAll, need by choice/side/info/rand and forced/choice
+% % 1 = info, 0 = rand, 2 = none (timeout), 3 = incorrect (2 and 3 are errors)
+% 
+%     plot(okRxn);
+%     plot(find(okTypes==1),okRxn(okTypes == 1),'LineStyle','none','Marker','o','MarkerFaceColor',purple);
+%     plot(find(okTypes~=1),okRxn(okTypes ~= 1),'LineStyle','none','Marker','o');
+%     for d = 1: numel(unique(a.file(ok)))-1
+%         plot([blockSwitches(d)+0.5 blockSwitches(d)+0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',1); 
+%     end
+%     
+% end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1119,7 +1128,7 @@ if a.choiceMouseCt > 1
     
     saveas(fig,fullfile(pathname,'Overall'),'pdf');
     saveas(fig,fullfile(pathname,'Overall'),'png');
-%     close(fig);
+    close(fig);
 end
 
 %% 

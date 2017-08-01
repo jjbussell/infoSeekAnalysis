@@ -114,8 +114,8 @@ if loadData == 1
         c.rxn(c.firstRewardEntry == 0) = NaN;
         c.rxnAll = c.firstRewardEntryAll - c.goCueAll;
         c.rxnAll(c.firstRewardEntryAll == 0) = NaN;
-    a.rxn  = [b.rxn(b.correct); c.rxn];
     a.rxnAll = [b.rxn; c.rxnAll];
+    a.rxn  = [b.rxn(b.correct); c.rxn];
     a.odor2 = [b.trialParams(:,6); c.odor2];
     a.reward = [b.reward; c.reward];
     a.rewarded = [b.rewarded; zeros(numel(c.fileAll),1)];
@@ -144,8 +144,8 @@ else % only FSM files NEED TO FIX?!?!
     a.FSMall = ones(numel(a.fileAll),1);
     a.trialAll = a.trialNums;
     a.trial = a.corrTrials;
-    a.rxn = a.rxn(a.correct);
     a.rxnAll = a.rxn;
+    a.rxn = a.rxn(a.correct);
     a.odor2 = a.trialParams(:,6);
     a.trialLength = a.trialLength(a.correct);
     a.trialLengthCenterEntry = a.trialLengthCenterEntry(a.correct);
