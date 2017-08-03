@@ -29,7 +29,7 @@ void pickTrialParams(int choice){
   }
 
   int odorPick;
-  odorPick = randomize(); // 1 = OdorC, 0 = OdorD
+  odorPick = determineReward(randRewardProb); // 1 = OdorC, 0 = OdorD
   if ((choice == 1) && (reward == 1)) {
     odor = odorA;
   }

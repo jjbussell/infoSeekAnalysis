@@ -462,7 +462,7 @@ void loop() {
         //// MOVE TO FUNCTIONS/LIBRARY
         if (beamBreak(centerPort) == 1){ // is being broken
 //        if (digitalRead(53) == LOW){ // TOUCHING
-//          if (centerFlag == 0){ // if not currently broken
+          if (centerFlag == 0){ // if not currently broken
             Serial.println("Enter center");
             centerFlag = 1;
             if (current_state == WAIT_FOR_CENTER){
@@ -482,7 +482,7 @@ void loop() {
 
         if (beamBreak(infoPort) == 1){ // is being broken
 //        if (digitalRead(47) == LOW){
-//            if (infoFlag == 0){ // if not currently broken
+            if (infoFlag == 0){ // if not currently broken
             Serial.println("Enter info");
             infoFlag = 1;
             if (current_state == RESPONSE){
