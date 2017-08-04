@@ -655,10 +655,10 @@ for mm = 1:numel(a.currentMiceNums)
         ax.YLim = [0 1];
         ax.YTick = [0:0.25:1];
 %         ax.XLim = [0 a.mouseDayCt(m)];
-        ax.XTick = [1:a.mouseDayCt(m)+1];
-        ax.XTickLabel = [1:a.mouseDayCt(m) string('Legend')];
+        ax.XTick = [1:a.mouseDayCt(m)];
+        ax.XTickLabel = [1:a.mouseDayCt(m)];
         colormap(fig,CCfinal);
-        bar([outcomeCounts; ones(1,21)/21],'stacked');
+        bar(outcomeCounts,'stacked');
         set(gca, 'ydir', 'reverse');
         lgd = legend(ax,a.finalOutcomeLabels,'Location','eastoutside');
         lgd.Box = 'off';
