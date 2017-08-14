@@ -677,15 +677,15 @@ for mm = 1:numel(a.currentMiceNums)
             title(a.mouseList(m));       
             end
             ax.FontSize = 10;
-            [outcomeCounts,outcomeBins] = histcounts(a.daySummary.finalOutcome{m,d},[0.5:1:17.5],'Normalization','probability');
-            bar([1:17],outcomeCounts);
-            plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-            plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
+            [outcomeCounts,outcomeBins] = histcounts(a.daySummary.finalOutcome{m,d},[0.5:1:21.5],'Normalization','probability');
+            bar([1:21],outcomeCounts);
+            plot([9.5 9.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+            plot([15.5 15.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
             if d == ceil(a.mouseDayCt(m)/2)
             ylabel('Trial Outcomes (% of trials)');
             end
             if d == a.mouseDayCt(m)
-                ax.XTick = [1:17];
+                ax.XTick = [1:21];
             set(gca,'XTickLabel',a.finalOutcomeLabels,'XTickLabelRotation',35)
             end
         end
@@ -711,10 +711,10 @@ end
 %         title(a.mouseList(m));       
 %         end
 %         ax.FontSize = 10;
-%         [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
-%         bar([1:17],outcomeCounts);
-%         plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-%         plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
+%         [outcomeCounts,outcomeBins] = histcounts(a.daySummary.finalOutcome{m,d},[0.5:1:21.5],'Normalization','probability');
+%         bar([1:2`],outcomeCounts);
+%         plot([9.5 9.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+%         plot([15.5 15.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
 %         if d == ceil(a.mouseDayCt(m)/2)
 %         ylabel('Trial Outcomes (% of trials)');
 %         end
