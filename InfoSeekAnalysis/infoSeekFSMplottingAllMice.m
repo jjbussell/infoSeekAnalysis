@@ -140,12 +140,13 @@ for mm = 1:numel(a.currentMiceNums)
     if sum(isnan(cell2mat(a.daySummary.percentInfo(m,:)))) ~= a.mouseDayCt(m)
         ax.XTick = [0:5:a.mouseDayCt(m)];    
         ax.YTick = [0 0.25 0.50 0.75 1];
-        ax.YLim = [0 1];
-        plot(0:a.mouseDayCt(m),[0.5 cell2mat(a.daySummary.percentInfo(m,:))],'Color',a.mColors(m,:),'LineWidth',2,'Marker','o','MarkerFaceColor',a.mColors(m,:),'MarkerSize',3);
-        plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-        plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+        ax.YLim = [-0.1 1.1];
+        plot(0:a.mouseDayCt(m),[0.5 cell2mat(a.daySummary.percentInfo(m,:))],'Color',[.5 .5 .5],'LineWidth',2,'Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);
+        plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.8 0.8 0.8],'LineWidth',1);
+        plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
         for d = 1:a.mouseDayCt(m)
-            text(d+0.1,0.35,[num2str(a.daySummary.totalTrials{m,d}),' trials'],'Fontsize',5);
+            text(d,1.05,num2str(a.daySummary.infoBigProb{m,d}),'Fontsize',5);
+            text(d,-.05,num2str(a.daySummary.randBigProb{m,d}),'Fontsize',5);
         end   
         ylabel({'Info choice', 'probability'}); %ylabel({'line1', 'line2','line3'},)
     %     xlabel('Day');
@@ -171,7 +172,7 @@ for mm = 1:numel(a.currentMiceNums)
     plot(cell2mat(a.daySummary.rxnInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerEdgeColor',purple,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
     plot(cell2mat(a.daySummary.rxnRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
     plot(cell2mat(a.daySummary.rxnRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerEdgeColor',orange,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
-    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
     ylabel({'Reaction', 'Time (ms)'});
 %     xlabel('Day');    
     leg = legend(ax,'Info-Forced','Info-Choice','No Info - Forced','No Info - Choice','Location','southoutside','Orientation','horizontal');
@@ -189,7 +190,7 @@ for mm = 1:numel(a.currentMiceNums)
     plot(cell2mat(a.daySummary.randDLicksEarly(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':');
 %     plot(cell2mat(a.daySummary.randBigLicksEarly(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
 %     plot(cell2mat(a.daySummary.randSmallLicksEarly(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
-    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);        
     ylabel({'Early', 'lick rate'});
 %     xlabel('Day');
     leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
@@ -205,7 +206,7 @@ for mm = 1:numel(a.currentMiceNums)
     plot(cell2mat(a.daySummary.infoSmallLicks(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3);
     plot(cell2mat(a.daySummary.randCLicks(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',3);
     plot(cell2mat(a.daySummary.randDLicks(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':');
-    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);        
     ylabel({'Anticipatory', 'lick rate'});
     xlabel('Day');
     leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
@@ -225,7 +226,7 @@ for mm = 1:numel(a.currentMiceNums)
     plot(cell2mat(a.daySummary.randSmallLicksWater(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
 %     plot(cell2mat(a.daySummary.randCLicksWater(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
 %     plot(cell2mat(a.daySummary.randDLicksWater(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
-    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);        
     ylabel({'Post-outcome', 'lick rate'});
 %     xlabel('Day');
     leg = legend(ax,'Info-Rew','Info-No Rew','No Info - Rew','No Info - No Rew','Location','southoutside','Orientation','horizontal');
@@ -243,7 +244,7 @@ for mm = 1:numel(a.currentMiceNums)
     plot(cell2mat(a.daySummary.DRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':');
 %     plot(cell2mat(a.daySummary.randBigRewards(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
 %     plot(cell2mat(a.daySummary.randSmallRewards(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
-    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);        
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);        
     ylabel({'Mean Reward', '(uL)'});
 %     xlabel('Day');
     leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
@@ -251,18 +252,36 @@ for mm = 1:numel(a.currentMiceNums)
     leg.FontWeight = 'bold';
     hold off;
     
+%     ax = nsubplot(4,2,3,2);
+%     ax.FontSize = 8;
+%     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
+% %     ax.YLim = [6000 20000];
+%     plot(cell2mat(a.daySummary.trialLengthEntryInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
+%     plot(cell2mat(a.daySummary.trialLengthEntryInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3,'LineStyle',':');
+%     plot(cell2mat(a.daySummary.trialLengthEntryRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
+%     plot(cell2mat(a.daySummary.trialLengthEntryRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3,'LineStyle',':');
+%     plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+%     ylabel({'Trial', 'duration (ms)'});
+% %     xlabel('Day');
+%     leg = legend(ax,'Info Forced','Info Choice','No Info Forced','No Info Choice','Location','southoutside','Orientation','horizontal');
+%     leg.Box = 'off';
+%     leg.FontWeight = 'bold';
+%     hold off;
+
     ax = nsubplot(4,2,3,2);
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
 %     ax.YLim = [6000 20000];
-    plot(cell2mat(a.daySummary.trialLengthEntryInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.trialLengthEntryInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3,'LineStyle',':');
-    plot(cell2mat(a.daySummary.trialLengthEntryRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.trialLengthEntryRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3,'LineStyle',':');
-    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
-    ylabel({'Trial', 'duration (ms)'});
+    plot(cell2mat(a.infoIncorr(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
+    plot(cell2mat(a.randIncorr(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
+    plot(cell2mat(a.choiceIncorr(m,:)),'Color',[.8 .8 .8],'LineWidth',2,'Marker','o','MarkerFaceColor',[.8 .8 .8],'MarkerSize',3);
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
+    for d = 1:a.mouseDayCt(m)
+        text(d+0.1,1,num2str(a.daySummary.totalTrials{m,d}),'Fontsize',5);
+    end 
+    ylabel('Error rate');
 %     xlabel('Day');
-    leg = legend(ax,'Info Forced','Info Choice','No Info Forced','No Info Choice','Location','southoutside','Orientation','horizontal');
+    leg = legend(ax,'Info','No Info','Choice','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -275,7 +294,7 @@ for mm = 1:numel(a.currentMiceNums)
     plot(cell2mat(a.daySummary.rewardRateInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerEdgeColor',purple,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
     plot(cell2mat(a.daySummary.rewardRateRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
     plot(cell2mat(a.daySummary.rewardRateRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerEdgeColor',orange,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
-    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',4);
+    plot([a.reverseDay(m)-0.5 a.reverseDay(m)-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
         plot(cell2mat(a.daySummary.infoBigLicksWater(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3,'Visible','off');
     plot(cell2mat(a.daySummary.infoSmallLicksWater(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3,'Visible','off');
     plot(cell2mat(a.daySummary.randBigLicksWater(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3,'Visible','off');
@@ -763,21 +782,21 @@ end
 
 %% FINAL OUTCOME (error plots) ACROSS DAYS
 
-infoCorrCodes = [11 13 14];
-infoIncorrCodes = [10 12 15];
-randCorrCodes = [17 19];
-randIncorrCodes = [16 18 20 21];
-
-for mm = 1:sum(a.FSMmice)
-    m=a.FSMmouseIdx(mm);
-    for d = 1:a.mouseDayCt(m)
-        outcomes = a.daySummary.finalOutcome{m,d};
-        infoCorr{m,d} = sum(ismember(outcomes,infoCorrCodes))/(sum(ismember(outcomes,infoCorrCodes))+sum(ismember(outcomes,infoIncorrCodes)));
-        infoIncorr{m,d} = sum(ismember(outcomes,infoIncorrCodes))/(sum(ismember(outcomes,infoCorrCodes))+sum(ismember(outcomes,infoIncorrCodes)));
-        randCorr{m,d} = sum(ismember(outcomes,randCorrCodes))/(sum(ismember(outcomes,randCorrCodes))+sum(ismember(outcomes,randIncorrCodes)));
-        randIncorr{m,d} = sum(ismember(outcomes,randIncorrCodes))/(sum(ismember(outcomes,randCorrCodes))+sum(ismember(outcomes,randIncorrCodes)));
-    end
-end
+% infoCorrCodes = [11 13 14];
+% infoIncorrCodes = [10 12 15];
+% randCorrCodes = [17 19];
+% randIncorrCodes = [16 18 20 21];
+% 
+% for mm = 1:sum(a.FSMmice)
+%     m=a.FSMmouseIdx(mm);
+%     for d = 1:a.mouseDayCt(m)
+%         outcomes = a.daySummary.finalOutcome{m,d};
+%         infoCorr{m,d} = sum(ismember(outcomes,infoCorrCodes))/(sum(ismember(outcomes,infoCorrCodes))+sum(ismember(outcomes,infoIncorrCodes)));
+%         infoIncorr{m,d} = sum(ismember(outcomes,infoIncorrCodes))/(sum(ismember(outcomes,infoCorrCodes))+sum(ismember(outcomes,infoIncorrCodes)));
+%         randCorr{m,d} = sum(ismember(outcomes,randCorrCodes))/(sum(ismember(outcomes,randCorrCodes))+sum(ismember(outcomes,randIncorrCodes)));
+%         randIncorr{m,d} = sum(ismember(outcomes,randIncorrCodes))/(sum(ismember(outcomes,randCorrCodes))+sum(ismember(outcomes,randIncorrCodes)));
+%     end
+% end
 
 % for mm = 1:sum(a.FSMmice)
 %     m=a.FSMmouseIdx(mm);

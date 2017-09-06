@@ -25,8 +25,6 @@
 
 % NEED TO SAVE ENTRIES TO a.
 
-% outcome plots - ERROR RATES!
-
 % fix lick prob days for histogram
 
 % LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!! AND LICKING AFTER TRIAL
@@ -220,20 +218,6 @@ a.choiceTypeCtsCorr = [sum(a.infoForcedCorr) sum(a.randForcedCorr) sum(a.infoCho
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% REACTION TIMES
-
-% by trial type
-
-% a.rxnInfoForcedCorr = a.rxn(a.infoForcedCorr);
-% a.rxnInfoChoiceCorr = a.rxn(a.infoChoiceCorr);
-% a.rxnRandForcedCorr = a.rxn(a.randForcedCorr);
-% a.rxnRandChoiceCorr = a.rxn(a.randChoiceCorr);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%
@@ -246,7 +230,8 @@ for m = 1:a.mouseCt
   a.miceAll(:,m) = strcmp(a.mouseAll,a.mouseList(m)) == 1;
 end
 
-%%
+%% DAY AND MOUSE
+
 a.dayCell = a.parameters(:,3); % names
 a.miceCell = a.parameters(:,2); % names
 
@@ -284,7 +269,7 @@ for tfa = 1:length(a.fileAll) % for each trial
    a.mouseDayAll(tfa,1) = a.fileDay(a.fileAll(tfa));
 end
 
-%% REVERSAL
+%% REVERSAL -FIX
 
 % FINDS REVERSE DAY (a.reverseDay(m,1) AND TRIAL (a.preReverse)
 
@@ -300,7 +285,13 @@ for m = 1:a.mouseCt
     fileSums = [0; cumsum(mouseFileCt)];
     if mouseFileCt(m,1) > 1
         mouseInfoSideDiff = diff(infoSide(a.fileMouse == m));
-        if ~isempty(find(mouseInfoSideDiff) ~= 0)       
+        if ~isempty(find(mouseInfoSideDiff) ~= 0)
+            
+%             for a = sum(mouseInfoSideDiff~=0)
+%                 a.reverseFile(m,a)
+%                 a.reverseDay(m,a)
+
+            
 %             a.reverseFile(m,1) = max(find(mouseInfoSideDiff~=0)) + 1;
             a.reverseFile(m,1) = find(mouseInfoSideDiff~=0,1,'first') + 1;
 %             a.prereverseFiles(fileSums(m) + a.reverseFile(m,1) : fileSums(m+1)) = 0;
@@ -323,12 +314,12 @@ for i = 1:size(a.file,1)
    a.infoSide(i,1) = a.files(a.file(i)).infoSide;  
 end
 
-%% REWARD FLAG
+%% REWARD FLAG (SINCE REWARD IN uL)
 
 a.rewardFlag = zeros(numel(a.reward),1);
 a.rewardFlag(a.reward>0) = 1;
 
-%% CHOICES
+%% CHOICES -FIX
 
 % MAKE THESE INCLUDE REVERSE, THEN CAN DO AVERAGES AND LIMIT TO LAST X
 % TRIALS/DAYS
@@ -368,7 +359,7 @@ for m = 1:a.mouseCt
    a.choiceIISByMouse{m} = a.choice_all(ok);   
 end
 
-%% CURRENT AND CHOICE AND REVERSED MICE
+%% CURRENT AND CHOICE AND REVERSED AND FSM MICE
 
 % create list of mice with choices to cycle through and sort names
 
@@ -401,19 +392,17 @@ end
 a.reverseMice = find(a.reverseFile>0);
 a.reverseMiceList = a.mouseList(a.reverseMice);
 
-%% ALL PRE-REVERSE CHOICES ALIGNED TO START
-
-% a.choiceByMouse %a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
-a.maxChoiceTrials = max(a.choiceTrialCt);
-a.choiceTrialsOrg = NaN(a.choiceMouseCt,a.maxChoiceTrials);
-
-if a.maxChoiceTrials > 0
-    for m = a.choiceMice(1):a.choiceMice(end)   
-       a.choiceTrialsOrg(m,1:a.choiceTrialCt(m)) = a.choicebyMouse{m}; 
+% FSM mice
+a.FSMmice = zeros(a.mouseCt,1);
+for m = 1:a.mouseCt
+    if sum(a.FSM(a.mice(:,m) == 1)) > 0
+        a.FSMmice(m,1) = 1;
     end
 end
+a.FSMmouseIdx = find(a.FSMmice);
 
-%% CHOICE AND REVERSE START
+
+%% CHOICE AND REVERSE START-FIX
 
 % FIND DAYS WITH CHOICE TRIALS
 % ASK IF THEY ARE PREREVERSE
@@ -467,6 +456,18 @@ a.choiceDaysPreReverse = a.reverseDay - a.firstChoiceDay;
 a.trialsReverseTraining = a.firstReverseChoice - a.firstReverse;
 a.trialsReverseWithChoices = a.lastReverse - a.firstReverseChoice;
 
+%% ALL PRE-REVERSE CHOICES ALIGNED TO START-ONLY FOR ALIGNING BY REVERSE?
+
+% a.choiceByMouse %a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
+a.maxChoiceTrials = max(a.choiceTrialCt);
+a.choiceTrialsOrg = NaN(a.choiceMouseCt,a.maxChoiceTrials);
+
+if a.maxChoiceTrials > 0
+    for m = a.choiceMice(1):a.choiceMice(end)   
+       a.choiceTrialsOrg(m,1:a.choiceTrialCt(m)) = a.choicebyMouse{m}; 
+    end
+end
+
 %% ALL CHOICES ALIGNED TO REVERSE START
 
 % find first reverse trial within choicesand then max pre and post, create NaN array
@@ -489,7 +490,7 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 %     end
 % end
 
-%% MEAN CHOICES / STATS AND CHOICE RANGES
+%% MEAN CHOICES / STATS AND CHOICE RANGES -FIX
 
 % TAKE NON-REVERSE MICE OUT OF GLM CALCS
 
@@ -646,7 +647,7 @@ if ~isempty(a.choiceMice)
     a.overallP = signrank(a.icp_all-50);
 end
 
-%% TRIAL TYPE COUNTS BY MOUSE BY DAY
+%% TRIAL TYPE COUNTS BY MOUSE BY DAY - UNUSED?
 
 for m = 1:a.mouseCt
     for d = 1:a.mouseDayCt(m)
@@ -655,16 +656,6 @@ for m = 1:a.mouseCt
        a.choiceTypeSizesmouseDays(d,:,m) = [sum(a.infoForcedCorr(ok)) sum(a.infoChoiceCorr(ok)) sum(a.randForcedCorr(ok)) sum(a.randChoiceCorr(ok))];
     end
 end
-
-%% FSM MICE
-% FSM mice
-a.FSMmice = zeros(a.mouseCt,1);
-for m = 1:a.mouseCt
-    if sum(a.FSM(a.mice(:,m) == 1)) > 0
-        a.FSMmice(m,1) = 1;
-    end
-end
-a.FSMmouseIdx = find(a.FSMmice);
 
 %% LICK INDEX
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -846,6 +837,7 @@ for m = 1:a.mouseCt
         a.daySummary.randSmall{m,d} = sum(a.randSmall(ok));
         lastFileIdx = find(ok,1,'last');
         a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),24};
+        a.daySummary.randBigProb{m,d} = a.parameters{a.file(lastFileIdx),25};
         a.daySummary.rewardDelay{m,d} = a.parameters{a.file(lastFileIdx),21};
         a.daySummary.totalRewards{m,d} = sum(a.reward(ok));
         a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
@@ -895,5 +887,24 @@ for m = 1:a.mouseCt
     end
 end
 
+a.infoCorrCodes = [11 13 14];
+a.infoIncorrCodes = [10 12 15];
+a.randCorrCodes = [17 19];
+a.randIncorrCodes = [16 18 20 21];
+a.choiceCorrCodes = [2 4 5 6 8];
+a.choiceIncorrCodes = [1 3 7 9];
+
+for mm = 1:sum(a.FSMmice)
+    m=a.FSMmouseIdx(mm);
+    for d = 1:a.mouseDayCt(m)
+        outcomes = a.daySummary.finalOutcome{m,d};
+        a.infoCorr{m,d} = sum(ismember(outcomes,a.infoCorrCodes))/(sum(ismember(outcomes,a.infoCorrCodes))+sum(ismember(outcomes,a.infoIncorrCodes)));
+        a.infoIncorr{m,d} = sum(ismember(outcomes,a.infoIncorrCodes))/(sum(ismember(outcomes,a.infoCorrCodes))+sum(ismember(outcomes,a.infoIncorrCodes)));
+        a.randCorr{m,d} = sum(ismember(outcomes,a.randCorrCodes))/(sum(ismember(outcomes,a.randCorrCodes))+sum(ismember(outcomes,a.randIncorrCodes)));
+        a.randIncorr{m,d} = sum(ismember(outcomes,a.randIncorrCodes))/(sum(ismember(outcomes,a.randCorrCodes))+sum(ismember(outcomes,a.randIncorrCodes)));
+        a.choiceIncorr{m,d} = sum(ismember(outcomes,a.choiceIncorrCodes))/(sum(ismember(outcomes,a.choiceCorrCodes))+sum(ismember(outcomes,a.choiceIncorrCodes)));
+    end
+end
+
 %%
-uisave({'a'},'infoSeekFSMDataAnalyzedComplete.mat');
+uisave({'a'},'infoSeekFSMDataAnalyzed.mat');
