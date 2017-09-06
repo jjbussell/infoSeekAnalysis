@@ -269,36 +269,35 @@ for tfa = 1:length(a.fileAll) % for each trial
    a.mouseDayAll(tfa,1) = a.fileDay(a.fileAll(tfa));
 end
 
-%% REVERSAL -FIX
+%% REVERSAL
 
-% FINDS REVERSE DAY (a.reverseDay(m,1) AND TRIAL (a.preReverse)
+% FINDS REVERSE DAY (a.reverseDay(m,1) AND TRIALS (a.preReverse)
 
 infoSide = cell2mat({a.files.infoSide});
 
-a.reverseFile = zeros(a.mouseCt,1);
-a.reverseDay = zeros(a.mouseCt,1);
+% a.reverseFile = zeros(a.mouseCt,1);
+% a.reverseDay = zeros(a.mouseCt,1);
 a.prereverseFiles = ones(a.numFiles,1); %flag 1 = file before reverse
 
 for m = 1:a.mouseCt
-    
     mouseFileCt(m,1) = sum(a.fileMouse == m);
-    fileSums = [0; cumsum(mouseFileCt)];
+    
+    % initial info side
+    a.initinfoside(m,1) =  a.files(find(a.fileMouse == m,1)).infoSide;
+    
+   
+%     fileSums = [0; cumsum(mouseFileCt)];
     if mouseFileCt(m,1) > 1
         mouseInfoSideDiff = diff(infoSide(a.fileMouse == m));
         if ~isempty(find(mouseInfoSideDiff) ~= 0)
-            
-%             for a = sum(mouseInfoSideDiff~=0)
-%                 a.reverseFile(m,a)
-%                 a.reverseDay(m,a)
-
-            
-%             a.reverseFile(m,1) = max(find(mouseInfoSideDiff~=0)) + 1;
-            a.reverseFile(m,1) = find(mouseInfoSideDiff~=0,1,'first') + 1;
-%             a.prereverseFiles(fileSums(m) + a.reverseFile(m,1) : fileSums(m+1)) = 0;
             mouseFilesIdx = find(a.fileMouse == m);
-            a.prereverseFiles(mouseFilesIdx(a.reverseFile(m,1):end)) = 0;
             mouseFileDays = a.fileDay(a.fileMouse == m);
-            a.reverseDay(m,1) = mouseFileDays(a.reverseFile(m,1));
+            reverses = find(mouseInfoSideDiff~=0);
+            for r = 1:numel(reverses)
+                a.reverseFile{m,r} = reverses(r) + 1;
+                a.reverseDay{m,r} = mouseFileDays(a.reverseFile{m,r});
+            end
+            a.prereverseFiles(mouseFilesIdx(a.reverseFile{m,1}:end)) = 0;
         end
     end
 end
@@ -308,7 +307,7 @@ for t = 1:size(a.file,1)
     a.preReverse(t,1) = a.prereverseFiles(a.file(t));
 end
 
-%% INFOSIDE
+%% INFOSIDE FOR ALL TRIALS
 
 for i = 1:size(a.file,1)
    a.infoSide(i,1) = a.files(a.file(i)).infoSide;  
@@ -328,13 +327,10 @@ a.choice_all = a.choiceCorr; % choice relative to initial info side, all trials
 reverseFlag = a.preReverse == 0;
 a.choice_all(reverseFlag) = ~a.choice_all(reverseFlag);
 
-a.initinfoside_info = -ones(a.corrTrialCt,1); % initinfoside_info all trials
-
+a.initinfoside_info = -ones(a.corrTrialCt,1); % initinfoside_info all trials. 1 if initinfoside, -1 if reversed
 a.initinfoside_side = ones(a.corrTrialCt,1); % initinfoside_side all trials
 
 for m = 1:a.mouseCt
-    % initial info side
-    a.initinfoside(m,1) =  a.files(find(a.fileMouse == m,1)).infoSide;
     ok = a.mice(:,m) == 1;
     a.initinfoside_info(a.infoSide == a.initinfoside(m) & ok == 1) = 1;
 end
