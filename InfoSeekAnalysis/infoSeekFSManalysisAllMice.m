@@ -176,6 +176,12 @@ a.dayAll = a.fileDays(a.fileAll);
 a.trialCt = size(a.fileAll,1);
 a.corrTrialCt = size(a.file,1);
 
+%% TYPES POSSIBLE
+a.fileTrialTypes = zeros(numel(a.file),1);
+for f = 1:a.numFiles
+    a.fileTrialTypes(a.file == f) = a.parameters{f,7};
+end
+
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -274,7 +280,7 @@ end
 a.rewardFlag = zeros(numel(a.reward),1);
 a.rewardFlag(a.reward>0) = 1;
 
-%% REVERSAL
+%% REVERSAL & CHOICES
 
 % FINDS REVERSE DAY (a.reverseDay(m,1) AND TRIALS (a.preReverse)
 
@@ -282,43 +288,94 @@ a.fileInfoSide = cell2mat({a.files.infoSide});
 
 % a.reverseFile = zeros(a.mouseCt,1);
 % a.reverseDay = zeros(a.mouseCt,1);
-a.prereverseFiles = ones(a.numFiles,1); %flag 1 = file before reverse
+a.reverseDay = cell(a.mouseCt,1);
+a.prereverseFiles = ones(a.numFiles,1); %flag 1 = file with choices before reverse
+a.prereverseFiles(cell2mat(a.parameters(:,7))~=5) = 0;
 a.reverseFiles = zeros(a.numFiles,1); % flag 1 = file before first reverse, -1 = file during first reverse
 
 for m = 1:a.mouseCt
+    ok = a.mice(:,m) == 1;
     mouseFileCt(m,1) = sum(a.fileMouse == m);
+    mouseFileTypes = cell2mat(a.parameters(a.fileMouse == m,7));
+    mouseFilesIdx = find(a.fileMouse == m);
+    mouseFileDays = a.fileDay(a.fileMouse == m);    
     
     % initial info side
     a.initinfoside(m,1) =  a.files(find(a.fileMouse == m,1)).infoSide;
     
-%     fileSums = [0; cumsum(mouseFileCt)];
+   if isempty(find(mouseFileTypes == 5,1))
+      a.firstChoice(m,1) = 0;
+      a.mouseChoiceDays{m} = [];
+      a.firstChoiceDay(m,1) = 0;
+      choiceDays =[];
+   else
+     choiceFile = mouseFilesIdx(find(mouseFileTypes == 5,1,'first'));
+     a.firstChoice(m,1) = find(a.file == choiceFile,1); % within all that mouse's trials
+     a.mouseChoiceDays{m} = unique(mouseFileDays(mouseFileTypes == 5));
+     choiceDays = cell2mat(a.mouseChoiceDays(m));
+     a.firstChoiceDay(m,1) = choiceDays(1); 
+   end    
+    
     if mouseFileCt(m,1) > 1
         mouseInfoSideDiff = diff(a.fileInfoSide(a.fileMouse == m));
         if ~isempty(find(mouseInfoSideDiff) ~= 0)
-            mouseFilesIdx = find(a.fileMouse == m);
-            mouseFileDays = a.fileDay(a.fileMouse == m);
             reverses = find(mouseInfoSideDiff~=0);
             for r = 1:numel(reverses)
                 a.reverseFile{m,r} = reverses(r) + 1;
                 a.reverseDay{m,r} = mouseFileDays(a.reverseFile{m,r});
             end
             a.prereverseFiles(mouseFilesIdx(a.reverseFile{m,1}:end)) = 0;
-            a.reverseFiles(mouseFilesIdx(1:a.reverseFile{m,1}-1)) = 1;
+            a.reverseFiles(mouseFilesIdx(find(mouseFileTypes == 5,1,'first'):a.reverseFile{m,1}-1)) = 1;
             if numel(reverses)>1
                 a.reverseFiles(mouseFilesIdx(a.reverseFile{m,1}:a.reverseFile{m,2}-1)) = -1;
             else
                 a.reverseFiles(mouseFilesIdx(a.reverseFile{m,1}:end)) = -1;
             end
+        else a.reverseDay{m,1} = 0;
         end
     end
 end
+    
+    a.preReverse = ones(size(a.file,1),1);
+    a.reverse = zeros(size(a.file,1),1);
+    for t = 1:size(a.file,1)
+        a.preReverse(t,1) = a.prereverseFiles(a.file(t));
+        a.reverse(t,1) = a.reverseFiles(a.file(t));
+    end
 
-a.preReverse = ones(size(a.file,1),1);
-a.reverse = zeros(size(a.file,1),1);
-for t = 1:size(a.file,1)
-    a.preReverse(t,1) = a.prereverseFiles(a.file(t));
-    a.reverse(t,1) = a.reverseFiles(a.file(t));
+    
+for m = 1:a.mouseCt
+    ok = a.mice(:,m) == 1;    
+    mouseReverse = a.reverse(ok);
+    mousePrereverse = a.preReverse(ok);
+    mouseTypes = a.choiceTypeCorr(ok);
+    
+    if isempty(find(mouseReverse == -1,1))
+       a.mouseReverseDays{m} = [];
+       a.firstReverse(m,1) = 0;
+       a.firstReverseChoice(m,1) = 0; % if empty
+       a.lastReverse(m,1) = 0;
+       reverseDays = [];       
+       a.reverseChoiceDays(m) = 0;
+       a.reverseTrainingDays(m) = 0;
+       a.firstReverseInChoiceTrials(m,1) = 0;
+    else
+       a.mouseReverseDays{m} = unique(a.mouseDay(a.reverse == -1 & ok));
+       a.firstReverse(m,1) = find(mouseReverse == -1,1,'first'); % within all that mouse's trials
+       a.firstReverseChoice(m,1) = find(mouseTypes == 1 & mouseReverse == -1,1);
+       a.lastReverse(m,1) = find(mousePrereverse == 0,1,'last');
+       reverseDays = a.mouseReverseDays{m};
+       choiceDays = cell2mat(a.mouseChoiceDays(m));
+       a.reverseChoiceDays(m) = numel(choiceDays(ismember(a.mouseChoiceDays{m},a.mouseReverseDays{m})));
+       a.reverseTrainingDays(m) = numel(reverseDays(~ismember(a.mouseReverseDays{m},a.mouseChoiceDays{m})));
+       a.firstReverseInChoiceTrials(m,1) = find(a.preReverse==0 & ok,1);
+    end  
 end
+
+a.trialsPreReverse = a.firstReverse - a.firstChoice;
+a.choiceDaysPreReverse = cell2mat(a.reverseDay(:,1)) - a.firstChoiceDay;
+a.trialsReverseTraining = a.firstReverseChoice - a.firstReverse;
+a.trialsReverseWithChoices = a.lastReverse - a.firstReverseChoice;
 
 %% INFOSIDE
 
@@ -395,7 +452,7 @@ else
 end
 
 
-a.reverseMice = find(a.reverseFile>0);
+a.reverseMice = find(cell2mat(a.reverseFile(:,1))>0);
 a.reverseMiceList = a.mouseList(a.reverseMice);
 
 % FSM mice
@@ -406,62 +463,6 @@ for m = 1:a.mouseCt
     end
 end
 a.FSMmouseIdx = find(a.FSMmice);
-
-
-%% CHOICE AND REVERSE START - FOR LAST REVERSE, ASSUMES ONLY 1
-
-% FIND DAYS WITH CHOICE TRIALS
-% ASK IF THEY ARE PREREVERSE
-
-% a.firstChoice = first choice trial
-% a.firstChoiceDay = first choice day
-% a.firstReverse = first reverse trial
-% a.reverseDay = first reverse day
-% need reverse training trials
-% total reverse trials
-
-for m = 1:a.mouseCt
-   ok = a.mice(:,m) == 1;
-   mouseTypes = a.choiceTypeCorr(ok);
-   mouseReverse = a.initinfoside_info(ok);
-   mousePrereverse = a.preReverse(ok);
-   if isempty(find(mouseTypes == 1,1))
-      a.firstChoice(m,1) = 0;
-      a.mouseChoiceDays{m} = [];
-      a.firstChoiceDay(m,1) = 0;
-      choiceDays =[];
-   else
-     a.firstChoice(m,1) = find(mouseTypes == 1,1); % within all that mouse's trials
-     a.mouseChoiceDays{m} = unique(a.mouseDay(find(a.choiceTypeCorr==1 & ok)));
-     a.firstChoiceDay(m,1) = a.mouseDay(find(a.choiceTypeCorr==1 & ok,1)); 
-     choiceDays = a.mouseChoiceDays{m};
-   end
-   if isempty(find(mousePrereverse == 0,1))
-       a.mouseReverseDays{m} = [];
-       a.firstReverse(m,1) = 0;
-       a.firstReverseChoice(m,1) = 0; % if empty
-       a.lastReverse(m,1) = 0;
-       reverseDays = [];       
-       a.reverseChoiceDays(m) = 0;
-       a.reverseTrainingDays(m) = 0;
-       a.firstReverseInChoiceTrials(m,1) = 0;
-   else
-       a.mouseReverseDays{m} = unique(a.mouseDay(a.initinfoside_info == -1 & ok));
-       a.firstReverse(m,1) = find(mouseReverse == -1,1,'first'); % within all that mouse's trials
-       a.firstReverseChoice(m,1) = find(mouseTypes == 1 & mouseReverse == -1,1);
-       a.lastReverse(m,1) = find(mousePrereverse == 0,1,'last');
-       reverseDays = a.mouseReverseDays{m};
-       a.reverseChoiceDays(m) = numel(choiceDays(ismember(a.mouseChoiceDays{m},a.mouseReverseDays{m})));
-       a.reverseTrainingDays(m) = numel(reverseDays(~ismember(a.mouseReverseDays{m},a.mouseChoiceDays{m})));
-       reverse = a.preReverseByMouse{m};
-       a.firstReverseInChoiceTrials(m,1) = find(reverse==0,1);
-   end
-end
-
-a.trialsPreReverse = a.firstReverse - a.firstChoice;
-a.choiceDaysPreReverse = a.reverseDay - a.firstChoiceDay;
-a.trialsReverseTraining = a.firstReverseChoice - a.firstReverse;
-a.trialsReverseWithChoices = a.lastReverse - a.firstReverseChoice;
 
 %% ALL PRE-REVERSE CHOICES ALIGNED TO START-ONLY FOR ALIGNING BY REVERSE?
 
@@ -497,7 +498,7 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 %     end
 % end
 
-%% MEAN CHOICES / STATS AND CHOICE RANGES
+%% MEAN CHOICES / STATS AND CHOICE RANGES - FIX
 
 % TAKE NON-REVERSE MICE OUT OF GLM CALCS
 
@@ -536,8 +537,8 @@ if ~isempty(a.choiceMice)
        
        % FOR FIRST REVERSE
        if ismember(m,a.reverseMice)
-         choicePostRev = a.choice_all(ok & a.reverse==-1);
-         [a.meanChoice(m,2),a.choiceRevCI(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
+           choicePostRev = a.choice_all(ok & a.reverse==-1);
+           [a.meanChoice(m,2),a.choiceRevCI(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
            x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
            y = a.choice_all(ok);
            [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
@@ -849,7 +850,7 @@ for m = 1:a.mouseCt
         a.daySummary.rewardDelay{m,d} = a.parameters{a.file(lastFileIdx),21};
         a.daySummary.totalRewards{m,d} = sum(a.reward(ok));
         a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
-        a.daySummary.percentInfo{m,d} = mean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1));
+        a.daySummary.percentInfo{m,d} = mean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1 & a.fileTrialTypes == 5));
         a.daySummary.rxnInfoForced{m,d} = mean(a.rxn(a.infoForcedCorr & ok));
         a.daySummary.rxnInfoChoice{m,d} = mean(a.rxn(a.infoChoiceCorr & ok));
         a.daySummary.rxnRandForced{m,d} = mean(a.rxn(a.randForcedCorr & ok));

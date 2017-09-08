@@ -23,7 +23,7 @@ loadData = str2num(cell2mat(loadData));
 if loadData == 1
     [datafilename,datapathname]=uigetfile('*.mat', 'Choose processed data file to load');
     fname=fullfile(datapathname,datafilename); 
-    load(fname); % opens structure "a" with previos data, if available
+    load(fname); % opens structure "a" with previous data, if available
     
     for fn = 1:a.numFiles
         names{fn} = a.files(fn).name; 
