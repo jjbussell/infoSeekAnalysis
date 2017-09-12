@@ -62,6 +62,8 @@ extern unsigned long bigRewardTime;
 extern unsigned long smallRewardTime;
 extern unsigned long rewardDelay;
 extern int rewardDrops;
+extern int rewardDropCount;
+extern int maxRewardDrops;
 extern unsigned long currentRewardTime;
 extern uint16_t lickRate;
 

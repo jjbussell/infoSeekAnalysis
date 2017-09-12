@@ -101,6 +101,8 @@ int trialCt;
 int trialType;
 unsigned long currentRewardTime;
 int rewardDrops;
+int maxRewardDrops;
+int rewardDropCount;
 int odor;
 int reward;
 int water;
@@ -180,8 +182,10 @@ unsigned long startDelay; // time after center odor before trial can start
 unsigned long odorDelay; // time between go cue and odor delivery (ms)
 unsigned long odorTime; // length of odor delivery (ms) in reward port
 unsigned long rewardDelay; // time mouse must remain in port before reward delivery (ms) ///////////////// MUST BE MORE
-unsigned long bigRewardTime;
-unsigned long smallRewardTime;
+unsigned long infoBigRewardTime;
+unsigned long infoSmallRewardTime;
+unsigned long randBigRewardTime;
+unsigned long randSmallRewardTime;
 int infoRewardProb;
 int randRewardProb;
 unsigned long gracePeriod; // additional time to enter reward port
@@ -285,8 +289,10 @@ void loop() {
       odorDelay         =        Serial.parseInt();
       odorTime          =        Serial.parseInt();
       rewardDelay       =        Serial.parseInt();
-      bigRewardTime     =        Serial.parseInt();
-      smallRewardTime   =        Serial.parseInt();
+      infoBigRewardTime     =        Serial.parseInt();
+      infoSmallRewardTime   =        Serial.parseInt();
+      randBigRewardTime     =        Serial.parseInt();
+      randSmallRewardTime   =        Serial.parseInt();
       infoRewardProb    =        Serial.parseInt();
       randRewardProb    =        Serial.parseInt();
       gracePeriod       =        Serial.parseInt();
@@ -302,6 +308,7 @@ void loop() {
       rewardDropTime = 20;
       rewardPauseTime = 200;
       rewardAmt = 0;
+      maxRewardDrops = max(infoBigRewardTime,randBigRewardTime);
       
       startTime = 0;
       currentTime = 0;
@@ -379,7 +386,7 @@ void loop() {
         static StateGracePeriod state_grace_period(gracePeriod);
         static StateSideOdor state_side_odor(odorTime);
         static StateRewardDelay state_reward_delay(rewardDelay);
-        static StateTimeout state_timeout(odorTime + rewardDelay + bigRewardTime);
+        static StateTimeout state_timeout(odorTime + rewardDelay + maxRewardDrops * rewardDropTime + (maxRewardDrops - 1) * rewardPauseTime);
         static StateRewardPause state_reward_pause(rewardPauseTime);
 
 
@@ -636,7 +643,9 @@ void loop() {
               Serial.println(rewardDrops);   
             }
 
-            if (rewardDrops > 0){
+            rewardDropCount = rewardDropCount - 1;
+
+            if (rewardDropCount > 0){
               next_state = REWARD_PAUSE;
             }
             else{
