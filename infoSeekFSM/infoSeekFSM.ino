@@ -633,6 +633,8 @@ void loop() {
 
             delay(rewardDropTime);
 
+            Serial.println("reward time delay");
+            
             if (waterValveOpen) {
               Serial.println("water off");
               digitalWrite(water, LOW);
