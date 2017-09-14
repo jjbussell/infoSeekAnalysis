@@ -6,7 +6,7 @@
 % NOTE, files can be deleted and now fileIdx vals diff from numFiles!!
 
 %%
-clear;
+clear all;
 close all;
 
 % MAKE DYNAMIC
@@ -87,15 +87,15 @@ if newData == 1
         if csvread(fname,31,0,[31,0,31,0]) == 0
             data = csvread(fname,31,0);
             sessionParams(:,f) = csvread(fname,1,1,[1,1,30,1]); % report        
-        else csvread(fname,29,0,[29,0,29,0]) == 0
+        elseif csvread(fname,29,0,[29,0,29,0]) == 0
             data = csvread(fname,29,0);
             temp = csvread(fname,1,1,[1,1,28,1]); % report
-            sessionParams(:,f) = [temp(1:20) temp(19:20) temp(21:end)];                                
+            sessionParams(:,f) = [temp(1:20); temp(19:20); temp(21:end)];                                
         end
         
         b = struct;
 
-        infoSide = sessionParams(5,1);
+        infoSide = sessionParams(5,f);
         info = ports(infoSide+1); % set for each session
         rand = setdiff(ports,info);
         odorDelay = sessionParams(16,f);
@@ -418,26 +418,40 @@ if newData == 1
         b.bigRewards(:,1) = ff;
         b.smallRewards = [zeros(size(b.smallRewards,1),1) b.smallRewards];
         b.smallRewards(:,1) = ff;
-        b.bigRewardCt = size(b.bigRewards,1); % report
-        b.smallRewardCt = size(b.smallRewards,1); % report
-        b.rewardCts = b.bigRewardCt + b.smallRewardCt; % report
-        
-        %%%%%%%%%%% FIX NOW THAT DIFF FOR INFO/RANDOM
-        b.bigRewardTime = sessionParams(19,f); % NOW DROPS (7/1/2017)
-        b.smallRewardTime = sessionParams(20,f);
+        b.infoBigRewards = b.bigRewards(b.bigRewards(:,6) == 1,:);
+        b.infoSmallRewards = b.smallRewards(b.smallRewards(:,6) == 1,:);
+        b.randBigRewards = b.bigRewards(b.bigRewards(:,6) == 0,:);
+        b.randSmallRewards = b.smallRewards(b.smallRewards(:,6) == 0,:);
+        b.infoBigRewardCt = size(b.infoBigRewards,1); % report
+        b.infoSallRewardCt = size(b.infoSmallRewards,1); % report                
+        b.randBigRewardCt = size(b.randBigRewards,1); % report
+        b.randSmallRewardCt = size(b.randSmallRewards,1); % report
+        b.rewardCts = b.infoBigRewardCt + b.infoSmallRewardCt + b.randBigRewardCt + b.rand
+        b.infoBigRewardTime = sessionParams(19,f);
+        b.infoSmallRewardTime = sessionParams(20,f);
+        b.randBigRewardTime = sessionParams(21,f);
+        b.randSmallRewardTime = sessionParams(22,f);
         
         % need to account for drops vs time param
-        if b.bigRewardTime == 30
-            b.bigReward = 4;
-            b.smallReward = 4;
+        if b.infoBigRewardTime == 30
+            b.infoBigReward = 4;
+            b.infoSmallReward = 0;
+            b.randBigReward = 4;
+            b.randSmallReward = 0;
         else if b.bigRewardTime > 10
-            b.bigReward = (b.bigRewardTime * 40)/1000;
-            b.smallReward = (b.smallRewardTime * 40)/1000;
-        else
-            b.bigReward = b.bigRewardTime * 4; % 4 is uL/drop
-            b.smallReward = b.smallRewardTime * 4;
+            b.infoBigReward = (b.infoBigRewardTime * 40)/1000;
+            b.infoSmallReward = (b.infoSmallRewardTime * 40)/1000;
+            b.randBigReward = (b.infoBigRewardTime * 40)/1000;
+            b.randSmallReward = (b.infoSmallRewardTime * 40)/1000;
+            else
+            b.infoBigReward = (b.infoBigRewardTime * 4;
+            b.infoSmallReward = (b.infoSmallRewardTime * 4);% 4 is uL/drop
+            b.randBigReward = (b.infoBigRewardTime * 4);
+            b.randSmallReward = (b.infoSmallRewardTime * 4);
             end
         end
+        
+        % FIX HERE DOWN
         b.rewardAmount = b.bigRewardCt * b.bigReward + b.smallRewardCt * b.smallReward; % report
         
 %% REWARD TYPES
@@ -627,104 +641,103 @@ if newData == 1
         
 %% FINAL OUTCOME (not present type) FOR ALL TRIALS
 
-b.finalOutcome = NaN(numel(trialCt),1);
+        b.finalOutcome = NaN(numel(trialCt),1);
 
-for t = 1:size(b.trialStart,1)
-    % choice 1 = info, 0 = rand, 3 = wrong, 2 = no choice
-    
+        for t = 1:size(b.trialStart,1)
+            % choice 1 = info, 0 = rand, 3 = wrong, 2 = no choice
 
-    if ~isempty(find(b.file == b.fileAll(t) & b.corrTrials == b.trialNums(t)))
-        corrIdx = find(b.file == b.fileAll(t) & b.corrTrials == b.trialNums(t));
-    end
-    % CHOICE TRIALS
-    if b.choiceType(t) == 1
-        % NO CHOICE
-        if b.choice(t,4) == 2
-            b.finalOutcome(t,1) = 1; % choice no choice;
-        % INFO    
-        elseif b.choice(t,4) == 1
-            % BIG
-            if b.trialParams(corrIdx,5) == 1
-                if b.rewarded(t) == 1
-                    b.finalOutcome(t,1) = 2; % choice info big
-                else b.finalOutcome(t,1) = 3; % choice info big NP
-                end
-            % SMALL
-            elseif b.trialParams(corrIdx,5) == 0
-                if b.rewarded(t) == 1
-                    b.finalOutcome(t,1) = 4; % choice info small
-                else b.finalOutcome(t,1) = 5; % choice info small NP
-                end
+
+            if ~isempty(find(b.file == b.fileAll(t) & b.corrTrials == b.trialNums(t)))
+                corrIdx = find(b.file == b.fileAll(t) & b.corrTrials == b.trialNums(t));
             end
-        % RANDOM
-        elseif b.choice(t,4) == 0
-            % BIG
-            if b.trialParams(corrIdx,5) == 1
-                if b.rewarded(t) == 1
-                    b.finalOutcome(t,1) = 6; % choice rand big
-                else b.finalOutcome(t,1) = 7; % choice rand big NP
+            % CHOICE TRIALS
+            if b.choiceType(t) == 1
+                % NO CHOICE
+                if b.choice(t,4) == 2
+                    b.finalOutcome(t,1) = 1; % choice no choice;
+                % INFO    
+                elseif b.choice(t,4) == 1
+                    % BIG
+                    if b.trialParams(corrIdx,5) == 1
+                        if b.rewarded(t) == 1
+                            b.finalOutcome(t,1) = 2; % choice info big
+                        else b.finalOutcome(t,1) = 3; % choice info big NP
+                        end
+                    % SMALL
+                    elseif b.trialParams(corrIdx,5) == 0
+                        if b.rewarded(t) == 1
+                            b.finalOutcome(t,1) = 4; % choice info small
+                        else b.finalOutcome(t,1) = 5; % choice info small NP
+                        end
+                    end
+                % RANDOM
+                elseif b.choice(t,4) == 0
+                    % BIG
+                    if b.trialParams(corrIdx,5) == 1
+                        if b.rewarded(t) == 1
+                            b.finalOutcome(t,1) = 6; % choice rand big
+                        else b.finalOutcome(t,1) = 7; % choice rand big NP
+                        end
+                    % SMALL
+                    elseif b.trialParams(corrIdx,5) == 0
+                        if b.rewarded(t) == 1
+                            b.finalOutcome(t,1) = 8; % choice rand small
+                        else b.finalOutcome(t,1) = 9; % choice rand small NP
+                        end
+                    end
                 end
-            % SMALL
-            elseif b.trialParams(corrIdx,5) == 0
-                if b.rewarded(t) == 1
-                    b.finalOutcome(t,1) = 8; % choice rand small
-                else b.finalOutcome(t,1) = 9; % choice rand small NP
+
+            % INFO TRIALS
+            elseif b.choiceType(t) == 2
+                % NO CHOICE
+                if b.choice(t,4) == 2
+                    b.finalOutcome(t,1) = 10; % info no choice;  
+                % CORRECT
+                elseif b.choice(t,4) == 1
+                    % BIG
+                    if b.trialParams(corrIdx,5) == 1
+                        if b.rewarded(t) == 1
+                            b.finalOutcome(t,1) = 11; % info big
+                        else b.finalOutcome(t,1) = 12; % info big NP
+                        end
+                    % SMALL
+                    elseif b.trialParams(corrIdx,5) == 0
+                        if b.rewarded(t) == 1
+                            b.finalOutcome(t,1) = 13; % info small
+                        else b.finalOutcome(t,1) = 14; % info small NP
+                        end
+                    end
+                % INCORRECT
+                else %a.choice(t,4) == 3 
+                    b.finalOutcome(t,1) = 15; % info incorrect (went rand)
                 end
-            end
+
+            % RAND TRIALS
+            elseif b.choiceType(t) == 3
+                % NO CHOICE
+                if b.choice(t,4) == 2
+                    b.finalOutcome(t,1) = 16; % rand no choice;  
+                % CORRECT
+                elseif b.choice(t,4) == 0
+                    % BIG
+                    if b.trialParams(corrIdx,5) == 1
+                        if b.rewarded(t) == 1
+                            b.finalOutcome(t,1) = 17; % rand big
+                        else b.finalOutcome(t,1) = 18; % rand big NP
+                        end
+                    % SMALL
+                    elseif b.trialParams(corrIdx,5) == 0
+                        if b.rewarded(t) == 1
+                            b.finalOutcome(t,1) = 19; % rand small
+                        else b.finalOutcome(t,1) = 20; % rand small NP
+                        end
+                    end
+                % INCORRECT
+                else %b.choice(t,4) == 3 
+                    b.finalOutcome(t,1) = 21; % rand incorrect (went info)
+                end
+            end     
         end
-
-    % INFO TRIALS
-    elseif b.choiceType(t) == 2
-        % NO CHOICE
-        if b.choice(t,4) == 2
-            b.finalOutcome(t,1) = 10; % info no choice;  
-        % CORRECT
-        elseif b.choice(t,4) == 1
-            % BIG
-            if b.trialParams(corrIdx,5) == 1
-                if b.rewarded(t) == 1
-                    b.finalOutcome(t,1) = 11; % info big
-                else b.finalOutcome(t,1) = 12; % info big NP
-                end
-            % SMALL
-            elseif b.trialParams(corrIdx,5) == 0
-                if b.rewarded(t) == 1
-                    b.finalOutcome(t,1) = 13; % info small
-                else b.finalOutcome(t,1) = 14; % info small NP
-                end
-            end
-        % INCORRECT
-        else %a.choice(t,4) == 3 
-            b.finalOutcome(t,1) = 15; % info incorrect (went rand)
-        end
-
-    % RAND TRIALS
-    elseif b.choiceType(t) == 3
-        % NO CHOICE
-        if b.choice(t,4) == 2
-            b.finalOutcome(t,1) = 16; % rand no choice;  
-        % CORRECT
-        elseif b.choice(t,4) == 0
-            % BIG
-            if b.trialParams(corrIdx,5) == 1
-                if b.rewarded(t) == 1
-                    b.finalOutcome(t,1) = 17; % rand big
-                else b.finalOutcome(t,1) = 18; % rand big NP
-                end
-            % SMALL
-            elseif b.trialParams(corrIdx,5) == 0
-                if b.rewarded(t) == 1
-                    b.finalOutcome(t,1) = 19; % rand small
-                else b.finalOutcome(t,1) = 20; % rand small NP
-                end
-            end
-        % INCORRECT
-        else %b.choice(t,4) == 3 
-            b.finalOutcome(t,1) = 21; % rand incorrect (went info)
-        end
-    end  
-    
-end
         
 %% LICKING
         
@@ -839,6 +852,8 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% still within for each file!
+
         if exist('a','var') == 0
 
             a = b;
@@ -855,7 +870,7 @@ end
             if size(sessionParameters,2) == size(a.parameters,2)
                 a.parameters = [a.parameters; sessionParameters];
             else
-                a.parameters = [a.parameters num2cell(zeros(size(a.parameters,1),size(sessionParameters,2) - size(a.parameters,2)))];
+                a.parameters = [a.parameters(:,1:23) a.parameters(:,22:23) a.parameters(:,24:end)];
                 a.parameters = [a.parameters; sessionParameters];
             end
             a.trialCts = [a.trialCts trialCt];
@@ -952,7 +967,7 @@ end
             a.type = [a.type; b.type];
             
         end
-    end
+    end % for each file!!
     
     % only data
     if isfield(a,'files') == 0
@@ -976,7 +991,7 @@ end
         a.numFiles = a.numFiles + numFiles;
     end
     
-end
+end % if newData
 
 uisave({'a'},'infoSeekFSMData.mat');
 

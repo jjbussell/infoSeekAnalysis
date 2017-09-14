@@ -60,24 +60,6 @@ orange = [251 139 6] ./ 255;
 cornflower = [100 149 237] ./ 255;
 grey = [17 17 17];
 
-CC = [0.2,0.2,0.2; %choice no choice
-    0.984313725490196,0.545098039215686,0.0235294117647059; %choice info big
-    1, 0.8, 0.0; %choice info small
-    1,0.8,0.8; %choice info NP
-    0.474509803921569,0.125490196078431,0.768627450980392; %choice rand big
-    0.9490, 0.8, 1.0; %choicerandsmall
-    0.8,0.8,0.8; %choicerandNP
-    0.6,0.6,0.6; %info no choice
-    0,1,0; %info big
-    1,0,1; %infosmall
-    1,0.8,0.8; %info not present
-    0.0,0.0,0.0; %infoincorrect
-    0.2,0.2,0.2;% rand no choice
-    0,0,1; %rand big
-    0,1,1; %rand small
-    0.8,0.8,0.8; %rand NP
-    0.0,0.0,0.0]; %rand incorrect
-
 CCfinal = [0.2,0.2,0.2; %choice no choice
     0.984313725490196,0.545098039215686,0.0235294117647059; %choice info big
     245/255,222/255,179/255; % choice info big NP
@@ -257,14 +239,14 @@ for m = 1:a.mouseCt
     plot(cell2mat(a.daySummary.BRewards(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3);
     plot(cell2mat(a.daySummary.CRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',3);
     plot(cell2mat(a.daySummary.DRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':');
-%     plot(cell2mat(a.daySummary.randBigRewards(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
-%     plot(cell2mat(a.daySummary.randSmallRewards(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
+    plot(cell2mat(a.daySummary.randBigRewards(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
+    plot(cell2mat(a.daySummary.randSmallRewards(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
     for r = 1:numel(cell2mat(a.reverseDay(m,:)))
         plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
     end     
     ylabel({'Mean Reward', '(uL)'});
 %     xlabel('Day');
-    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
+    leg = legend(ax,'Info-Rew','Info-No Rew','No Info-C','No Info-D','No Info-Rew','No Info-No Rew','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -731,7 +713,7 @@ for mm = 1:numel(a.currentMiceNums)
         end
     end
     saveas(fig,fullfile(pathname,['outcomesStacked' a.mouseList{m}]),'pdf');
-%     close(fig);
+    close(fig);
 end
 
     %% bar plot for each day

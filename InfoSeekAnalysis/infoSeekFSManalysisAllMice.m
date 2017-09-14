@@ -41,9 +41,8 @@
 % graph of all entries for each trial
 
 
-clear;
+clear all;
 close all;
-
 uiopen('.mat'); % pulls in data structure "a" with current data
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -79,7 +78,11 @@ if loadData == 1
     a.FSM = [b.FSM; c.FSM];
     a.FSMall = [b.FSMall; c.FSMall];
     
-    c.parameters = [c.allSummary(:,1:30) cell(size(c.allSummary,1),1) c.allSummary(:,31)];   
+    
+    
+    c.parameters = [c.allSummary(:,1:23) c.allSummary(:,22:23)...
+        c.allSummary(:,24:27) cell(size(c.allSummary,1),1)...
+        c.allSummary(:,28:31)];
     a.parameters = [b.parameters; c.parameters];
     
     a.numFiles = size(a.parameters,1);    
@@ -136,8 +139,9 @@ if loadData == 1
     % NEED TO PULL IN CENTER ENTRIES AND REWARD ENTRIES! and GO CUE
     
     clear b; clear c;
-    
-else % only FSM files NEED TO FIX?!?!
+
+    % only FSM files NEED TO FIX?!?!
+else 
     a.FSM = ones(numel(a.file),1);
     a.FSMall = ones(numel(a.fileAll),1);
     a.trialAll = a.trialNums;
@@ -149,9 +153,19 @@ else % only FSM files NEED TO FIX?!?!
     a.trialLengthCenterEntry = a.trialLengthCenterEntry(a.correct);
     a.rewardAssigned = a.trialParams(:,5);
     if exist('a.deletedFiles')
-    a.deletedFiles = a.deletedFiles;
+        a.deletedFiles = a.deletedFiles;
     end
 end
+
+a.paramNames = {'File';'Mouse';'Day';'Session End';'Trials in Session';...
+    'Imaging Flag';'Trial Types';'Info Side';'Info Odor';'Rand Odor';...
+    'Choice Odor';'Odor A';'Odor B';'Odor C';'Odor D';'Center Delay';...
+    'Center Odor Time';'Start Delay';'Odor Delay';'Odor Time';...
+    'Reward Delay';'Info Big Reward Time';'Info Small Reward Time';...
+    'Rand Big Reward Time';'Rand Small Reward Time';'Info Reward Prob';...
+    'Rand Reward Prob';'Grace Period Reward Latency';'Interval';...
+    'TOU_THRESH';'REL_THRESH Timeout';'Touch_Right';'Touch_Left';...
+    'session time';'File Days'};
 
 %% DAYS
 
@@ -161,11 +175,11 @@ days = a.parameters(:,3);
 days = unique(days);
 % assign numeric day to each file
 for s = 1:size(a.parameters,1)
-   a.parameters{s,33} = find(ismember(days,a.parameters{s,3})); 
-   a.files(s).day = a.parameters{s,33};
+   a.parameters{s,35} = find(ismember(days,a.parameters{s,3})); 
+   a.files(s).day = a.parameters{s,35};
 end
 
-a.fileDays = cell2mat(a.parameters(:,33));
+a.fileDays = cell2mat(a.parameters(:,35));
 
 a.day = a.fileDays(a.file);
 a.dayAll = a.fileDays(a.fileAll);
@@ -845,8 +859,8 @@ for m = 1:a.mouseCt
         a.daySummary.randBig{m,d} = sum(a.randBig(ok));
         a.daySummary.randSmall{m,d} = sum(a.randSmall(ok));
         lastFileIdx = find(ok,1,'last');
-        a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),24};
-        a.daySummary.randBigProb{m,d} = a.parameters{a.file(lastFileIdx),25};
+        a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),26};
+        a.daySummary.randBigProb{m,d} = a.parameters{a.file(lastFileIdx),27};
         a.daySummary.rewardDelay{m,d} = a.parameters{a.file(lastFileIdx),21};
         a.daySummary.totalRewards{m,d} = sum(a.reward(ok));
         a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
