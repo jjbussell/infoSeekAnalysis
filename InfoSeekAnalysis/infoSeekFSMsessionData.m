@@ -78,23 +78,29 @@ if newData == 1
         day = filename(dayPlace(1)+1:dayPlace(2)-1);
 
         data = [];
-        if csvread(fname,29,0,[29,0,29,0]) == 0
+        temp = [];
+        
+        % as of 9/13/2017, added 2 new parameters for separate info/rand
+        % reward amounts, so session parameters 2 bigger. also extra
+        % parameter for FSM vs before?!?
+        
+        if csvread(fname,31,0,[31,0,31,0]) == 0
+            data = csvread(fname,31,0);
+            sessionParams(:,f) = csvread(fname,1,1,[1,1,30,1]); % report        
+        else csvread(fname,29,0,[29,0,29,0]) == 0
             data = csvread(fname,29,0);
-            sessionParams(:,f) = csvread(fname,1,1,[1,1,28,1]); % report                       
-        else
-            data = csvread(fname,27,0);
-            sessionParams(:,f) = [csvread(fname,1,1,[1,1,26,1]); 0; 0]; % report           
+            temp = csvread(fname,1,1,[1,1,28,1]); % report
+            sessionParams(:,f) = [temp(1:20) temp(19:20) temp(21:end)];                                
         end
         
         b = struct;
 
-        infoSide = sessionParams(5,f);
+        infoSide = sessionParams(5,1);
         info = ports(infoSide+1); % set for each session
         rand = setdiff(ports,info);
         odorDelay = sessionParams(16,f);
         odorTime = sessionParams(17,f);
         rewardDelay = sessionParams(18,f);
-        interval = sessionParams(24,f);
 
 % SAVE SESSION PARAMETERS
         sessionLength = (data(end,1)-data(1,1))/1000; % report
@@ -120,17 +126,18 @@ if newData == 1
         files(f).odorDelay = odorDelay;
         files(f).odorTime = odorTime;
         files(f).rewardDelay = rewardDelay;
-        files(f).interval = interval;
         files(f).odors = sessionParams([6:12],f);
         files(f).centerDelay = sessionParams(13,f);
         files(f).centerOdorTime = sessionParams(14,f);
         files(f).startDelay = sessionParams(15,f);
-        files(f).bigRewardTime = sessionParams(19,f);
-        files(f).smallRewardTime = sessionParams(20,f);
-        files(f).infoRewardProb = sessionParams(21,f);
-        files(f).randRewardProb = sessionParams(22,f);
-        files(f).gracePeriod = sessionParams(23,f);
-        files(f).timeout = sessionParams(26,f);
+        files(f).infoBigRewardTime = sessionParams(19,f);
+        files(f).infoSmallRewardTime = sessionParams(20,f);
+        files(f).randBigRewardTime = sessionParams(21,f);
+        files(f).randSmallRewardTime = sessionParams(22,f);            
+        files(f).infoRewardProb = sessionParams(23,f);
+        files(f).randRewardProb = sessionParams(24,f);
+        files(f).gracePeriod = sessionParams(25,f);
+        files(f).interval = sessionParams(26,f);
         if isfield(files, 'folder')
             files = rmfield(files,'folder');
         end
@@ -403,7 +410,7 @@ if newData == 1
         b.trialParams = [zeros(size(b.trialParams,1),1) b.trialParams];
         b.trialParams(:,1) = ff;
                
-%% REWARD
+%% REWARD !!!!! NEED TO FIX FOR INFO VS RANDOM
 
         b.bigRewards = data(data(:,3) == 15,:); % trial type, choice (1 = info, 0 = rand)
         b.smallRewards = data(data(:,3) == 16,:); % trial type, choice
@@ -414,6 +421,8 @@ if newData == 1
         b.bigRewardCt = size(b.bigRewards,1); % report
         b.smallRewardCt = size(b.smallRewards,1); % report
         b.rewardCts = b.bigRewardCt + b.smallRewardCt; % report
+        
+        %%%%%%%%%%% FIX NOW THAT DIFF FOR INFO/RANDOM
         b.bigRewardTime = sessionParams(19,f); % NOW DROPS (7/1/2017)
         b.smallRewardTime = sessionParams(20,f);
         
@@ -949,7 +958,20 @@ end
     if isfield(a,'files') == 0
         a.files = files;
         a.numFiles = numFiles;
-    else
+    elseif size(fieldnames(a.files),1)==26
+        oldFiles=struct2cell(a.files);
+        infoBigRewardTime = oldFiles(21,:);
+        infoSmallRewardTime = oldFiles(22,:);
+        randBigRewardTime = oldFiles(21,:);
+        randSmallRewardTime = oldFiles(22,:);
+        oldFilesComplete = [oldFiles(1:15,:); oldFiles(17:20,:); infoBigRewardTime;...
+            infoSmallRewardTime; randBigRewardTime; randSmallRewardTime;...
+            oldFiles(23:25,:); oldFiles(16,:)];
+        names=fieldnames(files);
+        a.files = cell2struct(oldFilesComplete,names,1);
+        a.files = [a.files; files];
+        a.numFiles = a.numFiles + numFiles;
+    else       
         a.files = [a.files; files];
         a.numFiles = a.numFiles + numFiles;
     end
