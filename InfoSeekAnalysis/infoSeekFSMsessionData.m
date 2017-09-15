@@ -423,10 +423,10 @@ if newData == 1
         b.randBigRewards = b.bigRewards(b.bigRewards(:,6) == 0,:);
         b.randSmallRewards = b.smallRewards(b.smallRewards(:,6) == 0,:);
         b.infoBigRewardCt = size(b.infoBigRewards,1); % report
-        b.infoSallRewardCt = size(b.infoSmallRewards,1); % report                
+        b.infoSmallRewardCt = size(b.infoSmallRewards,1); % report                
         b.randBigRewardCt = size(b.randBigRewards,1); % report
         b.randSmallRewardCt = size(b.randSmallRewards,1); % report
-        b.rewardCts = b.infoBigRewardCt + b.infoSmallRewardCt + b.randBigRewardCt + b.rand
+        b.rewardCts = b.infoBigRewardCt + b.infoSmallRewardCt + b.randBigRewardCt + b.randSmallRewardCt;
         b.infoBigRewardTime = sessionParams(19,f);
         b.infoSmallRewardTime = sessionParams(20,f);
         b.randBigRewardTime = sessionParams(21,f);
@@ -438,32 +438,36 @@ if newData == 1
             b.infoSmallReward = 0;
             b.randBigReward = 4;
             b.randSmallReward = 0;
-        else if b.bigRewardTime > 10
+        elseif b.infoBigRewardTime > 10
             b.infoBigReward = (b.infoBigRewardTime * 40)/1000;
             b.infoSmallReward = (b.infoSmallRewardTime * 40)/1000;
             b.randBigReward = (b.infoBigRewardTime * 40)/1000;
             b.randSmallReward = (b.infoSmallRewardTime * 40)/1000;
-            else
-            b.infoBigReward = (b.infoBigRewardTime * 4;
+        else
+            b.infoBigReward = (b.infoBigRewardTime * 4);
             b.infoSmallReward = (b.infoSmallRewardTime * 4);% 4 is uL/drop
-            b.randBigReward = (b.infoBigRewardTime * 4);
-            b.randSmallReward = (b.infoSmallRewardTime * 4);
-            end
+            b.randBigReward = (b.randBigRewardTime * 4);
+            b.randSmallReward = (b.randSmallRewardTime * 4);
         end
         
-        % FIX HERE DOWN
-        b.rewardAmount = b.bigRewardCt * b.bigReward + b.smallRewardCt * b.smallReward; % report
+        b.rewardAmount = b.infoBigRewardCt * b.infoBigReward +...
+            b.infoSmallRewardCt * b.infoSmallReward + b.randBigRewardCt...
+            * b.randBigReward + b.randSmallRewardCt * b.randSmallReward; % report
         
 %% REWARD TYPES
         
         allRewards = sort([b.bigRewards(:,3); b.smallRewards(:,3)]);
         b.rewarded = ismember(b.trialNums, allRewards);
-        b.big = ismember(b.trialNums,b.bigRewards(:,3));
-        b.small = ismember(b.trialNums,b.smallRewards(:,3));
+        b.infoBig = ismember(b.trialNums,b.infoBigRewards(:,3));
+        b.infoSmall = ismember(b.trialNums,b.infoSmallRewards(:,3));
+        b.randBig = ismember(b.trialNums,b.randBigRewards(:,3));
+        b.randSmall = ismember(b.trialNums,b.randSmallRewards(:,3));            
         
         b.reward = zeros(trialCt,1);
-        b.reward(b.big) = b.bigReward;
-        b.reward(b.small) = b.smallReward;
+        b.reward(b.infoBig) = b.infoBigReward;
+        b.reward(b.infoSmall) = b.infoSmallReward;
+        b.reward(b.randBig) = b.randBigReward;
+        b.reward(b.randSmall) = b.randSmallReward;        
         b.reward = b.reward(b.correct);
 
 %% WATER
@@ -571,10 +575,10 @@ if newData == 1
                 % INFO    
                 elseif b.choice(t,4) == 1
                     % BIG
-                    if b.big(t) == 1
+                    if b.infoBig(t) == 1
                         b.outcome(t,1) = 2; % choice info big
                     % SMALL
-                    elseif b.small(t) == 1
+                    elseif b.infoSmall(t) == 1
                         b.outcome(t,1) = 3; % choice info small
                     % NOT PRESENT
                     else b.outcome(t,1) = 4; %choice info not present
@@ -583,10 +587,10 @@ if newData == 1
                 % RANDOM
                 else %if b.choice(t,4) == 0
                     %BIG
-                    if b.big(t) == 1
+                    if b.randBig(t) == 1
                         b.outcome(t,1) = 5; % choice rand big
                     % SMALL
-                    elseif b.small(t) == 1
+                    elseif b.randSmall(t) == 1
                         b.outcome(t,1) = 6; % choice rand small
                     % NOT PRESENT
                     else b.outcome(t,1) = 7; %choice rand not present
@@ -601,10 +605,10 @@ if newData == 1
                 % CORRECT
                 elseif b.choice(t,4) == 1
                     % BIG
-                    if b.big(t) == 1
+                    if b.infoBig(t) == 1
                         b.outcome(t,1) = 9; % info big
                     % SMALL
-                    elseif b.small(t) == 1
+                    elseif b.infoSmall(t) == 1
                         b.outcome(t,1) = 10; % info small
                     % NOT PRESENT
                     else
@@ -623,10 +627,10 @@ if newData == 1
                 % CORRECT
                 elseif b.choice(t,4) == 0
                     % BIG
-                    if b.big(t) == 1
+                    if b.randBig(t) == 1
                         b.outcome(t,1) = 14; % rand big
                     % SMALL
-                    elseif b.small(t) == 1
+                    elseif b.randSmall(t) == 1
                         b.outcome(t,1) = 15; % rand small
                     % NOT PRESENT
                     else
@@ -942,20 +946,30 @@ if newData == 1
             a.trialLength = [a.trialLength; b.trialLength];
             a.trialLengthCenterEntry = [a.trialLengthCenterEntry; b.trialLengthCenterEntry];
             a.trialLengthTotal = [a.trialLengthTotal; b.trialLengthTotal];
-            a.bigRewards = [a.bigRewards; b.bigRewards];
-            a.smallRewards = [a.smallRewards; b.smallRewards];
-            a.bigRewardCt = [a.bigRewardCt; b.bigRewardCt];
-            a.smallRewardCt = [a.smallRewardCt; b.smallRewardCt];
+            a.infoBigRewards = [a.infoBigRewards; b.infoBigRewards];
+            a.infoSmallRewards = [a.infoSmallRewards; b.infoSmallRewards];
+            a.randBigRewards = [a.randBigRewards; b.randBigRewards];
+            a.randSmallRewards = [a.randSmallRewards; b.randSmallRewards];                        
+            a.infoBigRewardCt = [a.infoBigRewardCt; b.infoBigRewardCt];
+            a.infoSmallRewardCt = [a.infoSmallRewardCt; b.infoSmallRewardCt];
+            a.randBigRewardCt = [a.randBigRewardCt; b.randBigRewardCt];
+            a.randSmallRewardCt = [a.randSmallRewardCt; b.randSmallRewardCt];                        
             a.rewardCts = [a.rewardCts; b.rewardCts];
-            a.bigRewardTime = [a.bigRewardTime; b.bigRewardTime];
-            a.smallRewardTime = [a.smallRewardTime; b.smallRewardTime];
-            a.bigReward = [a.bigReward; b.bigReward];
-            a.smallReward = [a.smallReward; b.smallReward];
+            a.infoBigRewardTime = [a.infoBigRewardTime; b.infoBigRewardTime];
+            a.infoSmallRewardTime = [a.infoSmallRewardTime; b.infoSmallRewardTime];                       
+            a.randBigRewardTime = [a.randBigRewardTime; b.randBigRewardTime];
+            a.randSmallRewardTime = [a.randSmallRewardTime; b.randSmallRewardTime];
+            a.infoBigReward = [a.infoBigReward; b.infoBigReward];
+            a.infoSmallReward = [a.infoSmallReward; b.infoSmallReward];                        
+            a.randBigReward = [a.randBigReward; b.randBigReward];
+            a.randSmallReward = [a.randSmallReward; b.randSmallReward];
             a.rewardAmount = [a.rewardAmount; b.rewardAmount];
             a.rewarded = [a.rewarded; b.rewarded];
             a.reward = [a.reward; b.reward];
-            a.big = [a.big; b.big];
-            a.small = [a.small; b.small];
+            a.infoBig = [a.infoBig; b.infoBig];
+            a.ranBbig = [a.randBig; b.randBig];            
+            a.infoSmall = [a.infoSmall; b.infoSmall];
+            a.randSmall = [a.randSmall; b.randSmall];            
             a.choiceType = [a.choiceType; b.choiceType];
             a.choiceTrials = [a.choiceTrials; b.choiceTrials];
             a.infoForced = [a.infoForced; b.infoForced];

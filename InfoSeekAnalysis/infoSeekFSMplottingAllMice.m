@@ -1393,8 +1393,8 @@ end
 
     ax = nsubplot(1,1,1,1);
     ax.FontSize = 8;
-    ax.XLim = [-10 10];
-    ax.YLim = [-10 10];
+    ax.XLim = [-3 3];
+    ax.YLim = [-3 3];
     for m = 1:numel(a.reverseMice)
 %         plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
 %         plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
