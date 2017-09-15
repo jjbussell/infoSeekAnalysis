@@ -713,7 +713,7 @@ for mm = 1:numel(a.currentMiceNums)
         end
     end
     saveas(fig,fullfile(pathname,['outcomesStacked' a.mouseList{m}]),'pdf');
-    close(fig);
+%     close(fig);
 end
 
     %% bar plot for each day
@@ -1591,7 +1591,7 @@ end
     hold off;
 
     saveas(fig,fullfile(pathname,'PrevsPostRxn'),'pdf');
-    close(fig);
+%     close(fig);
     
 
 %%
