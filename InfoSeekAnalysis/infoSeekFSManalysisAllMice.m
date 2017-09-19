@@ -119,6 +119,7 @@ if loadData == 1
     a.rxn  = [b.rxn(b.correct); c.rxn];
     a.odor2 = [b.trialParams(:,6); c.odor2];
     a.reward = [b.reward; c.reward];
+    a.rewardCorr = [b.rewardCorr; c.rewardCorr];
     a.rewarded = [b.rewarded; zeros(numel(c.fileAll),1)];
     a.trialLength = [b.trialLength(b.correct); c.trialLength];
     a.anticipatoryLicks = [b.anticipatoryLicks; c.anticipatoryLicks];
@@ -130,7 +131,8 @@ if loadData == 1
     a.rewardAssigned = [b.trialParams(:,5); c.rewardSize]; % rewardSize in pre-FSM, need to calc from trialParms in FSM
     a.goCue = [b.goCue(:,2); c.goCueAll];
     a.firstCenterEntry = [b.firstCenterEntry(:,2); c.firstCenterEntryAll];
-    a.trialLengthCenterEntry = [b.trialLengthCenterEntry(b.correct); c.trialLengthCenterEntry(c.correctAll==1)];
+    a.trialLengthCenterEntryCorr = [b.trialLengthCenterEntry(b.correct); c.trialLengthCenterEntry(c.correctAll==1)];
+    a.trialLenghtCenterEntry = [b.trialLengthCenterEntry; c.trialLengthCenterEntry];
 %     a.rewardEntries = [b.rewardEntries; allRewardEntries Stuff
     if exist('a.deletedFiles')
         a.deletedFiles = b.deletedFiles;
@@ -150,7 +152,7 @@ else
     a.rxn = a.rxn(a.correct);
     a.odor2 = a.trialParams(:,6);
     a.trialLength = a.trialLength(a.correct);
-    a.trialLengthCenterEntry = a.trialLengthCenterEntry(a.correct);
+    a.trialLengthCenterEntryCorr = a.trialLengthCenterEntry(a.correct);
     a.rewardAssigned = a.trialParams(:,5);
     if exist('a.deletedFiles')
         a.deletedFiles = a.deletedFiles;
@@ -291,8 +293,8 @@ end
 
 %% REWARD FLAG (SINCE REWARD IN uL)
 
-a.rewardFlag = zeros(numel(a.reward),1);
-a.rewardFlag(a.reward>0) = 1;
+a.rewardFlag = zeros(numel(a.rewardCorr),1);
+a.rewardFlag(a.rewardCorr>0) = 1;
 
 %% REVERSAL & CHOICES
 
@@ -730,13 +732,13 @@ for m = 1:a.mouseCt
         
         a.lickIndex(m,d) = (a.AlicksBetween(m,d) + a.BlicksBetween(m,d))/(a.ClicksBetween(m,d) + a.DlicksBetween(m,d));
         
-        a.ARewards(m,d) = sum(a.reward(a.odorAtrials & ok));
-        a.BRewards(m,d) = sum(a.reward(a.odorBtrials & ok));
-        a.CRewards(m,d) = sum(a.reward(a.odorCtrials & ok));
-        a.DRewards(m,d) = sum(a.reward(a.odorDtrials & ok));
+        a.ARewards(m,d) = sum(a.rewardCorr(a.odorAtrials & ok));
+        a.BRewards(m,d) = sum(a.rewardCorr(a.odorBtrials & ok));
+        a.CRewards(m,d) = sum(a.rewardCorr(a.odorCtrials & ok));
+        a.DRewards(m,d) = sum(a.rewardCorr(a.odorDtrials & ok));
         
-        a.randBigRewards(m,d) = sum(a.reward(a.randBig & ok));
-        a.randSmallRewards(m,d) = sum(a.reward(a.randSmall & ok));
+        a.randBigRewards(m,d) = sum(a.rewardCorr(a.randBig & ok));
+        a.randSmallRewards(m,d) = sum(a.rewardCorr(a.randSmall & ok));
     end
 end
 
@@ -836,6 +838,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
 for m = 1:a.mouseCt
     for d = 1:a.mouseDayCt(m)
         % OUTCOMES (all trials)        
@@ -845,8 +848,9 @@ for m = 1:a.mouseCt
         end
         
         % OTHER (correct trials)
-        ok = [];
+        ok = []; okAll = [];
         ok = a.mouseDay == d & a.mice(:,m) == 1;
+        okAll = a.mouseDayAll == d & a.miceAll(:,m) == 1;
         a.daySummary.mouse{m,d} = m;
         a.daySummary.mouseName{m,d} = a.mouseList{m};
         a.daySummary.day{m,d} = d;
@@ -862,7 +866,7 @@ for m = 1:a.mouseCt
         a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),26};
         a.daySummary.randBigProb{m,d} = a.parameters{a.file(lastFileIdx),27};
         a.daySummary.rewardDelay{m,d} = a.parameters{a.file(lastFileIdx),21};
-        a.daySummary.totalRewards{m,d} = sum(a.reward(ok));
+        a.daySummary.totalRewards{m,d} = sum(a.rewardCorr(ok));
         a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
         a.daySummary.percentInfo{m,d} = mean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1 & a.fileTrialTypes == 5));
         a.daySummary.rxnInfoForced{m,d} = mean(a.rxn(a.infoForcedCorr & ok));
@@ -895,18 +899,25 @@ for m = 1:a.mouseCt
         a.daySummary.trialLengthInfoChoice{m,d} = nansum(a.trialLength(a.infoChoiceCorr == 1 & ok == 1))/sum(~isnan(a.trialLength(a.infoChoiceCorr == 1 & ok == 1)));
         a.daySummary.trialLengthRandForced{m,d} = nansum(a.trialLength(a.randForcedCorr == 1 & ok == 1))/sum(~isnan(a.trialLength(a.randForcedCorr == 1 & ok == 1)));
         a.daySummary.trialLengthRandChoice{m,d} = nansum(a.trialLength(a.randChoiceCorr == 1 & ok == 1))/sum(~isnan(a.trialLength(a.randChoiceCorr == 1 & ok == 1)));
-        a.daySummary.trialLengthEntryInfoForced{m,d} = nansum(a.trialLengthCenterEntry(a.infoForcedCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntry(a.infoForcedCorr == 1 & ok == 1)));
-        a.daySummary.trialLengthEntryInfoChoice{m,d} = nansum(a.trialLengthCenterEntry(a.infoChoiceCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntry(a.infoChoiceCorr == 1 & ok == 1)));
-        a.daySummary.trialLengthEntryRandForced{m,d} = nansum(a.trialLengthCenterEntry(a.randForcedCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntry(a.randForcedCorr == 1 & ok == 1)));
-        a.daySummary.trialLengthEntryRandChoice{m,d} = nansum(a.trialLengthCenterEntry(a.randChoiceCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntry(a.randChoiceCorr == 1 & ok == 1)));        
-        a.daySummary.rewardInfoForced{m,d} = sum(a.reward(a.infoForcedCorr == 1 & ok == 1))/sum(a.infoForcedCorr(ok));
-        a.daySummary.rewardInfoChoice{m,d} = sum(a.reward(a.infoChoiceCorr == 1 & ok == 1))/sum(a.infoChoiceCorr(ok));
-        a.daySummary.rewardRandForced{m,d} = sum(a.reward(a.randForcedCorr == 1 & ok == 1))/sum(a.randForcedCorr(ok));
-        a.daySummary.rewardRandChoice{m,d} = sum(a.reward(a.randChoiceCorr == 1 & ok == 1))/sum(a.randChoiceCorr(ok));
-        a.daySummary.rewardRateInfoForced{m,d} = sum(a.reward(a.infoForcedCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntry(a.infoForcedCorr == 1 & ok == 1))*1000;
-        a.daySummary.rewardRateInfoChoice{m,d} = sum(a.reward(a.infoChoiceCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntry(a.infoChoiceCorr == 1 & ok == 1))*1000;
-        a.daySummary.rewardRateRandForced{m,d} = sum(a.reward(a.randForcedCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntry(a.randForcedCorr == 1 & ok == 1))*1000;
-        a.daySummary.rewardRateRandChoice{m,d} = sum(a.reward(a.randChoiceCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntry(a.randChoiceCorr == 1 & ok == 1))*1000;        
+        a.daySummary.trialLengthEntryInfoForced{m,d} = nansum(a.trialLengthCenterEntryCorr(a.infoForcedCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntryCorr(a.infoForcedCorr == 1 & ok == 1)));
+        a.daySummary.trialLengthEntryInfoChoice{m,d} = nansum(a.trialLengthCenterEntryCorr(a.infoChoiceCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntryCorr(a.infoChoiceCorr == 1 & ok == 1)));
+        a.daySummary.trialLengthEntryRandForced{m,d} = nansum(a.trialLengthCenterEntryCorr(a.randForcedCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntryCorr(a.randForcedCorr == 1 & ok == 1)));
+        a.daySummary.trialLengthEntryRandChoice{m,d} = nansum(a.trialLengthCenterEntryCorr(a.randChoiceCorr == 1 & ok == 1))/sum(~isnan(a.trialLengthCenterEntryCorr(a.randChoiceCorr == 1 & ok == 1)));        
+        a.daySummary.rewardInfoForced{m,d} = sum(a.reward(a.infoForced == 1 & okAll == 1))/sum(a.infoForced(okAll));
+        a.daySummary.rewardRandForced{m,d} = sum(a.reward(a.randForced == 1 & okAll == 1))/sum(a.randForced(okAll));
+        a.daySummary.rewardChoice{m,d} = sum(a.reward(a.choiceTrials == 1 & okAll == 1))/sum(a.choiceTrials(okAll));
+%         a.daySummary.rewardInfoForced{m,d} = sum(a.rewardCorr(a.infoForcedCorr == 1 & ok == 1))/sum(a.infoForcedCorr(ok));
+%         a.daySummary.rewardInfoChoice{m,d} = sum(a.rewardCorr(a.infoChoiceCorr == 1 & ok == 1))/sum(a.infoChoiceCorr(ok));
+%         a.daySummary.rewardRandForced{m,d} = sum(a.rewardCorr(a.randForcedCorr == 1 & ok == 1))/sum(a.randForcedCorr(ok));
+%         a.daySummary.rewardRandChoice{m,d} = sum(a.rewardCorr(a.randChoiceCorr == 1 & ok == 1))/sum(a.randChoiceCorr(ok));
+        a.daySummary.rewardRateInfoForced{m,d} = sum(a.reward(a.infoForced == 1 & okAll == 1)) / nansum(a.trialLengthCenterEntry(a.infoForced == 1 & okAll == 1))*1000;
+        a.daySummary.rewardRateRandForced{m,d} = sum(a.reward(a.randForced == 1 & okAll == 1)) / nansum(a.trialLengthCenterEntry(a.randForced == 1 & okAll == 1))*1000;
+        a.daySummary.rewardRateChoice{m,d} = sum(a.reward(a.choiceTrials == 1 & okAll == 1)) / nansum(a.trialLengthCenterEntry(a.choiceTrials == 1 & okAll == 1))*1000;        
+%         a.daySummary.rewardRateInfoForced{m,d} = sum(a.rewardCorr(a.infoForcedCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntryCorr(a.infoForcedCorr == 1 & ok == 1))*1000;
+%         a.daySummary.rewardRateInfoChoice{m,d} = sum(a.rewardCorr(a.infoChoiceCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntryCorr(a.infoChoiceCorr == 1 & ok == 1))*1000;
+%         a.daySummary.rewardRateRandForced{m,d} = sum(a.rewardCorr(a.randForcedCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntryCorr(a.randForcedCorr == 1 & ok == 1))*1000;
+%         a.daySummary.rewardRateRandChoice{m,d} = sum(a.rewardCorr(a.randChoiceCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntryCorr(a.randChoiceCorr == 1 & ok == 1))*1000;        
+
     end
 end
 

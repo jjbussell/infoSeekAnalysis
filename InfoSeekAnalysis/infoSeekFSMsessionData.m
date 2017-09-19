@@ -468,7 +468,7 @@ if newData == 1
         b.reward(b.infoSmall) = b.infoSmallReward;
         b.reward(b.randBig) = b.randBigReward;
         b.reward(b.randSmall) = b.randSmallReward;        
-        b.reward = b.reward(b.correct);
+        b.rewardCorr = b.reward(b.correct);
 
 %% WATER
 
@@ -965,6 +965,7 @@ if newData == 1
             a.randSmallReward = [a.randSmallReward; b.randSmallReward];
             a.rewardAmount = [a.rewardAmount; b.rewardAmount];
             a.rewarded = [a.rewarded; b.rewarded];
+            a.rewardCorr = [a.rewardCorr; b.rewardCorr];
             a.reward = [a.reward; b.reward];
             a.infoBig = [a.infoBig; b.infoBig];
             a.ranBbig = [a.randBig; b.randBig];            
