@@ -1,24 +1,3 @@
-%         for f = 1:a.numFiles
-%             firstCenterEntry = [];
-%             goCue = [];
-%             trialLengthCenterEntry = [];
-%             firstCenterEntry = a.firstCenterEntry(a.firstCenterEntry(:,1)==f,:);
-%             goCue = a.goCue(a.goCue(:,1)==f,:);
-%             for tt = 1:a.trialCts(f)-1
-%                 if firstCenterEntry(tt+1,2)>0
-%                     trialLengthCenterEntry(tt,1) = firstCenterEntry(tt+1,2) - goCue(tt,2);
-%                 else
-%                     trialLengthCenterEntry(tt,1) = NaN;
-%                 end
-%             end
-%             trialLengthCenterEntry(a.trialCts(f),1) = NaN;
-%             if f == 1
-%                 a.trialLengthCenterEntry = trialLengthCenterEntry;
-%             else
-%                 a.trialLengthCenterEntry = [a.trialLengthCenterEntry; trialLengthCenterEntry];
-%             end
-%         end
-
 % WANT DWELL TIME FOR REWARDED PORT ENTRY -- get entries
 
 % "checking"/out of trial flow side entries--> GET ENTRIES!!!
@@ -334,6 +313,7 @@ for m = 1:a.mouseCt
     
     if mouseFileCt(m,1) > 1
         mouseInfoSideDiff = diff(a.fileInfoSide(a.fileMouse == m));
+        
         if ~isempty(find(mouseInfoSideDiff) ~= 0)
             reverses = find(mouseInfoSideDiff~=0);
             for r = 1:numel(reverses)
@@ -350,6 +330,16 @@ for m = 1:a.mouseCt
         else a.reverseDay{m,1} = 0;
         end
     end
+    
+    mouseValueFiles = find(diff([cell2mat(a.parameters(a.fileMouse==m,22)),cell2mat(a.parameters(a.fileMouse==m,24))],1,2)~=0);
+    a.valueFile{m,1} = mouseFilesIdx(mouseValueFiles);
+    a.valueDays{m,1} = mouseFileDays(mouseValueFiles);
+
+    
+    if ~isempty(mouseValueFiles)
+        a.valueMice(m,1) = m;
+    end;
+    
 end
     
     a.preReverse = ones(size(a.file,1),1);
@@ -470,6 +460,8 @@ end
 
 a.reverseMice = find(cell2mat(a.reverseFile(:,1))>0);
 a.reverseMiceList = a.mouseList(a.reverseMice);
+
+a.valueMiceList = a.mouseList(a.valueMice);
 
 % FSM mice
 a.FSMmice = zeros(a.mouseCt,1);
@@ -671,6 +663,19 @@ if ~isempty(a.choiceMice)
     a.icp_all = a.sortedChoice(:,1)*100;
     a.overallP = signrank(a.icp_all-50);
 end
+
+%% DIFFERENT SIDE VALUES
+
+a.valueFileCat = cat(2,a.valueFiles{:});
+for ff = 1:numel(a.valueFileCat)
+    f = a.valueFileCat(ff);
+    a.valChangeInfo(ff,1) = a.parameters{f,22};
+    a.valChangeRand(ff,1) = a.parameters{f,24};
+    a.valChangeMouse(ff,1) = a.fileMouse(f);
+    a.choiceByAmt{ff,1} = a.choice_all(a.file == f);
+end
+
+a.choicesByAmt = cat(2,a.choiceByAmt{:});
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY - UNUSED?
 
