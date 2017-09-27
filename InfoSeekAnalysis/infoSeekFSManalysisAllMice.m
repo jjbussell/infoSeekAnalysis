@@ -461,7 +461,7 @@ end
 a.reverseMice = find(cell2mat(a.reverseFile(:,1))>0);
 a.reverseMiceList = a.mouseList(a.reverseMice);
 
-a.valueMiceList = a.mouseList(a.valueMice);
+% a.valueMiceList = a.mouseList(a.valueMice);
 
 % FSM mice
 a.FSMmice = zeros(a.mouseCt,1);
@@ -666,16 +666,16 @@ end
 
 %% DIFFERENT SIDE VALUES
 
-a.valueFileCat = cat(2,a.valueFiles{:});
-for ff = 1:numel(a.valueFileCat)
-    f = a.valueFileCat(ff);
-    a.valChangeInfo(ff,1) = a.parameters{f,22};
-    a.valChangeRand(ff,1) = a.parameters{f,24};
-    a.valChangeMouse(ff,1) = a.fileMouse(f);
-    a.choiceByAmt{ff,1} = a.choice_all(a.file == f);
-end
-
-a.choicesByAmt = cat(2,a.choiceByAmt{:});
+% a.valueFileCat = cat(2,a.valueFiles{:});
+% for ff = 1:numel(a.valueFileCat)
+%     f = a.valueFileCat(ff);
+%     a.valChangeInfo(ff,1) = a.parameters{f,22};
+%     a.valChangeRand(ff,1) = a.parameters{f,24};
+%     a.valChangeMouse(ff,1) = a.fileMouse(f);
+%     a.choiceByAmt{ff,1} = a.choice_all(a.file == f);
+% end
+% 
+% a.choicesByAmt = cat(2,a.choiceByAmt{:});
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY - UNUSED?
 
