@@ -591,7 +591,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% %% CHOICE TRAINING PLOTS
+%% CHOICE TRAINING PLOTS - SKIPS
 % 
 % % CHOICE TRIANING MICE
 % a.choiceTrainingMice = zeros(a.mouseCt,1);
@@ -651,8 +651,7 @@ end
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% PLOT OUTCOMES BY MOUSE FOR CURRENT MICE - ONLY WORKS FOR FSM, CURRENTLY SKIP
-
+%% PLOT OUTCOMES BY MOUSE FOR CURRENT MICE - ONLY WORKS FOR FSM
 
     %% STACKED BARS
 
@@ -1155,6 +1154,67 @@ if a.choiceMouseCt > 1
     saveas(fig,fullfile(pathname,'Overall'),'png');
 %     close(fig);
 end
+
+%% PLOT VALUE RESPONSE CURVES
+
+% by mouse (1 fig for each mouse, plot1: value vs pref + baseline...
+% plot2: pref and vals each day)
+
+for mm = 1:numel(a.valueMice)
+    m = a.valueMice(mm); 
+    fig = figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+     
+    ax = nsubplot(2,1,1,1);
+    title(a.mouseList(m));
+    ax.FontSize = 8;
+    ax.XLim = [0 2];
+    ax.XTick = [0 a.relValues' 2];
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [0 1];
+    s=a.relValues';
+%     xticklabels([strtrim(cellstr(num2str(s'))') 'Overall']);
+    ylabel('Information Preference');
+    xlabel('Info side relative water amount');
+    mouseVals = ~isnan(a.valChoiceMeanbyMouse(mm,:));
+    plot([-10000000 1000000],[0.5 0.5],'k','yliminclude','off','xliminclude','off');
+    plot([a.relValues(mouseVals); 2],[a.valChoiceMeanbyMouse(mm,mouseVals) a.meanChoice(m,1)],'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
+%     xticklabels([strtrim(cellstr(num2str(s'))') 'Overall']);
+
+    ax = nsubplot(2,1,2,1);    
+    ax.FontSize = 8;
+%     ax.YLim = [0 1];
+    ylabel('Information Preference');
+    plot([-10000000 1000000],[0.5 0.5],'k','yliminclude','off','xliminclude','off');    
+    bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.valueDays{m,1}))/4],'FaceColor','none','EdgeColor','k');
+    plot(1:numel(a.valueDays{m,1})+1,[a.meanChoice(m,1) cell2mat(a.daySummary.percentInfo(m,a.valueDays{m,1}))],'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);
+
+end
+
+% overall
+% 1 fig, plot val vs pref (mean + error + baseline)
+
+fig = figure();
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0.5 0.5 10 7];
+set(fig,'renderer','painters');
+set(fig,'PaperOrientation','landscape');
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 8;
+ax.XLim = [0 2];
+ax.XTick = [0:0.5:2];
+ax.YTick = [0 0.25 0.50 0.75 1];
+ax.YLim = [0 1];
+ylabel('Information Preference');
+xlabel('Info side relative water amount');
+plot(a.relValues,a.choiceByAmtMean);
+
+
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

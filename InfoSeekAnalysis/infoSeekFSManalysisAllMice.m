@@ -287,6 +287,7 @@ a.reverseDay = cell(a.mouseCt,1);
 a.prereverseFiles = ones(a.numFiles,1); %flag 1 = file with choices before reverse
 a.prereverseFiles(cell2mat(a.parameters(:,7))~=5) = 0;
 a.reverseFiles = zeros(a.numFiles,1); % flag 1 = file before first reverse, -1 = file during first reverse
+a.valueMice = zeros(a.mouseCt,1);
 
 for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
@@ -331,16 +332,15 @@ for m = 1:a.mouseCt
         end
     end
     
-    mouseValueFiles = find(diff([cell2mat(a.parameters(a.fileMouse==m,22)),cell2mat(a.parameters(a.fileMouse==m,24))],1,2)~=0);
-    a.valueFile{m,1} = mouseFilesIdx(mouseValueFiles);
-    a.valueDays{m,1} = mouseFileDays(mouseValueFiles);
-
-    
-    if ~isempty(mouseValueFiles)
-        a.valueMice(m,1) = m;
-    end;
-    
+    mouseValueFile = find(diff([cell2mat(a.parameters(a.fileMouse==m,22)),cell2mat(a.parameters(a.fileMouse==m,24))],1,2)~=0,1,'first');
+    a.valueFile{m,1} = mouseFilesIdx(mouseValueFile:end);
+    a.valueDays{m,1} = mouseFileDays(mouseValueFile:end);    
+    if ~isempty(mouseValueFile)
+        a.valueMice(m,1) = 1;
+    end;    
 end
+
+a.valueMice = find(a.valueMice);
     
     a.preReverse = ones(size(a.file,1),1);
     a.reverse = zeros(size(a.file,1),1);
@@ -461,7 +461,7 @@ end
 a.reverseMice = find(cell2mat(a.reverseFile(:,1))>0);
 a.reverseMiceList = a.mouseList(a.reverseMice);
 
-% a.valueMiceList = a.mouseList(a.valueMice);
+a.valueMiceList = a.mouseList(a.valueMice);
 
 % FSM mice
 a.FSMmice = zeros(a.mouseCt,1);
@@ -666,16 +666,38 @@ end
 
 %% DIFFERENT SIDE VALUES
 
-% a.valueFileCat = cat(2,a.valueFiles{:});
-% for ff = 1:numel(a.valueFileCat)
-%     f = a.valueFileCat(ff);
-%     a.valChangeInfo(ff,1) = a.parameters{f,22};
-%     a.valChangeRand(ff,1) = a.parameters{f,24};
-%     a.valChangeMouse(ff,1) = a.fileMouse(f);
-%     a.choiceByAmt{ff,1} = a.choice_all(a.file == f);
-% end
-% 
-% a.choicesByAmt = cat(2,a.choiceByAmt{:});
+a.valueFileCat = cat(2,a.valueFile{:});
+for ff = 1:numel(a.valueFileCat)
+    f = a.valueFileCat(ff);
+    a.valChange(ff,1) = a.parameters{f,22};
+    a.valChange(ff,2) = a.parameters{f,24};
+    a.valChange(ff,3) = a.valChange(ff,1) / a.valChange(ff,2);
+    a.valChangeMouse(ff,1) = a.fileMouse(f);
+    a.choiceByAmtbyFile{ff,1} = a.choice_all(a.file == f);
+end
+
+a.values = unique(a.valChange(:,1));
+a.relValues = unique(a.valChange(:,1)/4);
+
+for mm = 1:numel(a.valueMice)
+    m = a.valueMice(mm);
+    for vv = 1:numel(a.values)
+       v = a.values(vv);
+       a.valFiles{mm,vv} = a.valueFileCat(a.valChange(:,1) == v & a.valChangeMouse(:,1) == m);
+       a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valFiles{mm,vv},2)==1);
+       a.valChoiceMeanbyMouse(mm,vv) = mean(a.valChoices{mm,vv});
+       a.valChoiceSEMbyMouse(mm,vv) = sem(a.valChoices{mm,vv});
+    end
+end
+
+for vv = 1:numel(a.values)
+   v = a.values(vv);
+   a.choiceByAmt{v,1} = cell2mat(a.choiceByAmtbyFile(a.valChange(:,1)==v,1));
+   a.choiceByAmtMean(v,1) = mean(a.choiceByAmt{v,1});
+   a.choiceByAmtSEM(v,1) = sem(a.choiceByAmt{v,1});
+end
+
+
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY - UNUSED?
 
@@ -868,6 +890,8 @@ for m = 1:a.mouseCt
         a.daySummary.randBig{m,d} = sum(a.randBig(ok));
         a.daySummary.randSmall{m,d} = sum(a.randSmall(ok));
         lastFileIdx = find(ok,1,'last');
+        a.daySummary.infoBigAmt{m,d} = a.parameters{a.file(lastFileIdx),22};
+        a.daySummary.randBigAmt{m,d} = a.parameters{a.file(lastFileIdx),24};
         a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),26};
         a.daySummary.randBigProb{m,d} = a.parameters{a.file(lastFileIdx),27};
         a.daySummary.rewardDelay{m,d} = a.parameters{a.file(lastFileIdx),21};
