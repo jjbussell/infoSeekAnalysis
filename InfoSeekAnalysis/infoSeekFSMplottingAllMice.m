@@ -1162,6 +1162,7 @@ end
 
 for mm = 1:numel(a.valueMice)
     m = a.valueMice(mm); 
+    
     fig = figure();
     fig = gcf;
     fig.PaperUnits = 'inches';
@@ -1172,30 +1173,44 @@ for mm = 1:numel(a.valueMice)
     ax = nsubplot(2,1,1,1);
     title(a.mouseList(m));
     ax.FontSize = 8;
-    ax.XLim = [0 2];
+    ax.XLim = [0 2.5];
     ax.XTick = [0 a.relValues' 2];
     ax.YTick = [0 0.25 0.50 0.75 1];
     ax.YLim = [0 1];
     s=a.relValues';
 %     xticklabels([strtrim(cellstr(num2str(s'))') 'Overall']);
-    ylabel('Information Preference');
+    ylabel({'Info choice', 'probability'});
     xlabel('Info side relative water amount');
     mouseVals = ~isnan(a.valChoiceMeanbyMouse(mm,:));
-    plot([-10000000 1000000],[0.5 0.5],'k','yliminclude','off','xliminclude','off');
-    plot([a.relValues(mouseVals); 2],[a.valChoiceMeanbyMouse(mm,mouseVals) a.meanChoice(m,1)],'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
+    plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
+    bar([a.relValues(mouseVals); 2],[a.valChoiceMeanbyMouse(mm,mouseVals) a.meanChoice(m,1)],0.2,'FaceColor','k');
 %     xticklabels([strtrim(cellstr(num2str(s'))') 'Overall']);
 
     ax = nsubplot(2,1,2,1);    
     ax.FontSize = 8;
 %     ax.YLim = [0 1];
-    ylabel('Information Preference');
-    plot([-10000000 1000000],[0.5 0.5],'k','yliminclude','off','xliminclude','off');    
-    bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.valueDays{m,1}))/4],'FaceColor','none','EdgeColor','k');
-    plot(1:numel(a.valueDays{m,1})+1,[a.meanChoice(m,1) cell2mat(a.daySummary.percentInfo(m,a.valueDays{m,1}))],'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);
+    xlabel('Day');
+    yyaxis left
+    ax = gca;
+    ax.YColor = 'k';
+    ylabel({'Info', 'relative value'});
+    ax.YTick = [0 a.relValues'];
+    ax.YLim = [0 1.5];
+    plot([-10000000 1000000],[1 1],'Color',grey,'yliminclude','off','xliminclude','off','LineWidth',0.5);
+    bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.valueDays{m,1}))/4],'FaceColor','k','EdgeColor','none'); 
+    
+    yyaxis right
+    ax = gca;
+    ax.YColor = 'r';
+    ylabel({'Info choice', 'probability'});
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [0 1];
+    plot([-10000000 1000000],[0.5 0.5],'Color','r','yliminclude','off','xliminclude','off','LineWidth',0.5);
+    plot(1:numel(a.valueDays{m,1})+1,[a.meanChoice(m,1) cell2mat(a.daySummary.percentInfo(m,a.valueDays{m,1}))],'Color','r','LineWidth',3,'Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);    
 
 end
 
-% overall
+%% overall value plot
 % 1 fig, plot val vs pref (mean + error + baseline)
 
 fig = figure();
@@ -1205,16 +1220,20 @@ fig.PaperPosition = [0.5 0.5 10 7];
 set(fig,'renderer','painters');
 set(fig,'PaperOrientation','landscape');
 ax = nsubplot(1,1,1,1);
-ax.FontSize = 8;
+% ax.FontSize = 8;
 ax.XLim = [0 2];
 ax.XTick = [0:0.5:2];
 ax.YTick = [0 0.25 0.50 0.75 1];
 ax.YLim = [0 1];
-ylabel('Information Preference');
+ylabel({'Info choice probability', 'across all mice'});
 xlabel('Info side relative water amount');
-plot(a.relValues,a.choiceByAmtMean);
-
-
+% p = patch([[a.relValues'] fliplr([a.relValues'])], [[a.choiceByAmtMean-a.choiceByAmtSEM]',[fliplr([a.choiceByAmtMean+a.choiceByAmtSEM]')]],[0.8 0.8 0.8]);
+% p.EdgeColor = 'none';
+% plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
+bar(a.relValues,a.choiceByAmtMean,'FaceColor','k');
+errorbar(a.relValues,a.choiceByAmtMean,a.choiceByAmtSEM,'Color','k','LineStyle','none','CapSize',10,'LineWidth',2);
+plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
+hold off;
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
