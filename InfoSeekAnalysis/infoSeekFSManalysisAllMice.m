@@ -457,8 +457,10 @@ else
     a.currentChoiceMiceList = [];
 end
 
-
+if isfield('a','reverseFile')
 a.reverseMice = find(cell2mat(a.reverseFile(:,1))>0);
+else a.reverseMice = [];
+end
 a.reverseMiceList = a.mouseList(a.reverseMice);
 
 a.valueMiceList = a.mouseList(a.valueMice);
@@ -676,8 +678,13 @@ for ff = 1:numel(a.valueFileCat)
     a.choiceByAmtbyFile{ff,1} = a.choice_all(a.file == f);
 end
 
+if isfield('a','valChange')
 a.values = unique(a.valChange(:,1));
 a.relValues = unique(a.valChange(:,1)/4);
+else
+    a.values = [];
+    a.relValues = [];
+end
 
 for mm = 1:numel(a.valueMice)
     m = a.valueMice(mm);

@@ -309,7 +309,24 @@ if newData == 1
 
         gotToChoose = ismember(b.goCue(:,3),b.choice(:,3));
         b.rxn = NaN(trialCt,1);
-        b.rxn(gotToChoose) = b.choiceTime - b.goCue(gotToChoose,2);             
+        b.rxn(gotToChoose) = b.choiceTime - b.goCue(gotToChoose,2); 
+        
+%% ODORS
+
+        b.centerOdorOn = data(data(:,3) == 3 & data(:,5) == 0,:);
+        b.centerOdorOff = data(data(:,3) == 5 & data(:,5) == 0,:);
+
+        b.centerOdorOn = [zeros(size(b.centerOdorOn,1),1) b.centerOdorOn];
+        b.centerOdorOn(:,1) = ff; 
+        b.centerOdorOff = [zeros(size(b.centerOdorOff,1),1) b.centerOdorOff];
+        b.centerOdorOff(:,1) = ff;
+
+        b.sideOdorOn = data(data(:,3) == 3 & data(:,5) == 1,:);
+        b.sideOdorOff = data(data(:,3) == 5 & data(:,5) == 1,:);
+        b.sideOdorOn = [zeros(size(b.sideOdorOn,1),1) b.sideOdorOn];
+        b.sideOdorOn(:,1) = ff;
+        b.sideOdorOff = [zeros(size(b.sideOdorOff,1),1) b.sideOdorOff];
+        b.sideOdorOff(:,1) = ff;        
         
 %% CENTER ENTRY FIRST AND FOR GO CUE
         
@@ -317,23 +334,37 @@ if newData == 1
             b.centerEntryGo(r,1) = ff;
             b.centerExitGo(r,1) = ff;
             b.centerEntryCt(r,1) = ff;
+            b.centerOdorOnGo(r,1) = ff;
             
             if size(b.goCue,1) >= trialCt % if there is a complete center entry in that trial
                 centerEntryGoDiff =  b.goCue(r,2) - b.centerEntries(:,2); % find entry just before go cue
                 centerEntryGoDiff(centerEntryGoDiff < 0) = inf;
                 [centerEntryVal,centerEntryGoIdx] = min(centerEntryGoDiff);
+                
+                centerOdorGoDiff =  b.goCue(r,2) - b.centerOdorOn(:,2); % find entry just before go cue
+                centerOdorGoDiff(centerOdorGoDiff < 0) = inf;
+                [centerOdorVal,centerOdorGoIdx] = min(centerOdorGoDiff);
+                
                 if isinf(centerEntryVal)
                    b.centerEntryGo(r,2) = 0;
                    b.centerExitGo(r,2) = 0;
+                   
                 else
                    b.centerEntryGo(r,[2 3]) = b.centerEntries(centerEntryGoIdx,[3 2]);
                    b.centerExitGo(r,[2 3]) = b.centerEntries(centerEntryGoIdx,[3 7]);
+                end
+                
+                if isinf(centerOdorVal)
+                    b.centerOdorOnGo(r,1) = 0;
+                else
+                    b.centerOdorOnGo(r,[2 3]) = b.centerOdorOn(centerOdorGoIdx, [3 2]);
                 end
 
             else
                 b.centerEntryGo(r,[2 3]) = 0;
                 b.centerExitGo(r,[2 3]) = 0;
                 b.centerEntryCt(r,2) = 0;
+                b.centerOdorOnGo(r,[2 3]) = 0;
             end
             
             if ~isempty(b.centerEntries(:,3) == r) & ~isempty(find(b.txn3_4(:,3) == r))
@@ -385,24 +416,6 @@ if newData == 1
         b.rewardEntries = rewardEntries;
         
         b.rewardEntriesCorr = b.rewardEntries(b.rewardEntries(:,6) == 1,:);
-        
-
-%% ODORS
-
-        b.centerOdorOn = data(data(:,3) == 3 & data(:,5) == 0,:);
-        b.centerOdorOff = data(data(:,3) == 5 & data(:,5) == 0,:);
-
-        b.centerOdorOn = [zeros(size(b.centerOdorOn,1),1) b.centerOdorOn];
-        b.centerOdorOn(:,1) = ff; 
-        b.centerOdorOff = [zeros(size(b.centerOdorOff,1),1) b.centerOdorOff];
-        b.centerOdorOff(:,1) = ff;
-
-        b.sideOdorOn = data(data(:,3) == 3 & data(:,5) == 1,:);
-        b.sideOdorOff = data(data(:,3) == 5 & data(:,5) == 1,:);
-        b.sideOdorOn = [zeros(size(b.sideOdorOn,1),1) b.sideOdorOn];
-        b.sideOdorOn(:,1) = ff;
-        b.sideOdorOff = [zeros(size(b.sideOdorOff,1),1) b.sideOdorOff];
-        b.sideOdorOff(:,1) = ff;
 
 %% TRIAL PARAMS
     
@@ -929,6 +942,7 @@ if newData == 1
             a.rewardEntriesCorr = [a.rewardEntriesCorr; b.rewardEntriesCorr];
             a.centerOdorOn = [a.centerOdorOn; b.centerOdorOn];
             a.centerOdorOff = [a.centerOdorOff; b.centerOdorOff];
+            a.centerOdorOnGo= [a.centerOdorOnGo; b.centerOdorOnGo];
             a.sideOdorOn = [a.sideOdorOn; b.sideOdorOn];
             a.sideOdorOff = [a.sideOdorOff; b.sideOdorOff];
             a.trialParams = [a.trialParams; b.trialParams];
