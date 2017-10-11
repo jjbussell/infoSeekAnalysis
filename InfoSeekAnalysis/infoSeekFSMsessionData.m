@@ -942,7 +942,11 @@ if newData == 1
             a.rewardEntriesCorr = [a.rewardEntriesCorr; b.rewardEntriesCorr];
             a.centerOdorOn = [a.centerOdorOn; b.centerOdorOn];
             a.centerOdorOff = [a.centerOdorOff; b.centerOdorOff];
-            a.centerOdorOnGo= [a.centerOdorOnGo; b.centerOdorOnGo];
+            if isfield(a,'centerOdorOnGo')
+                a.centerOdorOnGo= [a.centerOdorOnGo; b.centerOdorOnGo];
+            else
+                a.centerOdorOnGo = b.centerOdorOnGo;
+            end
             a.sideOdorOn = [a.sideOdorOn; b.sideOdorOn];
             a.sideOdorOff = [a.sideOdorOff; b.sideOdorOff];
             a.trialParams = [a.trialParams; b.trialParams];
