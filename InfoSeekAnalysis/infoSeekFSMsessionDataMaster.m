@@ -36,22 +36,15 @@ f = 1;
 %% FOR EACH FILE
 for f = 1:numFiles
     filename = files(f).name;
-
-    if loadData == 1
-        if sum(strcmp(filename,names)) > 0
-            disp(fprintf(['Skipping duplicate file ' filename]));
-            files(f) = [];
-            f = f+1;
-            filename = files(f).name;
-            numFiles = numFiles - 1;
-        end
-
-        ff = a.numFiles + f;
-
-    else
-        ff = f;
+    if sum(strcmp(filename,names)) > 0
+        disp(fprintf(['Skipping duplicate file ' filename]));
+        files(f) = [];
+        f = f+1;
+        filename = files(f).name;
+        numFiles = numFiles - 1;
     end
 
+    ff = a.numFiles + f;
 
     fname = fullfile(pathname,filename); % report
     dayPlace = strfind(filename,'_');
@@ -133,12 +126,9 @@ for f = 1:numFiles
     trialStarts = data(data(:,3) == 10,:);
     b.trialStart = data(data(:,3) == 10,:);
 
-    % this needs to take into account existing files!
-    if loadData == 0
-        b.fileAll(1:trialCt,1) = f;
-    else
-        b.fileAll(1:trialCt,1) = f + a.numFiles;
-    end
+
+    b.fileAll(1:trialCt,1) = f + a.numFiles;
+
 
 %% IMAGING
 
@@ -1006,5 +996,5 @@ else
     a.numFiles = a.numFiles + numFiles;
 end
 
-save({'a'},'infoSeekFSMData.mat');
+save('infoSeekFSMDataM.mat','a');
 

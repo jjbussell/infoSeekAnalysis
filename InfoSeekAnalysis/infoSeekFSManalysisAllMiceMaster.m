@@ -683,25 +683,39 @@ else
     a.relValues = [];
 end
 
+% mean/SEM only the last 100 trials of that value!!
 for mm = 1:numel(a.valueMice)
     m = a.valueMice(mm);
     for vv = 1:numel(a.values)
        v = a.values(vv);
        a.valFiles{mm,vv} = a.valueFileCat(a.valChange(:,1) == v & a.valChangeMouse(:,1) == m);
        a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valFiles{mm,vv},2)==1);
-       a.valChoiceMeanbyMouse(mm,vv) = mean(a.valChoices{mm,vv});
-       a.valChoiceSEMbyMouse(mm,vv) = sem(a.valChoices{mm,vv});
+       currentValChoices = a.valChoices{mm,vv};
+       if numel(currentValChoices) >= 100
+           a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices(end-100:end));
+           a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices(end-100:end));
+           a.choiceByAmtByMouse{mm,vv} = currentValChoices(end-99:end);
+       else
+           a.valChoiceMeanbyMouse(mm,vv) = NaN;
+           a.valChoiceSEMbyMouse(mm,vv) = NaN;
+           a.choiceByAmtByMouse{mm,vv} = NaN;
+       end
     end
 end
 
 for vv = 1:numel(a.values)
    v = a.values(vv);
    a.choiceByAmt{v,1} = cell2mat(a.choiceByAmtbyFile(a.valChange(:,1)==v,1));
-   a.choiceByAmtMean(v,1) = mean(a.choiceByAmt{v,1});
-   a.choiceByAmtSEM(v,1) = sem(a.choiceByAmt{v,1});
+   currentChoiceByAmt = a.choiceByAmt{v,1};
+%    a.choiceByAmtMean(v,1) = mean(a.choiceByAmt{v,1});
+%    a.choiceByAmtSEM(v,1) = sem(a.choiceByAmt{v,1});
 end
 
-
+for vv = 1:numel(a.values)
+    v = a.values(vv);
+    a.choiceByAmtMean(v,1) = nanmean(cell2mat(a.choiceByAmtByMouse(:,v)))
+    a.choiceByAmtSEM(v,1) = sem(cell2mat(a.choiceByAmtByMouse(:,v)))
+end
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY - UNUSED?
 
@@ -974,4 +988,4 @@ for mm = 1:sum(a.FSMmice)
 end
 
 %%
-save({'a'},'infoSeekFSMDataAnalyzed.mat');
+save('infoSeekFSMDataAnalyzed.mat','a');
