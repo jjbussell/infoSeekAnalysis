@@ -996,5 +996,5 @@ else
     a.numFiles = a.numFiles + numFiles;
 end
 
-save('infoSeekFSMDataM.mat','a');
+save('infoSeekFSMData.mat','a');
 
