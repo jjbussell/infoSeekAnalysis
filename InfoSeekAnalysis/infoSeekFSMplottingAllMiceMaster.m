@@ -1476,8 +1476,6 @@ end
 % %     close(fig);
 
     %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
-    
-    % NEED TO FIX LABELS/M!!!!!!
 
     fig = figure();
     fig.PaperUnits = 'inches';
@@ -1489,11 +1487,12 @@ end
     ax.FontSize = 8;
     ax.XLim = [-3 3];
     ax.YLim = [-3 3];
-    for m = 1:numel(a.reverseMice)
+    for mm = 1:numel(a.reverseMice)
+        m = a.reverseMice(mm);
 %         plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
 %         plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
 %         dy = a.beta(m,2) - a.betaCI(m,2) + 0.02;
-        text(a.beta(m,1),a.beta(m,2) + 0.2,a.reverseMiceList{m},'HorizontalAlignment','center');
+        text(a.beta(m,1),a.beta(m,2) + 0.1,a.reverseMiceList{mm},'HorizontalAlignment','center');
     end
     scatter(a.beta(:,1),a.beta(:,2),'filled','FaceColor','k')
     plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
@@ -1507,58 +1506,58 @@ end
 %     close(fig);
 
 
-%     %% EARLY LICKS
-% 
-%     bothSig = a.preRevEarlyLicks(:,3)<0.05 & a.postRevEarlyLicks(:,3)<0.05;
-% 
-%     for m = 1:a.mouseCt
-%         if bothSig(m) == 1
-%             if a.preRevEarlyLicks(m,1)>a.preRevEarlyLicks(m,2)
-%                 if a.postRevEarlyLicks(m,1)>a.preRevEarlyLicks(m,2)
-%                     sig(m) = 2;
-%                 else
-%                     sig(m) = 3;
-%                 end
-%             else if a.preRevEarlyLicks(m,1)<a.preRevEarlyLicks(m,2)
-%                     if a.postRevEarlyLicks(m,1)<a.postRevEarlyLicks(m,2)
-%                         sig(m) = 1;
-%                     else
-%                         sig(m) = 3;
-%                     end
-%                 end
-%             end
-%         else sig(m) = 4;
-%         end
-%     end
-% 
-%     
-%     fig = figure();
-%     fig.PaperUnits = 'inches';
-%     fig.PaperPosition = [0.5 0.5 10 7];
-%     set(fig,'renderer','painters');
-%     set(fig,'PaperOrientation','landscape');
-% 
-%     ax = nsubplot(1,1,1,1);
-%     ax.FontSize = 8;
-%     ax.XLim = [-1 1];
-%     ax.YLim = [-1 1];
-%     for l = 1:numel(a.reverseMice)
-%         m = a.reverseMice(l);
-%         dy = 0.02;
-%         text(a.earlyLickIdx(m,1),a.earlyLickIdx(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
-%     end
-%     plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-%     plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-%     scatter(a.earlyLickIdx(sig==1,1),a.earlyLickIdx(sig==1,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
-%     scatter(a.earlyLickIdx(sig==2,1),a.earlyLickIdx(sig==2,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
-%     scatter(a.earlyLickIdx(sig==3,1),a.earlyLickIdx(sig==3,2),'filled','MarkerEdgeColor','none','MarkerFaceColor','k');
-%     scatter(a.earlyLickIdx(sig==4,1),a.earlyLickIdx(sig==4,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',[.8 .8 .8]);
-%     ylabel('POST-reversal (info side vs other side)');
-%     xlabel('PRE-reversal (info side vs other side)');
-%     title({'Pre-odor2 lick indices, pre vs post-reversal', '(-1 = lick more for no info side)'});
-%     hold off;
-% 
-%     saveas(fig,fullfile(pathname,'PrevsPostEarlyLicks'),'pdf');
+    %% EARLY LICKS
+
+    bothSig = a.preRevEarlyLicks(:,3)<0.05 & a.postRevEarlyLicks(:,3)<0.05;
+
+    for m = 1:a.mouseCt
+        if bothSig(m) == 1
+            if a.preRevEarlyLicks(m,1)>a.preRevEarlyLicks(m,2)
+                if a.postRevEarlyLicks(m,1)>a.preRevEarlyLicks(m,2)
+                    sig(m) = 2;
+                else
+                    sig(m) = 3;
+                end
+            else if a.preRevEarlyLicks(m,1)<a.preRevEarlyLicks(m,2)
+                    if a.postRevEarlyLicks(m,1)<a.postRevEarlyLicks(m,2)
+                        sig(m) = 1;
+                    else
+                        sig(m) = 3;
+                    end
+                end
+            end
+        else sig(m) = 4;
+        end
+    end
+
+    
+    fig = figure();
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+    ax.XLim = [-1 1];
+    ax.YLim = [-1 1];
+    for l = 1:numel(a.reverseMice)
+        m = a.reverseMice(l);
+        dy = 0.02;
+        text(a.earlyLickIdx(m,1),a.earlyLickIdx(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
+    end
+    plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    scatter(a.earlyLickIdx(sig==1,1),a.earlyLickIdx(sig==1,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
+    scatter(a.earlyLickIdx(sig==2,1),a.earlyLickIdx(sig==2,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
+    scatter(a.earlyLickIdx(sig==3,1),a.earlyLickIdx(sig==3,2),'filled','MarkerEdgeColor','none','MarkerFaceColor','k');
+    scatter(a.earlyLickIdx(sig==4,1),a.earlyLickIdx(sig==4,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',[.8 .8 .8]);
+    ylabel('POST-reversal (info side vs other side)');
+    xlabel('PRE-reversal (info side vs other side)');
+    title({'Pre-odor2 lick indices, pre vs post-reversal', '(-1 = lick more for no info side)'});
+    hold off;
+
+    saveas(fig,fullfile(pathname,'PrevsPostEarlyLicks'),'pdf');
 % %     close(fig);
 
 

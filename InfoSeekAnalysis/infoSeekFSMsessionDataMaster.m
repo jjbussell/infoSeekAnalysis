@@ -215,6 +215,7 @@ b.images(:,1) = ff;
 
     % match exit--is this necessary?
     for e = 1:size(centerEntries,1)
+        if ~isempty(centerEntries)
         centerExitDiff = centerExits(:,2) - centerEntries(e,2);
         centerExitDiff(centerExitDiff < 0) = inf;
         [centerExitVal,centerExitIdx] = min(centerExitDiff);
@@ -223,10 +224,14 @@ b.images(:,1) = ff;
         else
             centerEntries(e,7) = centerExits(centerExitIdx,2); % matching center exit
         end
+        else centerEntries(e,7) = [];
+        end
     end
 
     % CENTER DWELL TIME
-    centerEntries(:,8) = centerEntries(:,7) - centerEntries(:,2); % dwell time
+    if ~isempty(centerEntries)
+        centerEntries(:,8) = centerEntries(:,7) - centerEntries(:,2); % dwell time
+    end
 
     % SAVE ENTRIES AND EXITS TO DATA
     b.centerEntries = centerEntries;
@@ -308,54 +313,63 @@ b.images(:,1) = ff;
         b.centerEntryCt(r,1) = ff;
         b.centerOdorOnGo(r,1) = ff;
 
-        if size(b.goCue,1) >= trialCt % if there is a complete center entry in that trial
-            centerEntryGoDiff =  b.goCue(r,2) - b.centerEntries(:,2); % find entry just before go cue
-            centerEntryGoDiff(centerEntryGoDiff < 0) = inf;
-            [centerEntryVal,centerEntryGoIdx] = min(centerEntryGoDiff);
+        if ~isempty(b.centerEntries)
+            if size(b.goCue,1) >= trialCt % if there is a complete center entry in that trial
+                centerEntryGoDiff =  b.goCue(r,2) - b.centerEntries(:,2); % find entry just before go cue
+                centerEntryGoDiff(centerEntryGoDiff < 0) = inf;
+                [centerEntryVal,centerEntryGoIdx] = min(centerEntryGoDiff);
 
-            centerOdorGoDiff =  b.goCue(r,2) - b.centerOdorOn(:,2); % find entry just before go cue
-            centerOdorGoDiff(centerOdorGoDiff < 0) = inf;
-            [centerOdorVal,centerOdorGoIdx] = min(centerOdorGoDiff);
+                centerOdorGoDiff =  b.goCue(r,2) - b.centerOdorOn(:,2); % find entry just before go cue
+                centerOdorGoDiff(centerOdorGoDiff < 0) = inf;
+                [centerOdorVal,centerOdorGoIdx] = min(centerOdorGoDiff);
 
-            if isinf(centerEntryVal)
-               b.centerEntryGo(r,2) = 0;
-               b.centerExitGo(r,2) = 0;
+                if isinf(centerEntryVal)
+                   b.centerEntryGo(r,2) = 0;
+                   b.centerExitGo(r,2) = 0;
+
+                else
+                   b.centerEntryGo(r,[2 3]) = b.centerEntries(centerEntryGoIdx,[3 2]);
+                   b.centerExitGo(r,[2 3]) = b.centerEntries(centerEntryGoIdx,[3 7]);
+                end
+
+                if isinf(centerOdorVal)
+                    b.centerOdorOnGo(r,1) = 0;
+                else
+                    b.centerOdorOnGo(r,[2 3]) = b.centerOdorOn(centerOdorGoIdx, [3 2]);
+                end
 
             else
-               b.centerEntryGo(r,[2 3]) = b.centerEntries(centerEntryGoIdx,[3 2]);
-               b.centerExitGo(r,[2 3]) = b.centerEntries(centerEntryGoIdx,[3 7]);
+                b.centerEntryGo(r,[2 3]) = 0;
+                b.centerExitGo(r,[2 3]) = 0;
+                b.centerEntryCt(r,2) = 0;
+                b.centerOdorOnGo(r,[2 3]) = 0;
             end
 
-            if isinf(centerOdorVal)
-                b.centerOdorOnGo(r,1) = 0;
+            if ~isempty(b.centerEntries(:,3) == r) & ~isempty(find(b.txn3_4(:,3) == r))
+                b.firstCenterEntryTxn(r,1) = b.txn3_4(find(b.txn3_4(:,3) == r,1,'first'),2); % FIRST CORRECT CENTER ENTRY
             else
-                b.centerOdorOnGo(r,[2 3]) = b.centerOdorOn(centerOdorGoIdx, [3 2]);
+                b.firstCenterEntryTxn(r,1) = 0;
             end
 
+            centerEntryFirstDiff = b.firstCenterEntryTxn(r,1) - b.centerEntries(:,2);
+            centerEntryFirstDiff(centerEntryFirstDiff < 0) = inf;
+            [centerEntryFirstVal, centerEntryFirstIdx] = min(centerEntryFirstDiff);
+            if ~isinf(centerEntryFirstVal)
+                b.firstCenterEntry(r,:) = b.centerEntries(centerEntryFirstIdx,:);
+                b.centerEntries(centerEntryFirstIdx,3) = r;
+            else
+                b.firstCenterEntry(r,:) = [ff totalTime r 0 0 0 0 0];
+            end
+
+            b.centerEntryCt(r,2) = sum(b.centerEntries(:,3) == r);
         else
             b.centerEntryGo(r,[2 3]) = 0;
             b.centerExitGo(r,[2 3]) = 0;
             b.centerEntryCt(r,2) = 0;
             b.centerOdorOnGo(r,[2 3]) = 0;
-        end
-
-        if ~isempty(b.centerEntries(:,3) == r) & ~isempty(find(b.txn3_4(:,3) == r))
-            b.firstCenterEntryTxn(r,1) = b.txn3_4(find(b.txn3_4(:,3) == r,1,'first'),2); % FIRST CORRECT CENTER ENTRY
-        else
+            b.firstCenterEntry(r,[2:8]) = 0;
             b.firstCenterEntryTxn(r,1) = 0;
         end
-
-        centerEntryFirstDiff = b.firstCenterEntryTxn(r,1) - b.centerEntries(:,2);
-        centerEntryFirstDiff(centerEntryFirstDiff < 0) = inf;
-        [centerEntryFirstVal, centerEntryFirstIdx] = min(centerEntryFirstDiff);
-        if ~isinf(centerEntryFirstVal)
-            b.firstCenterEntry(r,:) = b.centerEntries(centerEntryFirstIdx,:);
-            b.centerEntries(centerEntryFirstIdx,3) = r;
-        else
-            b.firstCenterEntry(r,:) = [ff totalTime r 0 0 0 0 0];
-        end
-
-        b.centerEntryCt(r,2) = sum(b.centerEntries(:,3) == r);            
     end
 
 % correct center entries include ones before and during the center entry
@@ -382,7 +396,9 @@ b.images(:,1) = ff;
     end
 
     % REWARD DWELL TIME
+    if ~isempty(rewardEntries)
     rewardEntries(:,8) = rewardEntries(:,7) - rewardEntries(:,2); % dwell time
+    end
 
     % SAVE ENTRIES AND EXITS TO DATA
     b.rewardEntries = rewardEntries;

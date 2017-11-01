@@ -454,7 +454,14 @@ else
 end
 
 if isfield(a,'reverseFile')
-    a.reverseMice = find(cell2mat(a.reverseFile(:,1))>0);
+    for m = 1:size(a.reverseFile,1)
+        if ~isempty(cell2mat(a.reverseFile(m,1)))
+            a.reverseMice(m,1) = 1;
+        else a.reverseMice(m,1) = 0;
+        end
+    end
+    a.reverseMice = find(a.reverseMice);
+%     a.reverseMice = find(cell2mat(a.reverseFile(:,1))>0);
 else
     a.reverseMice = [];
 end
@@ -509,7 +516,7 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 
 % TAKE NON-REVERSE MICE OUT OF GLM CALCS
 
-trialsToCount = 500;
+trialsToCount = 300;
 
 if ~isempty(a.choiceMice)
     
@@ -517,6 +524,7 @@ if ~isempty(a.choiceMice)
     a.choiceCI = NaN(a.choiceMice(a.choiceMouseCt),2);
     a.prefCI = NaN(a.choiceMice(a.choiceMouseCt),2);
     a.pref = NaN(a.choiceMice(a.choiceMouseCt),3);
+    a.beta = NaN(a.choiceMice(a.choiceMouseCt),2);
     
 %     for k = 1:numel(a.reverseMice)
 %        m = a.reverseMice(k);
@@ -557,7 +565,7 @@ if ~isempty(a.choiceMice)
  
    end
 
-    a.meanChoice = a.meanChoice(a.meanChoice(:,3)>0,:);
+%     a.meanChoice = a.meanChoice(a.meanChoice(:,3)>0,:);
     a.choiceCI = a.choiceCI(a.choiceCI(:,1)>0,:);
    
     allChoices = a.choiceCorr(a.choiceCorrTrials & a.preReverse == 1);
@@ -654,7 +662,7 @@ end
 %% SORT BY INFO PREFERENCE
 if ~isempty(a.choiceMice)
     [a.sortedChoice,a.sortIdx] = sortrows(a.meanChoice,1);
-    a.sortedMouseList = a.mouseList(a.sortIdx);
+    a.sortedMouseList = a.choiceMiceList(a.sortIdx);
     a.sortedCI = a.choiceCI(a.sortIdx,:);
 
     %% STATS
