@@ -19,6 +19,9 @@ ports = [1,3]; % port sensor IDs
 fname = 'infoSeekFSMData.mat';
 load(fname); % opens structure "a" with previous data, if available
 
+loadData = 1;
+% loadData = 0;
+
 for fn = 1:a.numFiles
     names{fn} = a.files(fn).name; 
 end
@@ -36,16 +39,20 @@ f = 1;
 %% FOR EACH FILE
 for f = 1:numFiles
     filename = files(f).name;
-    if sum(strcmp(filename,names)) > 0
-        disp(fprintf(['Skipping duplicate file ' filename]));
-        files(f) = [];
-        f = f+1;
-        filename = files(f).name;
-        numFiles = numFiles - 1;
+    
+    if loadData == 1
+        if sum(strcmp(filename,names)) > 0
+            disp(fprintf(['Skipping duplicate file ' filename]));
+            files(f) = [];
+            f = f+1;
+            filename = files(f).name;
+            numFiles = numFiles - 1;
+        end
+        ff = a.numFiles + f;
+    else
+        ff = f;
     end
-
-    ff = a.numFiles + f;
-
+    
     fname = fullfile(pathname,filename); % report
     dayPlace = strfind(filename,'_');
 
@@ -127,14 +134,17 @@ for f = 1:numFiles
     b.trialStart = data(data(:,3) == 10,:);
 
 
-    b.fileAll(1:trialCt,1) = f + a.numFiles;
-
+    if loadData == 0
+        b.fileAll(1:trialCt,1) = f;
+    else
+        b.fileAll(1:trialCt,1) = f + a.numFiles;
+    end
 
 %% IMAGING
 
 % Pull imaging frame timestamps
 b.images = [];
-b.images = data(data(:,3) == 20, 1);
+b.images = data(data(:,3) == 20, [1 2]);
 b.images = [zeros(size(b.images,1),1) b.images];
 b.images(:,1) = ff;    
 
@@ -1013,4 +1023,4 @@ else
 end
 
 save('infoSeekFSMData.mat','a');
-
+% uisave({'a'},'infoSeekFSMData.mat');

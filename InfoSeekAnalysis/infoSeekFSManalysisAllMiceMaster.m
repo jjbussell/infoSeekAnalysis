@@ -26,6 +26,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%
 % %% old data in structure "b"
 % 
 % prompt = {'Load old preFSM data file? 1 = yes, 0 = no'};
@@ -119,6 +120,8 @@
 % 
 %     % only FSM files NEED TO FIX?!?!
 % else 
+
+%%
     a.FSM = ones(numel(a.file),1);
     a.FSMall = ones(numel(a.fileAll),1);
     a.trialAll = a.trialNums;
@@ -565,7 +568,7 @@ if ~isempty(a.choiceMice)
  
    end
 
-%     a.meanChoice = a.meanChoice(a.meanChoice(:,3)>0,:);
+    a.meanChoice = a.meanChoice(a.meanChoice(:,3)>0,:);
     a.choiceCI = a.choiceCI(a.choiceCI(:,1)>0,:);
    
     allChoices = a.choiceCorr(a.choiceCorrTrials & a.preReverse == 1);
@@ -661,7 +664,7 @@ end
 
 %% SORT BY INFO PREFERENCE
 if ~isempty(a.choiceMice)
-    [a.sortedChoice,a.sortIdx] = sortrows(a.meanChoice,1);
+    [a.sortedChoice,a.sortIdx] = sortrows(a.meanChoice(~isnan(a.meanChoice(:,1)),:),1);
     a.sortedMouseList = a.choiceMiceList(a.sortIdx);
     a.sortedCI = a.choiceCI(a.sortIdx,:);
 
@@ -721,8 +724,8 @@ end
 
 for vv = 1:numel(a.values)
     v = a.values(vv);
-    a.choiceByAmtMean(v,1) = nanmean(cell2mat(a.choiceByAmtByMouse(:,v)))
-    a.choiceByAmtSEM(v,1) = sem(cell2mat(a.choiceByAmtByMouse(:,v)))
+    a.choiceByAmtMean(v,1) = nanmean(cell2mat(a.choiceByAmtByMouse(:,v)));
+    a.choiceByAmtSEM(v,1) = sem(cell2mat(a.choiceByAmtByMouse(:,v)));
 end
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY - UNUSED?
@@ -997,3 +1000,4 @@ end
 
 %%
 save('infoSeekFSMDataAnalyzed.mat','a');
+% save('JB195imagingDataAnalyzed.mat','a');
