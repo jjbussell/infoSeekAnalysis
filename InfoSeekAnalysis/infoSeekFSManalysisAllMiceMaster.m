@@ -378,7 +378,7 @@ for m = 1:a.mouseCt
 end
 
 a.trialsPreReverse = a.firstReverse - a.firstChoice;
-a.choiceDaysPreReverse = cell2mat(a.reverseDay(:,1)) - a.firstChoiceDay;
+a.choiceDaysPreReverse = cell2mat(a.reverseDay(:,1)) - a.firstChoiceDay;-
 a.trialsReverseTraining = a.firstReverseChoice - a.firstReverse;
 a.trialsReverseWithChoices = a.lastReverse - a.firstReverseChoice;
 

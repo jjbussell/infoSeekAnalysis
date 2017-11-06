@@ -16,14 +16,16 @@ ports = [1,3]; % port sensor IDs
 
 % [datafilename,datapathname]=uigetfile('*.mat', 'Choose processed data file to load');
 % fname=fullfile(datapathname,datafilename);
-fname = 'infoSeekFSMData.mat';
-load(fname); % opens structure "a" with previous data, if available
 
 loadData = 1;
 % loadData = 0;
 
-for fn = 1:a.numFiles
-    names{fn} = a.files(fn).name; 
+if loadData == 1
+    fname = 'infoSeekFSMData.mat';
+    load(fname); % opens structure "a" with previous data, if available    
+    for fn = 1:a.numFiles
+        names{fn} = a.files(fn).name; 
+    end
 end
 
 %% LOAD NEW DATA
@@ -919,7 +921,7 @@ b.images(:,1) = ff;
         a.txn11_16 = [a.txn11_16; b.txn11_16];
         a.txn10_16 = [a.txn10_16; b.txn10_16];
         a.txn16_15 = [a.txn16_15; b.txn16_15];
-        a.centerEntries = [a.centerEntries; b.centerEntries];
+        a.centerEntries = [a.centerEntries; b.centerEntries]; %
         a.centerEntryGo = [a.centerEntryGo; b.centerEntryGo];
         a.centerExitGo = [a.centerExitGo; b.centerExitGo];
         a.centerEntryCt = [a.centerEntryCt; b.centerEntryCt];
@@ -936,8 +938,8 @@ b.images(:,1) = ff;
         a.corrTrialCt = [a.corrTrialCt; b.corrTrialCt];
         a.corrTrials = [a.corrTrials; b.corrTrials];
         a.rxn = [a.rxn; b.rxn];
-        a.rewardEntries = [a.rewardEntries; b.rewardEntries];
-        a.rewardEntriesCorr = [a.rewardEntriesCorr; b.rewardEntriesCorr];
+        a.rewardEntries = [a.rewardEntries; b.rewardEntries]; %
+        a.rewardEntriesCorr = [a.rewardEntriesCorr; b.rewardEntriesCorr]; %
         a.centerOdorOn = [a.centerOdorOn; b.centerOdorOn];
         a.centerOdorOff = [a.centerOdorOff; b.centerOdorOff];
         if isfield(a,'centerOdorOnGo')
@@ -962,6 +964,8 @@ b.images(:,1) = ff;
         a.trialLength = [a.trialLength; b.trialLength];
         a.trialLengthCenterEntry = [a.trialLengthCenterEntry; b.trialLengthCenterEntry];
         a.trialLengthTotal = [a.trialLengthTotal; b.trialLengthTotal];
+        a.bigRewards = [a.bigRewards; b.bigRewards];
+        a.smallRewards = [a.smallRewards; b.smallRewards];
         a.infoBigRewards = [a.infoBigRewards; b.infoBigRewards];
         a.infoSmallRewards = [a.infoSmallRewards; b.infoSmallRewards];
         a.randBigRewards = [a.randBigRewards; b.randBigRewards];
@@ -984,7 +988,7 @@ b.images(:,1) = ff;
         a.rewardCorr = [a.rewardCorr; b.rewardCorr];
         a.reward = [a.reward; b.reward];
         a.infoBig = [a.infoBig; b.infoBig];
-        a.ranBbig = [a.randBig; b.randBig];            
+        a.randbig = [a.randBig; b.randBig];            
         a.infoSmall = [a.infoSmall; b.infoSmall];
         a.randSmall = [a.randSmall; b.randSmall];            
         a.choiceType = [a.choiceType; b.choiceType];
