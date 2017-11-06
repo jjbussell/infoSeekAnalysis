@@ -1529,6 +1529,9 @@ end
         else sig(m) = 4;
         end
     end
+    
+    reverseSig = sig(a.reverseMice);
+    a.earlyLickIdxRev = a.earlyLickIdx(a.reverseMice,:);
 
     
     fig = figure();
@@ -1548,10 +1551,10 @@ end
     end
     plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
     plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    scatter(a.earlyLickIdx(sig==1,1),a.earlyLickIdx(sig==1,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
-    scatter(a.earlyLickIdx(sig==2,1),a.earlyLickIdx(sig==2,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
-    scatter(a.earlyLickIdx(sig==3,1),a.earlyLickIdx(sig==3,2),'filled','MarkerEdgeColor','none','MarkerFaceColor','k');
-    scatter(a.earlyLickIdx(sig==4,1),a.earlyLickIdx(sig==4,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',[.8 .8 .8]);
+    scatter(a.earlyLickIdxRev(reverseSig==1,1),a.earlyLickIdxRev(reverseSig==1,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
+    scatter(a.earlyLickIdxRev(reverseSig==2,1),a.earlyLickIdxRev(reverseSig==2,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
+    scatter(a.earlyLickIdxRev(reverseSig==3,1),a.earlyLickIdxRev(reverseSig==3,2),'filled','MarkerEdgeColor','none','MarkerFaceColor','k');
+    scatter(a.earlyLickIdxRev(reverseSig==4,1),a.earlyLickIdxRev(reverseSig==4,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',[.8 .8 .8]);
     ylabel('POST-reversal (info side vs other side)');
     xlabel('PRE-reversal (info side vs other side)');
     title({'Pre-odor2 lick indices, pre vs post-reversal', '(-1 = lick more for no info side)'});
@@ -1655,6 +1658,9 @@ end
         else sig(m) = 4;
         end
     end
+    
+    reverseSig = sig(a.reverseMice);
+    a.rxnSpeedIdxRev=a.rxnSpeedIdx(a.reverseMice,:);
 
     
     fig = figure();
@@ -1669,15 +1675,15 @@ end
     ax.YLim = [-.3 .3];
     for l = 1:numel(a.reverseMice)
         m = a.reverseMice(l);
-        dy = 0.02;
+        dy = 0.01;
         text(a.rxnSpeedIdx(m,1),a.rxnSpeedIdx(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
     end
     plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
     plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    scatter(a.rxnSpeedIdx(sig==1,1),a.rxnSpeedIdx(sig==1,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
-    scatter(a.rxnSpeedIdx(sig==2,1),a.rxnSpeedIdx(sig==2,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
-    scatter(a.rxnSpeedIdx(sig==3,1),a.rxnSpeedIdx(sig==3,2),'filled','MarkerEdgeColor','none','MarkerFaceColor','k');
-    scatter(a.rxnSpeedIdx(sig==4,1),a.rxnSpeedIdx(sig==4,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',[.8 .8 .8]);
+    scatter(a.rxnSpeedIdxRev(reverseSig==1,1),a.rxnSpeedIdxRev(reverseSig==1,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',purple);
+    scatter(a.rxnSpeedIdxRev(reverseSig==2,1),a.rxnSpeedIdxRev(reverseSig==2,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',orange);
+    scatter(a.rxnSpeedIdxRev(reverseSig==3,1),a.rxnSpeedIdxRev(reverseSig==3,2),'filled','MarkerEdgeColor','none','MarkerFaceColor','k');
+    scatter(a.rxnSpeedIdxRev(reverseSig==4,1),a.rxnSpeedIdxRev(reverseSig==4,2),'filled','MarkerEdgeColor','none','MarkerFaceColor',[.8 .8 .8]);
     ylabel('POST-reversal (info side vs other side)');
     xlabel('PRE-reversal (info side vs other side)');
     title({'Reaction speed indices, pre vs post-reversal', '(1 = faster reaction for info side)'});
