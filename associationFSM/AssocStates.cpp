@@ -2,34 +2,6 @@
 #include "Arduino.h"
 
 
-//// INTER_TRIAL_INTERVAL 15
-void StateInterTrialInterval::s_setup()
-{
-  Serial.println("ITI");
-//  Serial.println("setting duration");
-  set_duration(interval);
-  Serial.print("Completed Trials: ");
-  Serial.println(TCount);
-  Serial.print("CS+ 1 Trials: ");
-  Serial.print(plus1Ct);
-  Serial.print("   CS+ 2 Trials: ");
-  Serial.println(plus2Ct);
-  Serial.print("CS- 1 Trials: ");
-  Serial.print(minus1Ct);
-  Serial.print("   CS- 2 Trials: ");
-  Serial.println(minus2Ct);
-  Serial.print("US Trials: ");
-  Serial.print(USCt);
-  Serial.print("Reward Amount: ");
-  Serial.println(rewardAmt);
-}
-
-void StateInterTrialInterval::s_finish()
-{
-//  Serial.println("ending ITI, move to WAIT_FOR_TRIAL");
-  next_state = WAIT_FOR_TRIAL;   
-}
-
 //// WAIT_FOR_TRIAL 0
 void StateWaitForTrial::s_setup()
 {
@@ -63,6 +35,13 @@ void StateStartTrialDelay::s_finish()
 void StateBaseline::s_setup()
 {
   Serial.println("BASELINE");
+
+  if (imageFlag == 1){
+      Serial.println("start imaging")
+      digitalWrite(arduScope, LOW); //start imaging
+      image = 1;
+  }
+
   printer(13,0,0);
 }
 
@@ -70,35 +49,42 @@ void StateBaseline::loop()
 {
   if (portFlag == 0){
     Serial.println("WAIT_FOR_ENTRY");
-    timer = 0;
-    // TURN OFF IMAGING
+    if (image == 1){
+      image = 0;
+      digitalWrite(arduScope, HIGH);   
+      Serial.println("stop imaging")         
+    }
     next_state = WAIT_FOR_ENTRY;
   }
 }
 
 void StateBaseline::s_finish()
 {
-//  Serial.println("ending center odor delay, move to CENTER_ODOR");
   next_state = ODOR;
 }
 
 //// ODOR 5
 void StateOdor::s_setup()
 {
-  // IF TRIALTYPE <> US
-  odorOn(odor);
+  if (trialType < 4){
+    odorOn(odor);
+    }
+  
 }
 
 void StateOdor::loop()
 {
   if (portFlag == 0){
-    Serial.println("WAIT_FOR_ENTRY");
+    Serial.println("Exit-->TIMEOUT");
     if (odorValveOpen == 1){   
       odorOff(odor);
     }
-    // TURN OFF IMAGING
-    timer = 0;
-    next_state = WAIT_FOR_ENTRY;
+    if (image == 1){
+      image = 0;
+      digitalWrite(arduScope, HIGH);   
+      Serial.println("stop imaging")         
+    }
+    next_state = TIMEOUT;
   }
 }
 
@@ -107,21 +93,21 @@ void StateOdor::s_finish()
   if (odorValveOpen == 1){
     odorOff(odor);
   }
-  next_state = DELAY;
+  next_state = OUTCOME_DELAY;
 }
 
 
-//// DELAY 6
-void StateDelay::s_setup()
+//// OUTCOME_DELAY 6
+void StateOutcomeDelay::s_setup()
 {
-  Serial.println("DELAY");
-  buzzInterval = delay/10;
+  Serial.println("OUTOME DELAY");
+  buzzInterval = delayTime/10;
   change = 0;
   buzzCt = 0;
   lastBuzzCt = 0;
 }
 
-void StateDelay::loop(){
+void StateOutcomeDelay::loop(){
 
   //check if time to turn buzzer on
   if (currentTime >= lastBuzzerOff + buzzInterval) {
@@ -157,11 +143,22 @@ void StateDelay::loop(){
   if (currentTime % (1000) != 0 & change == 1){
     change = 0;
   }
+
+  // timeout if leave
+  if (portFlag == 0){
+    Serial.println("Exit-->TIMEOUT");
+    if (odorValveOpen == 1){   
+      odorOff(odor);
+    }
+    // TURN OFF IMAGING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!G
+    next_state = TIMEOUT;
+  }
+
 }
 
-void StateRewardDelay::s_finish()
+void StateOutcomeDelay::s_finish()
 {
- Serial.println("end delay, move to OUTCOME");
+ Serial.println("end delay, move to DELIVER_REWARD");
 
   noTone(buzzer);
   int port;
@@ -193,7 +190,33 @@ void StateRewardDelay::s_finish()
     printer(16, trialType, choice);
   }
 
-  next_state = OUTCOME;
+  next_state = DELIVER_REWARD;
+}
+
+
+//// REWARD_PAUSE 8
+void StateRewardPause::s_setup(){
+  Serial.println("REWARD PAUSE");
+}
+
+void StateRewardPause::s_finish(){
+  next_state = DELIVER_REWARD;
+}
+
+
+//// IMAGING_DELAY 10
+void StateImagingDelay::s_setup(){
+  Serial.println("Still Imaging");
+}
+
+void StateImagingDelay::s_finish(){
+  if (image == 1){
+    image = 0;
+    digitalWrite(arduScope, HIGH);   
+    Serial.println("stop imaging")         
+  }
+
+  next_state = INTER_TRIAL_INTERVAL;
 }
 
 
@@ -208,13 +231,32 @@ void StateTimeout::s_finish()
   next_state = INTER_TRIAL_INTERVAL;
 }
 
-//// REWARD_PAUSE 8
-void StateRewardPause::s_setup(){
-  Serial.println("REWARD PAUSE");
+
+//// INTER_TRIAL_INTERVAL 12
+void StateInterTrialInterval::s_setup()
+{
+  Serial.println("ITI");
+//  Serial.println("setting duration");
+  set_duration(interval);
+  Serial.print("Completed Trials: ");
+  Serial.println(TCount);
+  Serial.print("CS+ 1 Trials: ");
+  Serial.print(plus1Ct);
+  Serial.print("   CS+ 2 Trials: ");
+  Serial.println(plus2Ct);
+  Serial.print("CS- 1 Trials: ");
+  Serial.print(minus1Ct);
+  Serial.print("   CS- 2 Trials: ");
+  Serial.println(minus2Ct);
+  Serial.print("US Trials: ");
+  Serial.print(USCt);
+  Serial.print("Reward Amount: ");
+  Serial.println(rewardAmt);
 }
 
-void StateRewardPause::s_finish(){
-  next_state = OUTCOME;
+void StateInterTrialInterval::s_finish()
+{
+//  Serial.println("ending ITI, move to WAIT_FOR_TRIAL");
+  next_state = WAIT_FOR_TRIAL;   
 }
-
 

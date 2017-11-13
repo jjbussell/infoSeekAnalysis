@@ -15,8 +15,8 @@ enum STATE_TYPE{
   WAIT_FOR_ENTRY,
   BASELINE,
   ODOR,
-  DELAY,
-  OUTCOME,
+  OUTCOME_DELAY,
+  DELIVER_REWARD,
   REWARD_PAUSE,
   REWARD_COMPLETE,
   IMAGING_DELAY,
@@ -28,6 +28,7 @@ extern STATE_TYPE next_state;
 extern int centerFlag;
 extern int infoFlag;
 extern int randFlag;
+extern int portFlag;
 extern int choice;
 extern int odor;
 extern int water;
@@ -49,9 +50,9 @@ extern unsigned long trialStart;
 extern unsigned long rxn;
 extern unsigned long choiceStart;
 extern unsigned long odorDelay;
+extern unsigned long delayTime;
 extern unsigned long interval;
 extern unsigned long currentTime;
-extern unsigned long gracePeriod;
 extern int buzzer;
 extern unsigned long bigRewardTime;
 extern unsigned long smallRewardTime;
@@ -59,6 +60,9 @@ extern unsigned long rewardDelay;
 extern int rewardDrops;
 extern unsigned long currentRewardTime;
 extern uint16_t lickRate;
+extern int arduScope;
+extern int image;
+extern int imageFlag;
 
 
 class StateWaitForTrial : public TimedState {
@@ -70,14 +74,6 @@ class StateWaitForTrial : public TimedState {
     StateWaitForTrial(unsigned long d) : TimedState(d) { };
 };
 
-class StateInterTrialInterval : public TimedState {
-  protected:
-    void s_setup();
-    void s_finish();
-  
-  public:
-    StateInterTrialInterval(unsigned long d) : TimedState(d) { };
-};
 
 class StateStartTrialDelay : public TimedState {
   protected:
@@ -110,7 +106,7 @@ class StateOdor : public TimedState {
 };
 
 
-class StateDelay : public TimedState {
+class StateOutcomeDelay : public TimedState {
   protected:
     void s_setup();
     void loop();
@@ -123,17 +119,9 @@ class StateDelay : public TimedState {
     int change;
   
   public:
-    StateDelay(unsigned long d) : TimedState(d) { };
+    StateOutcomeDelay(unsigned long d) : TimedState(d) { };
 };
 
-class StateTimeout : public TimedState {
-  protected:
-    void s_setup();
-    void s_finish();
-  
-  public:
-    StateTimeout(unsigned long d) : TimedState(d) { };
-};
 
 class StateRewardPause : public TimedState{
   protected:
@@ -144,6 +132,7 @@ class StateRewardPause : public TimedState{
     StateRewardPause(unsigned long d) : TimedState(d) { };
 };
 
+
 class StateImagingDelay : public TimedState{
   protected:
     void s_setup();
@@ -151,6 +140,26 @@ class StateImagingDelay : public TimedState{
 
   public:
     StateImagingDelay(unsigned long d) : TimedState(d) { };
+};
+
+
+class StateInterTrialInterval : public TimedState {
+  protected:
+    void s_setup();
+    void s_finish();
+  
+  public:
+    StateInterTrialInterval(unsigned long d) : TimedState(d) { };
+};
+
+
+class StateTimeout : public TimedState {
+  protected:
+    void s_setup();
+    void s_finish();
+  
+  public:
+    StateTimeout(unsigned long d) : TimedState(d) { };
 };
 
 #endif

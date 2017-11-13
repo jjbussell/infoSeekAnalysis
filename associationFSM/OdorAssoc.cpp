@@ -2,20 +2,6 @@
 #include "Printer.h"
 #include "OdorAssoc.h"
 
-//////////////////////  CENTER ODORS  ///////////////////////
-void setCenterOdor(){
-  switch (trialType) {
-      case 1: //choice
-        centerOdor = choiceOdor;
-        break;
-      case 2: //forced info
-        centerOdor = infoOdor;
-        break;
-      case 3: // forced random
-        centerOdor = randOdor;
-        break;
-  }  
-}
 
 ////////////////////  SWITCHING SIDES  ///////////////////////////////////
 void setSide(){
@@ -75,31 +61,6 @@ void odorOff (int rewardOdor) {
   printer(5, rewardOdor, 1);
 }
 
-// Center odors
-void centerOdorOn (int centOdor){
-  if (centOdor<4){
-    controlOff(3);
-    digitalWrite (valves4[centOdor], HIGH);
-    digitalWrite (valves5[centOdor], HIGH);
-  }
-  centerOdorValveOpen = 1;
-  currentCenterOdor = centOdor;
-  Serial.print("center odor on ");
-  Serial.println(centOdor);
-  printer(3,centOdor,0);
-}
-
-void centerOdorOff (int centOdor){
-  if (centOdor<4){
-    controlOn(3);
-    digitalWrite (valves4[centOdor], LOW);
-    digitalWrite (valves5[centOdor], LOW);
-  }
-  centerOdorValveOpen = 0;
-  Serial.print("center odor off ");
-  Serial.println(centOdor);
-  printer(5,centOdor,0);
-}
 
 
 // To turn ON mineral oil 1 or 2 valves (mineral oil OFF, odor ON)

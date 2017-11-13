@@ -6,7 +6,7 @@ STATES:
  3 WAIT_FOR_ENTRY,
  4 BASELINE,
  5 ODOR,
- 6 DELAY,
+ 6 OUTCOME_DELAY,
  7 OUTCOME,
  8 REWARD_PAUSE
  9 REWARD_COMPLETE
@@ -20,10 +20,10 @@ STATES:
 #include <Arduino.h>
 #include <Wire.h>
 #include <MPR121.h>
-#include "States.h"
-#include "Odor.h"
+#include "AssocStates.h"
+#include "OdorAssoc.h"
 #include "Printer.h"
-#include "TrialParams.h"
+#include "TrialParamsAssoc.h"
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -37,8 +37,6 @@ STATES:
 // MOVE THESE INTO CONFIG.H/PARAMETERS/JSON FILE with format extern int ...
 
 int sensors[] = {0,1,2,3,4}; // Pins of IR beam sensors in the ports ANALOG
-int portSensors[] = {sensors[1], sensors[3]}; // IR beam at the entrance of the port; 0 = inside chamber left
-int centerPort = sensors[4]; // IR beam at entrance to center port
 int valves1[] = {22, 24, 26, 28}; // Valves BEFORE odor bottles, odors 1-4 (valves 0-3)  
 int valves2[] = {27, 29, 31, 33}; // Valves AFTER odor bottles, odors 1-4 (valves 0-3)  
 int valves3a[] = {42,46,50,43}; // Latch valves 1-4 direction 1
@@ -80,8 +78,7 @@ int water;
 
 //// SESSION DATA
 int rewardCount;
-int rewardBigCount;
-int rewardSmallCount;
+
 
 int infoFCt;
 int infoCCt;
@@ -94,6 +91,7 @@ int cTCount;
 int centerFlag;
 int randFlag;
 int infoFlag;
+int portFlag;
 int choice;
 unsigned long rxn; // Time of choice
 unsigned long choiceStart; // Time of goCue
@@ -104,31 +102,15 @@ uint16_t lastLickCt;
 uint16_t lickRate;
 
 
-//// PORTS AND ODORS AND WATER
-int infoPort; // informative port entry sensor
-int randPort; // random port entry sensor
-int randSide;
-int infoWater;
-int randWater;
-int controlList[] = {1,2};
-int infoControl;
-int randControl;
-int centerControl = 3;
-int infoOdors[2];
-int randOdors[2];
-int centerOdor;
-
 //// VALVE FLAGS
 bool waterValveOpen;
 bool odorValveOpen;
-bool centerOdorValveOpen;
 
 //// IMAGING-move into library?
 unsigned long scopeTTLpulse;
 unsigned long lastTTL;
 unsigned long TTLcount;
 int image;
-unsigned long lastImageChange;
 
 //// FROM PYTHON--> these should also go into parameters file
 
@@ -136,6 +118,7 @@ int sessionEnd; // trigger to end session: 1 = manual, 2 = # of trials, 3 = time
 int sessionTrials; // # of trials after which to end session
 int imageFlag; // 1 = image, 0 = no imaging
 int trialTypes; // 1 if all 5 with CS's, 2 if all US
+unsigned long imagingTime; // time to keep imaging after reward
 int port; // location of training
 
 int plus1; // CS+
@@ -145,7 +128,7 @@ int minus2; // CS-
 
 unsigned long baseline; // time before center odor
 unsigned long odorTime; // length of odor delivery (ms) in reward port
-unsigned long delay; // time mouse must remain in port before reward delivery (ms) ///////////////// MUST BE MORE
+unsigned long delayTime; // time mouse must remain in port before reward delivery (ms) ///////////////// MUST BE MORE
 unsigned long drops;
 unsigned long interval; // ITI
 
@@ -232,6 +215,7 @@ void loop() {
       sessionEnd        =        Serial.parseInt();
       sessionTrials     =        Serial.parseInt();
       imageFlag         =        Serial.parseInt();
+      trialTypes        =        Serial.parseInt();
       imagingTime       =        Serial.parseInt();
       port              =        Serial.parseInt();
       plus1             =        Serial.parseInt();
@@ -240,7 +224,7 @@ void loop() {
       minus2            =        Serial.parseInt();
       baseline          =        Serial.parseInt();
       odorTime          =        Serial.parseInt();
-      delay             =        Serial.parseInt();
+      delayTime         =        Serial.parseInt();
       drops             =        Serial.parseInt();
       interval          =        Serial.parseInt();
       TOU_THRESH        =        Serial.parseInt();
@@ -271,10 +255,8 @@ void loop() {
       lastLickCt = 0;
       lickRate = 0;
 
-      centerFlag = 0;
-      randFlag = 0;
-      infoFlag = 0;
-      choice = 2;
+      portFlag = 0;
+
 
       scopeTTLpulse = 0;
       lastTTL = 0;
@@ -289,12 +271,6 @@ void loop() {
       startTime = millis(); // start the timer for this session
 
       printer(0, 0, 0);
-
-      if (imageFlag == 1){
-          digitalWrite(arduScope, LOW); //start imaging
-          image = 1;
-          lastImageChange = startTime;
-      }
 
 
 //      Serial.println("session start");
@@ -316,10 +292,10 @@ void loop() {
         static StateStartTrialDelay state_start_trial_delay(200);
         static StateBaseline state_baseline(baseline);
         static StateOdor state_odor(odorTime);
-        static StateDelay state_delay(delay);
+        static StateOutcomeDelay state_outcome_delay(delayTime);
         static StateRewardPause state_reward_pause(rewardPauseTime);
         static StateTimeout state_timeout(odorTime + rewardDelay + bigRewardTime);
-        static StateImagingDelay state_imaging_delay(imagingTime)
+        static StateImagingDelay state_imaging_delay(imagingTime);
         static StateInterTrialInterval state_inter_trial_interval(interval); // update each trial
 
 
@@ -380,85 +356,32 @@ void loop() {
 
 
         //// CHECK FOR IMAGING /////////////////////
-        // CHANGE HERE TO CHANGE TIME!!
-        if (currentTime >= lastImageChange + 300000 & imageFlag == 1){
-          if (image == 1){
-            image = 0;
-            digitalWrite(arduScope, HIGH);            
-          }
-          else {
-            image = 1;
-            digitalWrite(arduScope, LOW);
-          }
-          lastImageChange = currentTime;
-        }
-
-
-        
         if (image == 1){
           readTTL();
+          Serial.println("image frame")
         }
 
         //// WATCH PORTS
         //// MOVE TO FUNCTIONS/LIBRARY
-        if (beamBreak(centerPort) == 1){ // is being broken
+        if (beamBreak(port) == 1){ // is being broken
 //        if (digitalRead(53) == LOW){ // TOUCHING
-          if (centerFlag == 0){ // if not currently broken
-            Serial.println("Enter center");
+          if (portFlag == 0){ // if not currently broken
+            Serial.println("Enter port");
             centerFlag = 1;
             if (current_state == WAIT_FOR_ENTRY){
-              printer(2,centerPort,1);
+              printer(2,port,1);
             }
             else {
-              printer(2, centerPort, 0);
+              printer(2, port, 0);
             }
           }   
         }
-        else if (centerFlag == 1){
-          Serial.println("exit center");
-          centerFlag = 0;
-          printer(6, centerPort, 0);
+        else if (portFlag == 1){
+          Serial.println("exit port");
+          portFlag = 0;
+          printer(6, port, 0);
         }
 
-
-        if (beamBreak(infoPort) == 1){ // is being broken
-//        if (digitalRead(47) == LOW){
-            if (infoFlag == 0){ // if not currently broken
-            Serial.println("Enter info");
-            infoFlag = 1;
-            if (current_state == WAIT_FOR_ENTRY){
-              printer(2,infoPort,1);
-            }
-            else {
-              printer(2, infoPort, 0);
-            }
-          }   
-        }
-        else if (infoFlag == 1){
-          Serial.println("exit info");
-          infoFlag = 0;
-          printer(6, infoPort, 0);
-        }
-
-
-        if (beamBreak(randPort) == 1){ // is being broken
-//        if (digitalRead(49) == LOW){
-            if (randFlag == 0){ // if not currently broken
-            Serial.println("Enter random");
-            randFlag = 1;
-            if (current_state == WAIT_FOR_ENTRY){
-              printer(2, randPort, 1);
-            }
-            else {
-              printer(2, randPort, 0);            
-            }
-          }   
-        }
-        else if (randFlag == 1){
-          Serial.println("exit random");
-          randFlag = 0;
-          printer(6, randPort, 0);
-        }
 
         currentTime = millis()-startTime;
         
@@ -486,10 +409,10 @@ void loop() {
                 trialNum++;
               }
               trialType = block[trialNum];
-              setParams();      
+              pickTrialParams(choice);      
               newTrial = 0;      
             }
-            printer(10, trialType, infoSide);
+            printer(10, trialType, odor);
             trialStart = currentTime;
             Serial.print("Trial num = ");
             Serial.println(trialCt);
@@ -520,7 +443,11 @@ void loop() {
             state_odor.run(currentTime);
             break;
 
-          case OUTCOME:
+          case OUTCOME_DELAY:
+            state_outcome_delay.run(currentTime);
+            break;
+
+          case DELIVER_REWARD:
             if (rewardDrops > 0){
 //            if (rewardDrops > 0 & reward == 1 & lickRate >0){
               Serial.println("DELIVER REWARD DROP");
@@ -551,41 +478,45 @@ void loop() {
             }
             break;
 
-          case INTER_TRIAL_INTERVAL:
-            state_inter_trial_interval.run(currentTime);
-            break;
-
-          case TIMEOUT:
-            state_timeout.run(currentTime);
-            break;
-
           case REWARD_PAUSE:
             state_reward_pause.run(currentTime);
             break;
 
           case REWARD_COMPLETE:
-              Serial.println("TRIAL COMPLETE");
-              printer(18,trialType,reward);
-              if (trialType == 1){
-                plus1Ct++;
-              }
-              else if (trialType == 2){
-                plus2Ct++;
-              }
-              else if (trialType == 3){
-                minus1Ct++;
-              }
-              else if (trialType == 4){
-                minus2Ct++;
-              }
-              else if (trialType == 5){
-                USCt++;
-              }              
-              TCount = plus1Ct + plus2Ct + minus1Ct + minus2Ct + USCt;
-              rewardDrops = 0;
-              //  Serial.println("end reward, move to ITI");
-              next_state = IMAGING_DELAY;
-              break;
+            Serial.println("TRIAL COMPLETE");
+            printer(18,trialType,reward);
+            if (trialType == 1){
+              plus1Ct++;
+            }
+            else if (trialType == 2){
+              plus2Ct++;
+            }
+            else if (trialType == 3){
+              minus1Ct++;
+            }
+            else if (trialType == 4){
+              minus2Ct++;
+            }
+            else if (trialType == 5){
+              USCt++;
+            }              
+            TCount = plus1Ct + plus2Ct + minus1Ct + minus2Ct + USCt;
+            rewardDrops = 0;
+            //  Serial.println("end reward, move to ITI");
+            next_state = IMAGING_DELAY;
+            break;
+
+          case IMAGING_DELAY:
+            state_imaging_delay.run(currentTime);
+            break;
+
+          case TIMEOUT:
+            state_timeout.run(currentTime);
+            break;               
+
+          case INTER_TRIAL_INTERVAL:
+            state_inter_trial_interval.run(currentTime);
+            break;         
         }
       
         //// Update the state variable
@@ -661,23 +592,14 @@ void endingSession (unsigned long stopTime) {
   Serial.println(stopTime);
   runSession = 0;
   digitalWrite(arduScope, HIGH);
-  if (centerOdorValveOpen == 1){
-    centerOdorOff(currentCenterOdor);
-  }
   if (odorValveOpen == 1){
     odorOff(odor);
-    // FIX
-    if (choice == 1){
-      controlOn(infoControl);
-      digitalWrite(valves4[infoSide], LOW);
-    }
-    else if (choice == 0){
-      controlOn(randControl);
-      digitalWrite(valves4[randSide], LOW);
-    }
+    controlOn(1); // ensures control valves open for mineral oil air flow
+    controlOn(2);
+    controlOn(3);
   }         
   if (waterValveOpen) {
     digitalWrite(water, LOW);
   }
-  Serial.println("1003211238");
+  Serial.println("12345");
 }
