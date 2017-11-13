@@ -341,12 +341,12 @@ end
 
 a.valueMice = find(a.valueMice);
     
-    a.preReverse = ones(size(a.file,1),1);
-    a.reverse = zeros(size(a.file,1),1);
-    for t = 1:size(a.file,1)
-        a.preReverse(t,1) = a.prereverseFiles(a.file(t));
-        a.reverse(t,1) = a.reverseFiles(a.file(t));
-    end
+a.preReverse = ones(size(a.file,1),1);
+a.reverse = zeros(size(a.file,1),1);
+for t = 1:size(a.file,1)
+    a.preReverse(t,1) = a.prereverseFiles(a.file(t));
+    a.reverse(t,1) = a.reverseFiles(a.file(t));
+end
 
     
 for m = 1:a.mouseCt
@@ -378,7 +378,7 @@ for m = 1:a.mouseCt
 end
 
 a.trialsPreReverse = a.firstReverse - a.firstChoice;
-a.choiceDaysPreReverse = cell2mat(a.reverseDay(:,1)) - a.firstChoiceDay;-
+a.choiceDaysPreReverse = cell2mat(a.reverseDay(:,1)) - a.firstChoiceDay;
 a.trialsReverseTraining = a.firstReverseChoice - a.firstReverse;
 a.trialsReverseWithChoices = a.lastReverse - a.firstReverseChoice;
 
@@ -694,7 +694,8 @@ else
     a.relValues = [];
 end
 
-% mean/SEM only the last 100 trials of that value!!
+% mean/SEM only the last 100 trials of that value!! no, ALL? What about
+% repeated values?
 for mm = 1:numel(a.valueMice)
     m = a.valueMice(mm);
     for vv = 1:numel(a.values)
@@ -703,9 +704,12 @@ for mm = 1:numel(a.valueMice)
        a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valFiles{mm,vv},2)==1);
        currentValChoices = a.valChoices{mm,vv};
        if numel(currentValChoices) >= 100
-           a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices(end-100:end));
-           a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices(end-100:end));
-           a.choiceByAmtByMouse{mm,vv} = currentValChoices(end-99:end);
+%            a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices(end-100:end));
+%            a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices(end-100:end));
+%            a.choiceByAmtByMouse{mm,vv} = currentValChoices(end-99:end);
+           a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices);
+           a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices);
+           a.choiceByAmtByMouse{mm,vv} = currentValChoices;           
        else
            a.valChoiceMeanbyMouse(mm,vv) = NaN;
            a.valChoiceSEMbyMouse(mm,vv) = NaN;

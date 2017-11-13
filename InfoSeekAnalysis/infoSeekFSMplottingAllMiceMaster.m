@@ -1223,6 +1223,7 @@ fig.PaperPosition = [0.5 0.5 10 7];
 set(fig,'renderer','painters');
 set(fig,'PaperOrientation','landscape');
 ax = nsubplot(1,1,1,1);
+hold on;
 % ax.FontSize = 8;
 ax.XLim = [0 2.5];
 ax.XTick = [0 a.relValues' 2];
