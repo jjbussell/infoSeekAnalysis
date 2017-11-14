@@ -4,39 +4,38 @@
 
 
 ////////////////////  SWITCHING SIDES  ///////////////////////////////////
-void setSide(){
-  if (infoSide == 0){
-    for (int s = 0; s < 2; s++){
-        digitalWrite(valves3a[infoOdors[s]], HIGH);
-        digitalWrite(valves3b[randOdors[s]], HIGH); 
+void setSide(int currentPort){
+  if (currentPort == 1){
+    for (int s = 0; s < 4; s++){
+        digitalWrite(valves3a[odors[s]], HIGH);
+        digitalWrite(valves3b[odors[s]], HIGH); 
       }
     delay(20);
-    for (int s = 0; s < 2; s++){
-      digitalWrite(valves3a[infoOdors[s]], LOW);
-      digitalWrite(valves3b[randOdors[s]], LOW);
+    for (int s = 0; s < 4; s++){
+      digitalWrite(valves3a[odors[s]], LOW);
+      digitalWrite(valves3b[odors[s]], LOW);
     }
-    Serial.println("Info side left."); // cycle valves3a = LEFT
-    randSide = 1;
+
+    odorControl = 1;
+    water = waterValves[0];
+
+    Serial.println("Port left."); // cycle valves3a = LEFT
   }
   else  {
-    for (int s = 0; s < 2; s++){
-      digitalWrite(valves3a[randOdors[s]], HIGH);
-      digitalWrite(valves3b[infoOdors[s]], HIGH);  
+    for (int s = 0; s < 4; s++){
+      digitalWrite(valves3a[odors[s]], HIGH);
+      digitalWrite(valves3b[odors[s]], HIGH);  
     }
     delay(20);
-    for (int s = 0; s < 2; s++){
-      digitalWrite(valves3a[randOdors[s]], LOW);
-      digitalWrite(valves3b[infoOdors[s]], LOW); 
+    for (int s = 0; s < 4; s++){
+      digitalWrite(valves3a[odors[s]], LOW);
+      digitalWrite(valves3b[odors[s]], LOW); 
     }
-    Serial.println("Info side right.");  
-    randSide = 0;
-  }  
-  infoPort = portSensors[infoSide];
-  randPort = portSensors[randSide];
-  infoControl = controlList[infoSide];
-  randControl = controlList[randSide]; 
-  infoWater = waterValves[infoSide];
-  randWater = waterValves[randSide];    
+
+    odorControl = 2;
+    water = waterValves[1];
+    Serial.println("Port right.");  
+  } 
 }
 
 ///////////////////  ODOR CONTROL  ////////////////////////

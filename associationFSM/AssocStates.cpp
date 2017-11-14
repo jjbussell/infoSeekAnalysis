@@ -6,7 +6,6 @@
 void StateWaitForTrial::s_setup()
 {
   Serial.println("WAIT_FOR_TRIAL");
-  trialStart = 0;
   trialCt++;
 }
 
@@ -34,10 +33,11 @@ void StateStartTrialDelay::s_finish()
 //// BASELINE 4
 void StateBaseline::s_setup()
 {
+//  set_duration(baseline);
   Serial.println("BASELINE");
 
   if (imageFlag == 1){
-      Serial.println("start imaging")
+      Serial.println("start imaging");
       digitalWrite(arduScope, LOW); //start imaging
       image = 1;
   }
@@ -48,12 +48,13 @@ void StateBaseline::s_setup()
 void StateBaseline::loop()
 {
   if (portFlag == 0){
-    Serial.println("WAIT_FOR_ENTRY");
     if (image == 1){
       image = 0;
       digitalWrite(arduScope, HIGH);   
-      Serial.println("stop imaging")         
+      Serial.println("stop imaging");         
     }
+    timer = 0;
+      Serial.println("WAIT_FOR_ENTRY");
     next_state = WAIT_FOR_ENTRY;
   }
 }
@@ -66,10 +67,11 @@ void StateBaseline::s_finish()
 //// ODOR 5
 void StateOdor::s_setup()
 {
-  if (trialType < 4){
-    odorOn(odor);
-    }
-  
+  Serial.println("ODOR");
+  if (trialType < 5){
+    controlOff(odorControl);
+    odorOn(currentOdor);
+    } 
 }
 
 void StateOdor::loop()
@@ -77,13 +79,14 @@ void StateOdor::loop()
   if (portFlag == 0){
     Serial.println("Exit-->TIMEOUT");
     if (odorValveOpen == 1){   
-      odorOff(odor);
+      odorOff(currentOdor);
+      controlOn(odorControl);
     }
-    if (image == 1){
-      image = 0;
-      digitalWrite(arduScope, HIGH);   
-      Serial.println("stop imaging")         
-    }
+//    if (image == 1){
+//      image = 0;
+//      digitalWrite(arduScope, HIGH);   
+//      Serial.println("stop imaging");         
+//    }
     next_state = TIMEOUT;
   }
 }
@@ -91,7 +94,8 @@ void StateOdor::loop()
 void StateOdor::s_finish()
 {
   if (odorValveOpen == 1){
-    odorOff(odor);
+    odorOff(currentOdor);
+    controlOn(odorControl);
   }
   next_state = OUTCOME_DELAY;
 }
@@ -100,7 +104,7 @@ void StateOdor::s_finish()
 //// OUTCOME_DELAY 6
 void StateOutcomeDelay::s_setup()
 {
-  Serial.println("OUTOME DELAY");
+  Serial.println("OUTCOME DELAY");
   buzzInterval = delayTime/10;
   change = 0;
   buzzCt = 0;
@@ -111,7 +115,7 @@ void StateOutcomeDelay::loop(){
 
   //check if time to turn buzzer on
   if (currentTime >= lastBuzzerOff + buzzInterval) {
-    tone(buzzer,8000);
+//    tone(buzzer,8000);
 //      Serial.print("t ");
 //      Serial.print(currentTime);
 //      Serial.println(" buzz");
@@ -148,9 +152,8 @@ void StateOutcomeDelay::loop(){
   if (portFlag == 0){
     Serial.println("Exit-->TIMEOUT");
     if (odorValveOpen == 1){   
-      odorOff(odor);
+      odorOff(currentOdor);
     }
-    // TURN OFF IMAGING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!G
     next_state = TIMEOUT;
   }
 
@@ -161,34 +164,24 @@ void StateOutcomeDelay::s_finish()
  Serial.println("end delay, move to DELIVER_REWARD");
 
   noTone(buzzer);
-  int port;
-  port = 5;
   
 //  Serial.print("reward delay end ");
 //  Serial.println(currentTime);
-//
- Serial.print("current reward time (drops) ");
- Serial.println(currentRewardTime);
 
-  Serial.print("lickRate = ");
-  Serial.println(lickRate);
+  // Serial.print("lickRate = ");
+  // Serial.println(lickRate);
 
-  rewardCount++;
-  rewardDrops = currentRewardTime;
+  if (reward == 1){
+    rewardDrops = drops;
+    printer(15,trialType,0);
+  }
+  else{
+    rewardDrops = 0;
+    printer(16,trialType,0);
+  }
+  
   Serial.print("reward drops = ");
   Serial.println(rewardDrops);
-
-  if (reward == 1) {
-    rewardBigCount++;
-    Serial.println("Reward");
-    printer(15, trialType, choice);
-    
-  }
-  else {
-    rewardSmallCount++;
-    Serial.println("No reward");
-    printer(16, trialType, choice);
-  }
 
   next_state = DELIVER_REWARD;
 }
@@ -213,7 +206,7 @@ void StateImagingDelay::s_finish(){
   if (image == 1){
     image = 0;
     digitalWrite(arduScope, HIGH);   
-    Serial.println("stop imaging")         
+    Serial.println("stop imaging");         
   }
 
   next_state = INTER_TRIAL_INTERVAL;
@@ -222,12 +215,21 @@ void StateImagingDelay::s_finish(){
 
 //// TIMEOUT 11
 void StateTimeout::s_setup(){
-  printer(11,choice,0);
+  set_duration((entryTime + baseline + odorTime + delayTime + drops*rewardDropTime + (drops-1)*rewardPauseTime + imagingTime) - currentTime);
+  Serial.print("timeout duration = ");
+  Serial.println((entryTime + baseline + odorTime + delayTime + drops*rewardDropTime + (drops-1)*rewardPauseTime + imagingTime) - currentTime);
+  printer(11,trialType,0);
   Serial.println("TIMEOUT");
 }
 
 void StateTimeout::s_finish()
 {
+  if (image == 1){
+    image = 0;
+    digitalWrite(arduScope, HIGH);   
+    Serial.println("stop imaging");         
+  }
+   
   next_state = INTER_TRIAL_INTERVAL;
 }
 
@@ -250,7 +252,7 @@ void StateInterTrialInterval::s_setup()
   Serial.println(minus2Ct);
   Serial.print("US Trials: ");
   Serial.print(USCt);
-  Serial.print("Reward Amount: ");
+  Serial.print("   Reward Amount: ");
   Serial.println(rewardAmt);
 }
 

@@ -8,16 +8,18 @@ extern int valves1[];
 extern int valves2[];
 extern int valves4[];
 extern int valves5[];
-extern int control;
 extern int controls[];
 extern bool odorValveOpen;
 extern int waterValves[];
+extern int water;
 extern int port;
+extern int odors[];
+extern int odorControl;
 
 extern void printer(int, int, int);
 
 
-void setSide(port);
+void setSide(int);
 
 void odorOn(int);
 
