@@ -20,109 +20,108 @@
 % graph of all entries for each trial
 
 
-clear all;
-close all;
-uiopen('.mat'); % pulls in data structure "a" with current data
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  ANALYSIS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% old data in structure "b"
+%%
+% %% old data in structure "b"
+% 
+% prompt = {'Load old preFSM data file? 1 = yes, 0 = no'};
+% dlg_title = 'Load preFSM data?';
+% num_lines = 1;
+% defaultans = {'1'};
+% loadData = inputdlg(prompt,dlg_title,num_lines,defaultans);
+% 
+% loadData = str2num(cell2mat(loadData));
+% 
+% if loadData == 1
+%     [datafilename,datapathname]=uigetfile('*.mat', 'Choose old data file to load');
+%     fname=fullfile(datapathname,datafilename); 
+%     load(fname); % opens structure "b" with previous data, if available
+%     
+%     c = b;
+%     clear b;
+%     b = a;
+%     clear a;
+%     
+%     b.FSM = ones(numel(b.file),1);
+%     b.FSMall = ones(numel(b.fileAll),1);
+%     c.FSM = zeros(numel(c.file),1);
+%     c.FSMall = zeros(numel(c.fileAll),1);
+%     a.FSM = [b.FSM; c.FSM];
+%     a.FSMall = [b.FSMall; c.FSMall];
+%     
+%     
+%     
+%     c.parameters = [c.allSummary(:,1:23) c.allSummary(:,22:23)...
+%         c.allSummary(:,24:27) cell(size(c.allSummary,1),1)...
+%         c.allSummary(:,28:31)];
+%     a.parameters = [b.parameters; c.parameters];
+%     
+%     a.numFiles = size(a.parameters,1);    
+% 
+%     f1 = struct2cell(b.files); f2 = struct2cell(c.files);    
+%     fileNames = [f1(1,:) f2(1,:)];
+%     infoSides = [f1(10,:) f2(9,:)];
+%     mouseNames = [f1(8,:) f2(7,:)];
+%     daysFromFiles = [f1(7,:) f2(6,:)];
+%     e = [fileNames;infoSides;mouseNames;daysFromFiles];
+%     fn = {'name';'infoSide';'mouseName';'day'};
+%     a.files = cell2struct(e,fn,1);
+% 
+%     a.fileAll = [b.fileAll; c.fileAll + b.numFiles];
+%     a.trialAll = [b.trialNums; c.trialAll];
+%     a.correct = [b.correct; c.correct];
+%     a.choiceType = [b.choiceType; c.trialTypeAll];
+%     a.infoForced = [b.infoForced; c.infoForced];
+%     a.randForced = [b.randForced; c.randForced];
+%     a.choiceTrials = [b.choiceTrials; c.choice];    
+%     a.file = [b.file; c.file + b.numFiles];
+%     a.trial = [b.corrTrials; c.trial];
+%     a.type = [b.type; c.type];
+%     a.mouse = [b.mouse; c.mouse];
+%     a.mouseAll = [b.mouseAll; c.mouseAll];
+%     a.choice = [b.choice(:,4); c.portChoiceAll];
+%     a.choiceCorr = [b.choiceCorr; c.info];
+%     a.choiceTypeCorr = [b.choiceTypeCorr; c.trialType];
+%         c.rxn = c.firstRewardEntry - c.goCue;
+%         c.rxn(c.firstRewardEntry == 0) = NaN;
+%         c.rxnAll = c.firstRewardEntryAll - c.goCueAll;
+%         c.rxnAll(c.firstRewardEntryAll == 0) = NaN;
+%     a.rxnAll = [b.rxn; c.rxnAll];
+%     a.rxn  = [b.rxn(b.correct); c.rxn];
+%     a.odor2 = [b.trialParams(:,6); c.odor2];
+%     a.reward = [b.reward; c.reward];
+%     a.rewardCorr = [b.rewardCorr; c.rewardCorr];
+%     a.rewarded = [b.rewarded; zeros(numel(c.fileAll),1)];
+%     a.trialLength = [b.trialLength(b.correct); c.trialLength];
+%     a.anticipatoryLicks = [b.anticipatoryLicks; c.anticipatoryLicks];
+%     a.betweenLicks = [b.betweenLicks; c.betweenLicks];
+%     a.earlyLicks = [b.earlyLicks; c.earlyLicks];
+%     a.waterLicks = [b.waterLicks; c.waterLicks];
+%     a.outcome = [b.outcome; zeros(numel(c.fileAll),1)]; % outcome only calculated for FSM
+%     a.finalOutcome = [b.finalOutcome; c.finalOutcome]; % outcome only calculated for FSM
+%     a.rewardAssigned = [b.trialParams(:,5); c.rewardSize]; % rewardSize in pre-FSM, need to calc from trialParms in FSM
+%     a.goCue = [b.goCue(:,2); c.goCueAll];
+%     a.firstCenterEntry = [b.firstCenterEntry(:,2); c.firstCenterEntryAll];
+%     a.trialLengthCenterEntryCorr = [b.trialLengthCenterEntry(b.correct); c.trialLengthCenterEntry(c.correctAll==1)];
+%     a.trialLenghtCenterEntry = [b.trialLengthCenterEntry; c.trialLengthCenterEntry];
+% %     a.rewardEntries = [b.rewardEntries; allRewardEntries Stuff
+%     if exist('a.deletedFiles')
+%         a.deletedFiles = b.deletedFiles;
+%     end
+%     
+%     % NEED TO PULL IN CENTER ENTRIES AND REWARD ENTRIES! and GO CUE
+%     
+%     clear b; clear c;
+% 
+%     % only FSM files NEED TO FIX?!?!
+% else 
 
-prompt = {'Load old preFSM data file? 1 = yes, 0 = no'};
-dlg_title = 'Load preFSM data?';
-num_lines = 1;
-defaultans = {'1'};
-loadData = inputdlg(prompt,dlg_title,num_lines,defaultans);
-
-loadData = str2num(cell2mat(loadData));
-
-if loadData == 1
-    [datafilename,datapathname]=uigetfile('*.mat', 'Choose old data file to load');
-    fname=fullfile(datapathname,datafilename); 
-    load(fname); % opens structure "b" with previous data, if available
-    
-    c = b;
-    clear b;
-    b = a;
-    clear a;
-    
-    b.FSM = ones(numel(b.file),1);
-    b.FSMall = ones(numel(b.fileAll),1);
-    c.FSM = zeros(numel(c.file),1);
-    c.FSMall = zeros(numel(c.fileAll),1);
-    a.FSM = [b.FSM; c.FSM];
-    a.FSMall = [b.FSMall; c.FSMall];
-    
-    
-    
-    c.parameters = [c.allSummary(:,1:23) c.allSummary(:,22:23)...
-        c.allSummary(:,24:27) cell(size(c.allSummary,1),1)...
-        c.allSummary(:,28:31)];
-    a.parameters = [b.parameters; c.parameters];
-    
-    a.numFiles = size(a.parameters,1);    
-
-    f1 = struct2cell(b.files); f2 = struct2cell(c.files);    
-    fileNames = [f1(1,:) f2(1,:)];
-    infoSides = [f1(10,:) f2(9,:)];
-    mouseNames = [f1(8,:) f2(7,:)];
-    daysFromFiles = [f1(7,:) f2(6,:)];
-    e = [fileNames;infoSides;mouseNames;daysFromFiles];
-    fn = {'name';'infoSide';'mouseName';'day'};
-    a.files = cell2struct(e,fn,1);
-
-    a.fileAll = [b.fileAll; c.fileAll + b.numFiles];
-    a.trialAll = [b.trialNums; c.trialAll];
-    a.correct = [b.correct; c.correct];
-    a.choiceType = [b.choiceType; c.trialTypeAll];
-    a.infoForced = [b.infoForced; c.infoForced];
-    a.randForced = [b.randForced; c.randForced];
-    a.choiceTrials = [b.choiceTrials; c.choice];    
-    a.file = [b.file; c.file + b.numFiles];
-    a.trial = [b.corrTrials; c.trial];
-    a.type = [b.type; c.type];
-    a.mouse = [b.mouse; c.mouse];
-    a.mouseAll = [b.mouseAll; c.mouseAll];
-    a.choice = [b.choice(:,4); c.portChoiceAll];
-    a.choiceCorr = [b.choiceCorr; c.info];
-    a.choiceTypeCorr = [b.choiceTypeCorr; c.trialType];
-        c.rxn = c.firstRewardEntry - c.goCue;
-        c.rxn(c.firstRewardEntry == 0) = NaN;
-        c.rxnAll = c.firstRewardEntryAll - c.goCueAll;
-        c.rxnAll(c.firstRewardEntryAll == 0) = NaN;
-    a.rxnAll = [b.rxn; c.rxnAll];
-    a.rxn  = [b.rxn(b.correct); c.rxn];
-    a.odor2 = [b.trialParams(:,6); c.odor2];
-    a.reward = [b.reward; c.reward];
-    a.rewardCorr = [b.rewardCorr; c.rewardCorr];
-    a.rewarded = [b.rewarded; zeros(numel(c.fileAll),1)];
-    a.trialLength = [b.trialLength(b.correct); c.trialLength];
-    a.anticipatoryLicks = [b.anticipatoryLicks; c.anticipatoryLicks];
-    a.betweenLicks = [b.betweenLicks; c.betweenLicks];
-    a.earlyLicks = [b.earlyLicks; c.earlyLicks];
-    a.waterLicks = [b.waterLicks; c.waterLicks];
-    a.outcome = [b.outcome; zeros(numel(c.fileAll),1)]; % outcome only calculated for FSM
-    a.finalOutcome = [b.finalOutcome; c.finalOutcome]; % outcome only calculated for FSM
-    a.rewardAssigned = [b.trialParams(:,5); c.rewardSize]; % rewardSize in pre-FSM, need to calc from trialParms in FSM
-    a.goCue = [b.goCue(:,2); c.goCueAll];
-    a.firstCenterEntry = [b.firstCenterEntry(:,2); c.firstCenterEntryAll];
-    a.trialLengthCenterEntryCorr = [b.trialLengthCenterEntry(b.correct); c.trialLengthCenterEntry(c.correctAll==1)];
-    a.trialLenghtCenterEntry = [b.trialLengthCenterEntry; c.trialLengthCenterEntry];
-%     a.rewardEntries = [b.rewardEntries; allRewardEntries Stuff
-    if exist('a.deletedFiles')
-        a.deletedFiles = b.deletedFiles;
-    end
-    
-    % NEED TO PULL IN CENTER ENTRIES AND REWARD ENTRIES! and GO CUE
-    
-    clear b; clear c;
-
-    % only FSM files NEED TO FIX?!?!
-else 
+%%
     a.FSM = ones(numel(a.file),1);
     a.FSMall = ones(numel(a.fileAll),1);
     a.trialAll = a.trialNums;
@@ -136,7 +135,7 @@ else
     if exist('a.deletedFiles')
         a.deletedFiles = a.deletedFiles;
     end
-end
+% end
 
 a.paramNames = {'File';'Mouse';'Day';'Session End';'Trials in Session';...
     'Imaging Flag';'Trial Types';'Info Side';'Info Odor';'Rand Odor';...
@@ -342,12 +341,12 @@ end
 
 a.valueMice = find(a.valueMice);
     
-    a.preReverse = ones(size(a.file,1),1);
-    a.reverse = zeros(size(a.file,1),1);
-    for t = 1:size(a.file,1)
-        a.preReverse(t,1) = a.prereverseFiles(a.file(t));
-        a.reverse(t,1) = a.reverseFiles(a.file(t));
-    end
+a.preReverse = ones(size(a.file,1),1);
+a.reverse = zeros(size(a.file,1),1);
+for t = 1:size(a.file,1)
+    a.preReverse(t,1) = a.prereverseFiles(a.file(t));
+    a.reverse(t,1) = a.reverseFiles(a.file(t));
+end
 
     
 for m = 1:a.mouseCt
@@ -458,7 +457,14 @@ else
 end
 
 if isfield(a,'reverseFile')
-    a.reverseMice = find(cell2mat(a.reverseFile(:,1))>0);
+    for m = 1:size(a.reverseFile,1)
+        if ~isempty(cell2mat(a.reverseFile(m,1)))
+            a.reverseMice(m,1) = 1;
+        else a.reverseMice(m,1) = 0;
+        end
+    end
+    a.reverseMice = find(a.reverseMice);
+%     a.reverseMice = find(cell2mat(a.reverseFile(:,1))>0);
 else
     a.reverseMice = [];
 end
@@ -513,7 +519,7 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 
 % TAKE NON-REVERSE MICE OUT OF GLM CALCS
 
-trialsToCount = 500;
+trialsToCount = 300;
 
 if ~isempty(a.choiceMice)
     
@@ -521,6 +527,7 @@ if ~isempty(a.choiceMice)
     a.choiceCI = NaN(a.choiceMice(a.choiceMouseCt),2);
     a.prefCI = NaN(a.choiceMice(a.choiceMouseCt),2);
     a.pref = NaN(a.choiceMice(a.choiceMouseCt),3);
+    a.beta = NaN(a.choiceMice(a.choiceMouseCt),2);
     
 %     for k = 1:numel(a.reverseMice)
 %        m = a.reverseMice(k);
@@ -657,8 +664,8 @@ end
 
 %% SORT BY INFO PREFERENCE
 if ~isempty(a.choiceMice)
-    [a.sortedChoice,a.sortIdx] = sortrows(a.meanChoice,1);
-    a.sortedMouseList = a.mouseList(a.sortIdx);
+    [a.sortedChoice,a.sortIdx] = sortrows(a.meanChoice(~isnan(a.meanChoice(:,1)),:),1);
+    a.sortedMouseList = a.choiceMiceList(a.sortIdx);
     a.sortedCI = a.choiceCI(a.sortIdx,:);
 
     %% STATS
@@ -687,25 +694,43 @@ else
     a.relValues = [];
 end
 
+% mean/SEM only the last 100 trials of that value!! no, ALL? What about
+% repeated values?
 for mm = 1:numel(a.valueMice)
     m = a.valueMice(mm);
     for vv = 1:numel(a.values)
        v = a.values(vv);
        a.valFiles{mm,vv} = a.valueFileCat(a.valChange(:,1) == v & a.valChangeMouse(:,1) == m);
        a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valFiles{mm,vv},2)==1);
-       a.valChoiceMeanbyMouse(mm,vv) = mean(a.valChoices{mm,vv});
-       a.valChoiceSEMbyMouse(mm,vv) = sem(a.valChoices{mm,vv});
+       currentValChoices = a.valChoices{mm,vv};
+       if numel(currentValChoices) >= 100
+%            a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices(end-100:end));
+%            a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices(end-100:end));
+%            a.choiceByAmtByMouse{mm,vv} = currentValChoices(end-99:end);
+           a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices);
+           a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices);
+           a.choiceByAmtByMouse{mm,vv} = currentValChoices;           
+       else
+           a.valChoiceMeanbyMouse(mm,vv) = NaN;
+           a.valChoiceSEMbyMouse(mm,vv) = NaN;
+           a.choiceByAmtByMouse{mm,vv} = NaN;
+       end
     end
 end
 
 for vv = 1:numel(a.values)
    v = a.values(vv);
    a.choiceByAmt{v,1} = cell2mat(a.choiceByAmtbyFile(a.valChange(:,1)==v,1));
-   a.choiceByAmtMean(v,1) = mean(a.choiceByAmt{v,1});
-   a.choiceByAmtSEM(v,1) = sem(a.choiceByAmt{v,1});
+   currentChoiceByAmt = a.choiceByAmt{v,1};
+%    a.choiceByAmtMean(v,1) = mean(a.choiceByAmt{v,1});
+%    a.choiceByAmtSEM(v,1) = sem(a.choiceByAmt{v,1});
 end
 
-
+for vv = 1:numel(a.values)
+    v = a.values(vv);
+    a.choiceByAmtMean(v,1) = nanmean(cell2mat(a.choiceByAmtByMouse(:,v)));
+    a.choiceByAmtSEM(v,1) = sem(cell2mat(a.choiceByAmtByMouse(:,v)));
+end
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY - UNUSED?
 
@@ -978,4 +1003,5 @@ for mm = 1:sum(a.FSMmice)
 end
 
 %%
-uisave({'a'},'infoSeekFSMDataAnalyzed.mat');
+save('infoSeekFSMDataAnalyzed.mat','a');
+% save('JB195imagingDataAnalyzed.mat','a');
