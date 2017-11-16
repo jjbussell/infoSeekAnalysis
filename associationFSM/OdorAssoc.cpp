@@ -6,15 +6,13 @@
 ////////////////////  SWITCHING SIDES  ///////////////////////////////////
 void setSide(int currentPort){
   if (currentPort == 1){
+    Serial.println("setting odor side 0, LEFT");
     for (int s = 0; s < 4; s++){
-        digitalWrite(valves3a[odors[s]], HIGH);
-        digitalWrite(valves3b[odors[s]], HIGH); 
-      }
-    delay(20);
-    for (int s = 0; s < 4; s++){
-      digitalWrite(valves3a[odors[s]], LOW);
-      digitalWrite(valves3b[odors[s]], LOW);
-    }
+      digitalWrite(valves3a[s], HIGH);
+      delay(200);
+      digitalWrite(valves3a[s], LOW);
+    }  
+  
 
     odorControl = 1;
     water = waterValves[0];
@@ -22,15 +20,13 @@ void setSide(int currentPort){
     Serial.println("Port left."); // cycle valves3a = LEFT
   }
   else  {
+    Serial.println("setting odor side 1, RIGHT");
     for (int s = 0; s < 4; s++){
-      digitalWrite(valves3a[odors[s]], HIGH);
-      digitalWrite(valves3b[odors[s]], HIGH);  
+        digitalWrite(valves3b[s], HIGH);
+        delay(200);
+        digitalWrite(valves3b[s], LOW); 
     }
-    delay(20);
-    for (int s = 0; s < 4; s++){
-      digitalWrite(valves3a[odors[s]], LOW);
-      digitalWrite(valves3b[odors[s]], LOW); 
-    }
+  
 
     odorControl = 2;
     water = waterValves[1];

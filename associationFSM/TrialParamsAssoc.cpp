@@ -15,11 +15,11 @@ void pickTrialParams(int currentTrialType){
         break;
       case 3:
         currentOdor = minus1;
-        reward = 1;
+        reward = 0;
         break;
       case 4:
         currentOdor = minus2;
-        reward = 1;
+        reward = 0;
         break;
       case 5:
         currentOdor = 7;
