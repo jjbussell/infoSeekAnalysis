@@ -274,7 +274,7 @@ end
 a.rewardFlag = zeros(numel(a.rewardCorr),1);
 a.rewardFlag(a.rewardCorr>0) = 1;
 
-%% REVERSAL & CHOICES
+%% REVERSAL & CHOICES & VALUE
 
 % FINDS REVERSE DAY (a.reverseDay(m,1) AND TRIALS (a.preReverse)
 
@@ -698,10 +698,35 @@ end
 % repeated values?
 for mm = 1:numel(a.valueMice)
     m = a.valueMice(mm);
+    mouseValFiles = a.valueFile{m,1};
+    mouseValDays = a.valueDays{m,1};
+%     mouseFileDays = a.fileDay(a.fileMouse == m);
     for vv = 1:numel(a.values)
        v = a.values(vv);
        a.valFiles{mm,vv} = a.valueFileCat(a.valChange(:,1) == v & a.valChangeMouse(:,1) == m);
-       a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valFiles{mm,vv},2)==1);
+       
+       currValFiles = find(ismember(mouseValFiles,a.valFiles{mm,vv}));
+       currValDays = mouseValDays(currValFiles);
+       currValDiff = [1 diff(currValDays)];
+       valSplit = find(currValDiff > 1);
+       if ~isempty(valSplit)
+           firstValDay = currValDays(valSplit-1);
+           secondValDay = currValDays(end);
+           valDays = [firstValDay, secondValDay];
+       elseif ~isempty(currValDays)
+           valDays = currValDays(end);
+       else
+           valDays = [];
+       end
+       % want to find last day in first string and last day in second
+       % string
+       
+       % get actual days/file numbers for valDays (by mouse) to get choices
+       
+       a.valChoiceFiles{mm,vv} = find(ismember(a.fileDay,valDays)&a.fileMouse==m);
+       a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valChoiceFiles{mm,vv},2)==1);
+%        a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valFiles{mm,vv},2)==1); % takes all choices from all files with those values
+       
        currentValChoices = a.valChoices{mm,vv};
        if numel(currentValChoices) >= 100
 %            a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices(end-100:end));
