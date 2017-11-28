@@ -408,6 +408,8 @@ void StateRewardDelay::s_finish()
 //
  Serial.print("current reward time (drops) ");
  Serial.println(currentRewardTime);
+
+ rewardDropCount = maxRewardDrops;
   
   if (choice < 2){
     if (infoFlag == 1){

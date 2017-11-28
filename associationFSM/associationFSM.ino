@@ -367,8 +367,8 @@ void loop() {
 
         //// WATCH PORTS
         //// MOVE TO FUNCTIONS/LIBRARY
-//        if (beamBreak(port) == 1){ // is being broken
-        if (digitalRead(53) == LOW){ // TOUCHING
+        if (beamBreak(port) == 1){ // is being broken
+//        if (digitalRead(53) == LOW){ // TOUCHING
           if (portFlag == 0){ // if not currently broken
             Serial.println("Enter port");
             portFlag = 1;

@@ -4,19 +4,27 @@
 // To determine the reward size and odor of the trial
 void pickTrialParams(int choice){
   int probBig;
+  unsigned long bigRewardTime;
+  unsigned long smallRewardTime;
   
   // vals based on choice
   if (choice == 1){
     water = infoWater;
     probBig = infoRewardProb;
+    bigRewardTime = infoBigRewardTime;
+    smallRewardTime = infoSmallRewardTime;
   }
   else if (choice == 0){
     water = randWater;
     probBig = randRewardProb;
+    bigRewardTime = randBigRewardTime;
+    smallRewardTime = randSmallRewardTime;
   }
   else {
     water = infoWater;
     probBig = 0;
+    smallRewardTime = infoSmallRewardTime;
+    bigRewardTime = infoBigRewardTime;
   }
 
   reward = determineReward(probBig);
