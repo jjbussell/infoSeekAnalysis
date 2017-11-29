@@ -73,8 +73,8 @@ void newBlock(){
     }
    }
    
-   Serial.print("block = ");
-   for (int w = 0; w < 5; w++){
-     Serial.println(block[w]);
-     }
+//   Serial.print("block = ");
+//   for (int w = 0; w < 5; w++){
+//     Serial.println(block[w]);
+//     }
 }
