@@ -177,8 +177,8 @@ void setup() {
   pinMode (arduScope, OUTPUT);
   pinMode (scopeArdu, INPUT);
 
-  digitalWrite (arduScope, HIGH);
-  digitalWrite (scopeArdu, LOW);
+  digitalWrite (arduScope, LOW);
+//  digitalWrite (scopeArdu, LOW);
 
   
   // random number seed  
