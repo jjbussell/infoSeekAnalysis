@@ -189,12 +189,49 @@ for f = 1:numFiles
 %% COMPLETE
 
     timeoutTrials = b.transitions(b.transitions(:,5) == 11,3);
-    b.complete = zeros(trialCt,1);
-    b.complete(timeoutTrials) = 1;
+    b.trialComplete = data(data(:,3)==18,:);
+    b.complete = ~ismember(b.trialNums,b.trialComplete(:,2));
 
 %% REWARDS
 
 % trial only complete (printer(18) if finish getting reward drops-->don't
 % have to be in port?!?!?
 
+    b.outcome = data(data(:,3) == 15 | data(:,3) == 16,:);
+    b.reward = b.outcome(b.outcome(:,3) == 15,:);
+    b.rewarded = ~ismember(b.trialNums,b.reward(:,2));
+
 %% LICKS
+
+    b.licks = [];
+    b.licks = data(data(:,3) == 4,[1 2]);
+    b.licks = [zeros(size(b.licks,1),1) b.licks];
+    b.licks(:,1) = ff;
+    
+    b.licks(:,4:8) = 0;
+    
+    for L = 1:size(b.licks,1)
+        lickEntDiff = [];
+        lickExitDiff = [];
+        lickIdx = [];
+        lickEntIdx = [];
+        lickExitIdx = [];
+        lickEntDiff = b.licks(L,2) - b.entries(:,2);
+        lickEntDiff(lickEntDiff<0) = inf;
+        [~,lickEntIdx] = min(lickEntDiff);
+        lickExitDiff = b.licks(L,2) - b.exits(:,2);
+        lickExitDiff(lickExitDiff<0) = inf;
+        [~,lickExitIdx] = min(lickExitDiff);
+        if ~isempty(lickExitIdx) & ~isempty(lickEntDiff)
+            if lickExitIdx < lickEntIdx
+                lickIdx = lickExitIdx;
+            else
+                lickIdx = lickEntIdx;
+            end
+            b.licks(L,4) = lickIdx; % baseline entry/trial number
+            b.licks(L,5) = b.entries(lickIdx,2); % entry time
+            b.licks(L,6) = b.licks(L,2) - b.entries(lickIdx,2); % time from entry
+            b.licks(L,7) = b.baseline(lickIdx,2);
+            b.licks(L,8) = b.licks(L,2) - b.baseline(lickIdx,2); % time from baseline
+        end                
+    end           
