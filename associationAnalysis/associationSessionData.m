@@ -2,9 +2,6 @@
 
 % find complete imaging trials
 % ID type
-% track all activity rel to trial start
-% assume concat video with allframes from all trials? 
-% find trial starts w/in frames
 
 % trial start (available)
 % port entry (baseline)
@@ -15,12 +12,6 @@
 % licks?
 
 % find all licks
-
-% show lick raster across trials
-% lick probs by type
-% rewards by type
-% complete % by type
-% dwell time by type
 
 %%
 clear all;
@@ -98,19 +89,19 @@ for f = 1:numFiles
     files(f).day = day;
     files(f).mouseName = cellstr(filename(1:dayPlace-1));
     files(f).sessionLength = sessionLength;
-    files(f).imagingFlag = sessionParams(6,f);
-    files(f).trialTypes = sessionParams(7,f);
-    files(f).imagingTime = sessionParams(8,f);
-    files(f).port = sessionParams(9,f);
-    files(f).CSplus1 = sessionParams(10,f);
-    files(f).CSplus2 = sessionParams(11,f);
-    files(f).CSminus1 = sessionParams(12,f);
-    files(f).CSminus2 = sessionParams(13,f);
-    files(f).baseline = sessionParams(14,f);
-    files(f).odorTime = sessionParams(15,f);
-    files(f).delayTime = sessionParams(16,f);
-    files(f).rewardDrops = sessionParams(17,f);
-    files(f).ITI = sessionParams(18,f);
+    files(f).imagingFlag = sessionParams(3,f);
+    files(f).trialTypes = sessionParams(4,f);
+    files(f).imagingTime = sessionParams(5,f);
+    files(f).port = sessionParams(6,f);
+    files(f).CSplus1 = sessionParams(7,f);
+    files(f).CSplus2 = sessionParams(8,f);
+    files(f).CSminus1 = sessionParams(9,f);
+    files(f).CSminus2 = sessionParams(10,f);
+    files(f).baseline = sessionParams(11,f);
+    files(f).odorTime = sessionParams(12,f);
+    files(f).delayTime = sessionParams(13,f);
+    files(f).rewardDrops = sessionParams(14,f);
+    files(f).ITI = sessionParams(15,f);
     if isfield(files, 'folder')
         files = rmfield(files,'folder');
     end
@@ -125,9 +116,9 @@ for f = 1:numFiles
 
 
     if loadData == 0
-        b.fileAll(1:trialCt,1) = f;
+        b.file(1:trialCt,1) = f;
     else
-        b.fileAll(1:trialCt,1) = f + a.numFiles;
+        b.file(1:trialCt,1) = f + a.numFiles;
     end
     
 %% TRIAL TYPE
@@ -174,6 +165,7 @@ for f = 1:numFiles
 
 %% BASELINE ENTRIES
     
+    % can be more than one per trial!
     baseline = b.transitions(b.transitions(:,5)==3,:);
     
     for t=1:trialCt
@@ -181,16 +173,16 @@ for f = 1:numFiles
        b.baseline(t,:) = baseline(baselineIdx,:);
        baselineDiff = b.baseline(t,2) - b.entries(:,2);
        baselineDiff(baselineDiff < 0) = inf;
-       [baselineEntryVal,baselineEntryIdx] = min(baselineDiff);
-       b.baselineEntry(t,:) = b.entries(baselineEntryIdx,:);
-       b.baselineExit(t,:) = b.exits(baselineEntryIdx,:);
+       [entryVal,entryIdx] = min(baselineDiff);
+       b.entry(t,:) = b.entries(entryIdx,:);
+       b.exit(t,:) = b.exits(entryIdx,:);
     end
     
 %% COMPLETE
 
     timeoutTrials = b.transitions(b.transitions(:,5) == 11,3);
     b.trialComplete = data(data(:,3)==18,:);
-    b.complete = ~ismember(b.trialNums,b.trialComplete(:,2));
+    b.complete = ismember(b.trialNums,b.trialComplete(:,2));
 
 %% REWARDS
 
@@ -199,7 +191,7 @@ for f = 1:numFiles
 
     b.outcome = data(data(:,3) == 15 | data(:,3) == 16,:);
     b.reward = b.outcome(b.outcome(:,3) == 15,:);
-    b.rewarded = ~ismember(b.trialNums,b.reward(:,2));
+    b.rewarded = ismember(b.trialNums,b.reward(:,2));
 
 %% LICKS
 
@@ -208,7 +200,7 @@ for f = 1:numFiles
     b.licks = [zeros(size(b.licks,1),1) b.licks];
     b.licks(:,1) = ff;
     
-    b.licks(:,4:8) = 0;
+    b.licks(:,4:11) = 0;
     
     for L = 1:size(b.licks,1)
         lickEntDiff = [];
@@ -218,20 +210,100 @@ for f = 1:numFiles
         lickExitIdx = [];
         lickEntDiff = b.licks(L,2) - b.entries(:,2);
         lickEntDiff(lickEntDiff<0) = inf;
-        [~,lickEntIdx] = min(lickEntDiff);
-        lickExitDiff = b.licks(L,2) - b.exits(:,2);
-        lickExitDiff(lickExitDiff<0) = inf;
-        [~,lickExitIdx] = min(lickExitDiff);
-        if ~isempty(lickExitIdx) & ~isempty(lickEntDiff)
-            if lickExitIdx < lickEntIdx
-                lickIdx = lickExitIdx;
-            else
-                lickIdx = lickEntIdx;
+        [~,lickIdx] = min(lickEntDiff);
+%         lickExitDiff = b.licks(L,2) - b.exits(:,2);
+%         lickExitDiff(lickExitDiff<0) = inf;
+%         [~,lickExitIdx] = min(lickExitDiff);
+% %         if ~isempty(lickExitIdx) & ~isempty(lickEntDiff)
+%         if lickExitIdx < lickEntIdx
+%             lickIdx = lickExitIdx;
+%         else
+%             lickIdx = lickEntIdx;
+%         end
+        b.licks(L,4) = lickIdx; % entry index
+        b.licks(L,5) = b.entries(lickIdx,2); % entry time (all entries, use for correct to find trial #)
+        b.licks(L,6) = b.licks(L,2) - b.entries(lickIdx,2); % time from entry
+        if ismember(b.licks(L,5),b.entry(:,2))
+            b.licks(L,7) = 1; % correct = during baseline entry
+            lickTrialIdx = find(b.entry(:,2) == b.licks(L,5),1,'first');
+            b.licks(L,8) = lickTrialIdx; % trial number
+            b.licks(L,9) = b.baseline(lickTrialIdx,2);
+            b.licks(L,10) = b.licks(L,2) - b.baseline(lickTrialIdx,2); % time from baseline
+            if b.licks(L,10) <= 0
+                b.licks(L,11) = 1; % pre-baseline
+            elseif b.licks(L,10) <= files(f).baseline
+                b.licks(L,11) = 2; % during baseline, pre-odor
+            elseif b.licks(L,10) <= files(f).baseline + files(f).odorTime + files(f).delayTime
+               b.licks(L,11) = 3; % pre-reward(anticipatory)
+            else b.licks(L,11) = 4; % consummatory
             end
-            b.licks(L,4) = lickIdx; % baseline entry/trial number
-            b.licks(L,5) = b.entries(lickIdx,2); % entry time
-            b.licks(L,6) = b.licks(L,2) - b.entries(lickIdx,2); % time from entry
-            b.licks(L,7) = b.baseline(lickIdx,2);
-            b.licks(L,8) = b.licks(L,2) - b.baseline(lickIdx,2); % time from baseline
-        end                
-    end           
+        end
+%         end                
+    end
+    
+%% LICKS PER TRIAL
+
+b.trialLicks = zeros(trialCt,5);
+
+for t = 1:trialCt
+    b.trialLicks(t,1) = sum(b.licks(:,8) == t);
+    b.trialLicks(t,2) = sum(b.licks(:,8) == t & b.licks(:,11) == 1);
+    b.trialLicks(t,3) = sum(b.licks(:,8) == t & b.licks(:,11) == 2);
+    b.trialLicks(t,4) = sum(b.licks(:,8) == t & b.licks(:,11) == 3);
+    b.trialLicks(t,5) = sum(b.licks(:,8) == t & b.licks(:,11) == 4);
+    b.allLicksTrialStart{t,1} = b.licks(:,2) - b.entry(t,2);
+end
+    
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  PUTTING FILES TOGETHER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% still within for each file!
+
+    if exist('a','var') == 0
+
+        a = b;
+        a.parameters = sessionParameters;
+        a.trialCts = trialCt;
+        a.mouse = repmat(mouse,trialCt,1);
+
+    else
+        a.file = [a.file; b.file];
+        a.parameters = [a.parameters; sessionParameters];
+
+        a.trialCts = [a.trialCts trialCt];
+        a.images = [a.images; b.images];
+        a.transitions = [a.transitions; b.transitions];        
+        a.mouse = [a.mouse; repmat(mouse,trialCt,1)];
+        a.trialNums = [a.trialNums; b.trialNums];
+        a.type = [a.type; b.type];
+        a.trialStart = [a.trialStart; b.trialStart];
+        a.entries = [a.entries; b.entries];
+        a.exits = [a.exits; b.exits];
+        a.baseline = [a.baseline; b.baseline];
+        a.entry = [a.entry; b.entry];
+        a.exit = [a.exit; b.exit];
+        a.trialComplete = [a.trialComplete; b.trialComplete];
+        a.complete = [a.complete; b.complete];
+        a.outcome = [a.outcome; b.outcome];
+        a.reward = [a.reward; b.reward];
+        a.rewarded = [a.rewarded; b.rewarded];
+        a.licks = [a.licks; b.licks];
+        a.trialLicks = [a.trialLicks; b.trialLicks];
+        a.allLicksTrialStart = [a.allLicksTrialStart; b.allLicksTrialStart];
+    end
+end % for each file
+
+if isfield(a,'files') == 0
+    a.files = files;
+    a.numFiles = numFiles;
+else       
+    a.files = [a.files; files];
+    a.numFiles = a.numFiles + numFiles;
+end
+
+% save('associationFSMData.mat','a');
+uisave({'a'},'associationFSMData.mat');
