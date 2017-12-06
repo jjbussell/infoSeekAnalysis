@@ -38,7 +38,7 @@ void StateBaseline::s_setup()
 
   if (imageFlag == 1){
       Serial.println("start imaging");
-      digitalWrite(arduScope, HIGH); //start imaging
+      digitalWrite(arduScope, LOW); //start imaging
       image = 1;
       printer(22,0,0);
   }
@@ -51,7 +51,7 @@ void StateBaseline::loop()
   if (portFlag == 0){
     if (image == 1){
       image = 0;
-      digitalWrite(arduScope, LOW);   
+      digitalWrite(arduScope, HIGH);   
       Serial.println("stop imaging");
       printer(23,0,0);         
     }
@@ -207,7 +207,7 @@ void StateImagingDelay::s_setup(){
 void StateImagingDelay::s_finish(){
   if (image == 1){
     image = 0;
-    digitalWrite(arduScope, LOW);   
+    digitalWrite(arduScope, HIGH);   
     Serial.println("stop imaging");
     printer(23,0,0);         
   }
@@ -229,7 +229,7 @@ void StateTimeout::s_finish()
 {
   if (image == 1){
     image = 0;
-    digitalWrite(arduScope, LOW);   
+    digitalWrite(arduScope, HIGH);   
     Serial.println("stop imaging");
     printer(23,0,0);         
   }
