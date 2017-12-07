@@ -109,38 +109,38 @@ a.completeByType = sum(a.complete == 1& a.types == 1)./a.trialCt;
 % a.meanDwellByType = nanmean(dwell(a.types));
 % a.semDwellByType = sem(dwell(a.types));
 
-dwellByType = NaN(sum(a.trialCt),5);
-for type = 1:numel(a.typeList)
-    if sum(a.type==type)~=0
-        dwellByType(:,type) = a.dwell(a.type==type);
-    end
-end
-a.meanDwellByType = nanmean(dwellByType);
-a.semDwellByType = sem(dwellByType);
+% dwellByType = NaN(sum(a.trialCt),5);
+% for type = 1:numel(a.typeList)
+%     if sum(a.type==type)~=0
+%         dwellByType(:,type) = a.dwell(a.type==type);
+%     end
+% end
+% a.meanDwellByType = nanmean(dwellByType);
+% a.semDwellByType = sem(dwellByType);
 
 %% LICK COUNTS BY TYPE
 
 % Need to assign correct licks to trial number, then calc time from trial
 % entry (start) and assign anticipatory or consummatory
-
-a.anticipatoryLicks = a.trialLicks(:,4);
-a.consummatoryLicks = a.trialLicks(:,5);
-
-% aLicks = repmat(a.anticipatoryLicks,1,5);
-% cLicks = repmat(a.consummatoryLicks,1,5);
-
-anticipatoryLicksByType = NaN(sum(a.trialCt),5);
-consummatoryLicksByType = NaN(sum(a.trialCt),5);
-for type = 1:numel(a.typeList)
-    if sum(a.type==type)~=0
-        anticipatoryLicksByType(:,type) = a.anticipatoryLicks(a.type==type);
-        consummatoryLicksByType(:,type) = a.consummatoryLicks(a.type==type);
-    end
-end
-a.meanAnticipatoryLicksByType = nanmean(anticipatoryLicksByType);
-a.semAnticipatoryLicksByType = sem(anticipatoryLicksByType);
-a.meanConsummatoryLicksByType = nanmean(consummatoryLicksByType);
-a.semConsummatoryLicksByType = sem(consummatoryLicksByType);
+% 
+% a.anticipatoryLicks = a.trialLicks(:,4);
+% a.consummatoryLicks = a.trialLicks(:,5);
+% 
+% % aLicks = repmat(a.anticipatoryLicks,1,5);
+% % cLicks = repmat(a.consummatoryLicks,1,5);
+% 
+% anticipatoryLicksByType = NaN(sum(a.trialCt),5);
+% consummatoryLicksByType = NaN(sum(a.trialCt),5);
+% for type = 1:numel(a.typeList)
+%     if sum(a.type==type)~=0
+%         anticipatoryLicksByType(:,type) = a.anticipatoryLicks(a.type==type);
+%         consummatoryLicksByType(:,type) = a.consummatoryLicks(a.type==type);
+%     end
+% end
+% a.meanAnticipatoryLicksByType = nanmean(anticipatoryLicksByType);
+% a.semAnticipatoryLicksByType = sem(anticipatoryLicksByType);
+% a.meanConsummatoryLicksByType = nanmean(consummatoryLicksByType);
+% a.semConsummatoryLicksByType = sem(consummatoryLicksByType);
 
 %% LICK PROBS BY TYPE
 

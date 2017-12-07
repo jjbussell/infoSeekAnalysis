@@ -80,6 +80,7 @@ void StateOdor::loop()
 {
   if (portFlag == 0){
     Serial.println("Exit-->TIMEOUT");
+    timer = 0;
     if (odorValveOpen == 1){   
       odorOff(currentOdor);
       controlOn(odorControl);
@@ -156,6 +157,7 @@ void StateOutcomeDelay::loop(){
     if (odorValveOpen == 1){   
       odorOff(currentOdor);
     }
+    timer = 0;
     next_state = TIMEOUT;
   }
 
