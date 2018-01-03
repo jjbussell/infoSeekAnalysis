@@ -165,17 +165,30 @@ for f = 1:numFiles
 
 %% BASELINE ENTRIES
     
-    % can be more than one per trial!
+    % can be more than one per trial! or none for last trial
+    baseline = [];
     baseline = b.transitions(b.transitions(:,5)==3,:);
     
     for t=1:trialCt
        baselineIdx = find(baseline(:,3)==t,1,'last');
-       b.baseline(t,:) = baseline(baselineIdx,:);
+       if ~isempty(baselineIdx)
+           b.baseline(t,:) = baseline(baselineIdx,:);
+       else
+           b.baseline(t,:) = [0,0,0,0,0,0];
+       end
        baselineDiff = b.baseline(t,2) - b.entries(:,2);
        baselineDiff(baselineDiff < 0) = inf;
        [entryVal,entryIdx] = min(baselineDiff);
-       b.entry(t,:) = b.entries(entryIdx,:);
-       b.exit(t,:) = b.exits(entryIdx,:);
+       if ~isempty(entryIdx)
+           b.entry(t,:) = b.entries(entryIdx,:);
+       else
+           b.entry(t,:) = [0,0,0,0,0,0];
+       end
+       if entryIdx <= size(b.exits,1)
+           b.exit(t,:) = b.exits(entryIdx,:);
+       else
+           b.exit(t,:) = [0,0,0,0,0,0];
+       end
     end
     
 %% COMPLETE
