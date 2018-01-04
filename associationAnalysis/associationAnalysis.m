@@ -106,6 +106,8 @@ a.currentMice = unique(a.parameters(currentDay,2));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+
+
 %% REWARDS BY TYPE
 
 a.rewardedByType = sum(a.rewarded == 1& a.types == 1)./a.typeCounts;
@@ -202,10 +204,24 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% a.win = 50;
-% a.maxBin = ceil(a.maxTimeToLick/a.win);
-% bins = [a.win/2:a.win:a.maxBin*a.win-a.win/2];
+fileComplete = a.file(a.complete);
+for f = 1:a.numFiles
+    ok = a.file == f & a.complete==1;
+    a.maxTrialLength(f,1) = max(a.trialComplete(fileComplete == f,1) - a.baseline(ok,2)) + a.files(f).ITI +a.files(f).imagingTime;
+end
+
+cumCts = cumsum(a.trialCt);
+starts = [0; cumCts(1:end-1)+1];
+
+lowerTime = -max(cell2mat(a.parameters(:,18)));
+upperTime = max(a.maxTrialLength);
+
+a.win = 50;
+a.maxBin = ceil(max(a.maxTrialLength)/a.win);
+a.minBin = ceil(lowerTime/a.win);
+bins = [a.win/2:a.win:a.maxBin*a.win-a.win/2];
 % a.timeBins = (0:a.win:a.maxBin*a.win);
+a.timeBins = (a.minBin*a.win:a.win:a.maxBin*a.win);
 
 %% COLORS
 
@@ -375,16 +391,7 @@ end
 % plot for each type
 
 % NEED TO SHOW BASELINE START, ODOR, WATER, TRIAL TYPE
-% 
-% fileComplete = a.file(a.complete);
-% for f = 1:a.numFiles
-%     ok = a.file == f & a.complete==1;
-%     a.maxTrialLength(f,1) = max(a.trialComplete(fileComplete == 1,1) - a.baseline(ok,2)) + a.files(f).ITI +a.files(f).imagingTime;
-% end
-% 
-% cumCts = cumsum(a.trialCt);
-% starts = [0; cumCts(1:end-1)+1];
-%     
+    
 % for m = 1:a.mouseCt     
 %     ok = a.mice(:,m)==1;
 %     
@@ -398,8 +405,6 @@ end
 %     ax = nsubplot(1,1,1,1);
 %     hold on;
 %     ax.FontSize = 10;
-%     lowerTime = -max(a.files.ITI);
-%     upperTime = max(a.maxTrialLength(a.fileMouse == m));
 %     ax.XLim = [lowerTime upperTime];
 %     ax.YLim = [-10 sum(ok)];
 %     ax.YDir = 'reverse';
@@ -434,4 +439,6 @@ end
 
 %% LICK PROBS
 
-% NEED FOR EACH MOUSE, EACH DAY, BY TYPE plot prob of licking
+% NEED FOR EACH MOUSE, subplot for EACH DAY, BY TYPE plot prob of licking
+
+a.lickProbs = histcounts(a.licks(:,10),a.timeBins);
