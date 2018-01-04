@@ -213,7 +213,7 @@ for f = 1:numFiles
     b.licks = [zeros(size(b.licks,1),1) b.licks];
     b.licks(:,1) = ff;
     
-    b.licks(:,4:11) = 0;
+    b.licks(:,4:11) = NaN;
     
     for L = 1:size(b.licks,1)
         lickEntDiff = [];
@@ -265,6 +265,7 @@ for t = 1:trialCt
     b.trialLicks(t,4) = sum(b.licks(:,8) == t & b.licks(:,11) == 3);
     b.trialLicks(t,5) = sum(b.licks(:,8) == t & b.licks(:,11) == 4);
     b.allLicksTrialStart{t,1} = b.licks(:,2) - b.entry(t,2);
+    b.lickTimes{t,1} = b.licks(b.licks(:,8) == t,10);
 end
     
 %%
@@ -307,6 +308,7 @@ end
         a.licks = [a.licks; b.licks];
         a.trialLicks = [a.trialLicks; b.trialLicks];
         a.allLicksTrialStart = [a.allLicksTrialStart; b.allLicksTrialStart];
+        a.lickTimes = [a.lickTimes; b.lickTimes];
     end
 end % for each file
 

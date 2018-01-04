@@ -213,15 +213,15 @@ end
 cumCts = cumsum(a.trialCt);
 starts = [0; cumCts(1:end-1)+1];
 
-lowerTime = -max(cell2mat(a.parameters(:,18)));
+lowerTime = -max(cell2mat(a.parameters(:,18))); % ITI
 upperTime = max(a.maxTrialLength);
 
 a.win = 50;
-a.maxBin = ceil(max(a.maxTrialLength)/a.win);
+a.maxBin = ceil(upperTime/a.win);
 a.minBin = ceil(lowerTime/a.win);
-bins = [a.win/2:a.win:a.maxBin*a.win-a.win/2];
 % a.timeBins = (0:a.win:a.maxBin*a.win);
-a.timeBins = (a.minBin*a.win:a.win:a.maxBin*a.win);
+a.bins = (a.minBin*a.win:a.win:a.maxBin*a.win);
+a.binLabels = [a.minBin*a.win+a.win/2:a.win:a.maxBin*a.win-a.win/2];
 
 %% COLORS
 
@@ -243,16 +243,12 @@ for mm = 1:numel(a.currentMiceNums)
     set(fig,'renderer','painters');
     set(fig,'PaperOrientation','landscape');
     
-    % ADD TRIAL NUMBERS
-    % FIX COLORS
     % SEM
     
     ax = nsubplot(3,2,1,1);
     title(a.mouseList(m));
     ax.FontSize = 8;
     ax.XTick = [0:5:a.mouseDayCt(m)];    
-%     ax.YTick = [0 0.25 0.50 0.75 1];
-%     ax.YLim = [-0.1 1.1];
     plotData = [];
     for d = 1:a.mouseDayCt(m)
         for type = 1:numel(a.typeList)
@@ -263,15 +259,9 @@ for mm = 1:numel(a.currentMiceNums)
     bar(plotData,'stacked');
     h = gcf; h.Colormap = CC;
     ylabel('Number of trials');
-%     ax.YLim = [0 1];
-%     ax.YTick = [0 .25 .50 .75 1];
-%     leg = legend(ax,'CS+ 1','CS+ 2','CS- 1','CS- 2','US','Location','southoutside','Orientation','horizontal');
-%     leg.Box = 'off';
-%     leg.FontWeight = 'bold';
     hold off;
     
     ax = nsubplot(3,2,2,1);
-%     title(a.mouseList(m));
     ax.FontSize = 8;
     ax.XTick = [0:5:a.mouseDayCt(m)];    
     ax.YTick = [0 0.25 0.50 0.75 1];
@@ -287,16 +277,11 @@ for mm = 1:numel(a.currentMiceNums)
     ylabel('% trials complete');
     ax.YLim = [0 1];
     ax.YTick = [0 .25 .50 .75 1];
-%     leg = legend(ax,'CS+ 1','CS+ 2','CS- 1','CS- 2','US','Location','southoutside','Orientation','horizontal');
-%     leg.Box = 'off';
-%     leg.FontWeight = 'bold';
     hold off;
     
     ax = nsubplot(3,2,3,1);
     ax.FontSize = 8;
     ax.XTick = [0:5:a.mouseDayCt(m)];    
-%     ax.YTick = [0 0.25 0.50 0.75 1];
-%     ax.YLim = [-0.1 1.1];
     plotData = [];
     for type = 1:numel(a.typeList)
         plotColor = CC(type,:);
@@ -308,8 +293,6 @@ for mm = 1:numel(a.currentMiceNums)
     end
     ylabel('Dwell Time (ms)');
     xlabel('Day');
-%     ax.YLim = [0 1];
-%     ax.YTick = [0 .25 .50 .75 1];
     leg = legend(ax,'CS+ 1','CS+ 2','CS- 1','CS- 2','US','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
@@ -319,8 +302,6 @@ for mm = 1:numel(a.currentMiceNums)
     ax.FontSize = 8;
     title(a.dayCell{find(a.fileMouse == m & a.fileDay == a.mouseDayCt(m),1,'first')});
     ax.XTick = [0:5:a.mouseDayCt(m)];    
-%     ax.YTick = [0 0.25 0.50 0.75 1];
-%     ax.YLim = [-0.1 1.1];
     plotData = [];
     for type = 1:numel(a.typeList)
         plotColor = CC(type,:);
@@ -331,18 +312,11 @@ for mm = 1:numel(a.currentMiceNums)
         plot(1:a.mouseDayCt(m),plotData(type,:),'Color',plotColor,'LineWidth',2,'Marker','o','MarkerSize',3,'MarkerFaceColor',plotColor,'MarkerEdgeColor',plotColor);
     end
     ylabel('Licks prior to odor');
-%     ax.YLim = [0 1];
-%     ax.YTick = [0 .25 .50 .75 1];
-%     leg = legend(ax,'CS+ 1','CS+ 2','CS- 1','CS- 2','US','Location','southoutside','Orientation','horizontal');
-%     leg.Box = 'off';
-%     leg.FontWeight = 'bold';
     hold off;
     
     ax = nsubplot(3,2,2,2);
     ax.FontSize = 8;
     ax.XTick = [0:5:a.mouseDayCt(m)];    
-%     ax.YTick = [0 0.25 0.50 0.75 1];
-%     ax.YLim = [-0.1 1.1];
     plotData = [];
     for type = 1:numel(a.typeList)
         plotColor = CC(type,:);
@@ -353,18 +327,11 @@ for mm = 1:numel(a.currentMiceNums)
         plot(1:a.mouseDayCt(m),plotData(type,:),'Color',plotColor,'LineWidth',2,'Marker','o','MarkerSize',3,'MarkerFaceColor',plotColor,'MarkerEdgeColor',plotColor);
     end
     ylabel('Licks between odor and outcome');
-%     ax.YLim = [0 1];
-%     ax.YTick = [0 .25 .50 .75 1];
-%     leg = legend(ax,'CS+ 1','CS+ 2','CS- 1','CS- 2','US','Location','southoutside','Orientation','horizontal');
-%     leg.Box = 'off';
-%     leg.FontWeight = 'bold';
     hold off;    
     
     ax = nsubplot(3,2,3,2);
     ax.FontSize = 8;
     ax.XTick = [0:5:a.mouseDayCt(m)];    
-%     ax.YTick = [0 0.25 0.50 0.75 1];
-%     ax.YLim = [-0.1 1.1];
     plotData = [];
     for type = 1:numel(a.typeList)
         plotColor = CC(type,:);
@@ -376,8 +343,6 @@ for mm = 1:numel(a.currentMiceNums)
     end
     ylabel('Consummatory Licks');
     xlabel('Day');    
-%     ax.YLim = [0 1];
-%     ax.YTick = [0 .25 .50 .75 1];
     leg = legend(ax,'CS+ 1','CS+ 2','CS- 1','CS- 2','US','Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
@@ -441,4 +406,52 @@ end
 
 % NEED FOR EACH MOUSE, subplot for EACH DAY, BY TYPE plot prob of licking
 
-a.lickProbs = histcounts(a.licks(:,10),a.timeBins);
+a.lickProbsOverall = histcounts(a.licks(:,10),a.bins,'Normalization','probability');
+
+% a.licks (1 == file, 8 == trial)
+
+for m = 1:a.mouseCt
+    for d = 1:a.mouseDayCt(m)
+%         files = find(a.fileDay == d & a.fileMouse == m);
+        for type = 1:numel(a.typeList)
+            ok = a.mouseDay == d & a.mice(:,m) == 1 & a.type == type;
+            if sum(ok)>0
+                for k = 1:sum(ok)
+                    okTrials = find(ok);
+                    if k == 1
+                        lickTimes = a.lickTimes{okTrials(k)};
+                    else
+                        lickTimes = [lickTimes; a.lickTimes{okTrials(k)}];
+                    end
+                end
+                a.lickTimesByType{m,d,type} = lickTimes;
+            else
+                a.lickTimesByType{m,d,type} = [];
+            end
+            a.lickProbs{m,d,type} = histcounts(a.lickTimesByType{m,d,type},a.bins,'Normalization','probability');
+        end
+    end
+end
+
+%% PLOT LICK PROBS
+
+for mm = 1:numel(a.currentMiceNums)
+    m=a.currentMiceNums(mm);
+% for m = 1:a.mouseCt
+    figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    for d = 1:a.mouseDayCt(m)
+        ax = nsubplot(a.mouseDayCt(m),1,d,1);
+        for type = 1:numel(a.typeList)
+            plotColor = CC(type,:);
+            plot(a.lickProbs{m,d,type},'Color',plotColor);
+        end
+    end
+    
+end
