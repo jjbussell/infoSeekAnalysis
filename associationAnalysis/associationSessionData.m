@@ -131,7 +131,17 @@ for f = 1:numFiles
     b.images = [];
     b.images = data(data(:,3) == 20, [1 2]);
     b.images = [zeros(size(b.images,1),1) b.images];
-    b.images(:,1) = ff;    
+    b.images(:,1) = ff; 
+    
+    b.imagingStart = [];
+    b.imagingStart = data(data(:,3) == 22, [1 2]);
+    b.imagingStart = [zeros(size(b.imagingStart,1),1) b.imagingStart];
+    b.imagingStart(:,1) = ff;
+    
+    b.imagingStop = [];
+    b.imagingStop = data(data(:,3) == 23, [1 2]);
+    b.imagingStop = [zeros(size(b.imagingStop,1),1) b.imagingStop];
+    b.imagingStop(:,1) = ff;    
     
 %% STATE TRANSITIONS
 
@@ -290,6 +300,8 @@ end
 
         a.trialCts = [a.trialCts trialCt];
         a.images = [a.images; b.images];
+        a.imagingStart = [a.imagingStart; b.imagingStart];
+        a.imagingStop = [a.imagingStop; b.imagingStop];
         a.transitions = [a.transitions; b.transitions];        
         a.mouse = [a.mouse; repmat(mouse,trialCt,1)];
         a.trialNums = [a.trialNums; b.trialNums];
