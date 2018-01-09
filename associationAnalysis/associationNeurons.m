@@ -5,7 +5,7 @@ close all;
 % open neuron file
 uiopen('.mat');
 
-% open analyzed infoseek file
+% open analyzed association behavior file
 uiopen('.mat');
 
 %%
@@ -42,3 +42,22 @@ a.frames = a.images(imagingFrames,:);
 a.behaviorFrames = size(a.frames,1);
 
 [a.neuronCt,a.neuronFrames] = size(neuron.C);
+
+%% IMAGING BOUTS
+
+% ONLY GOOD FOR THIS SPECIFIC DATA
+
+a.imagingBoutCt = size(a.imagingStart,1);
+
+if size(a.imagingStop,1) < a.imagingBoutCt
+   a.imagingStop(a.imagingBoutCt,:) =  [1, a.images(end,[2 3])];
+end
+
+a.images(:,4) = 0;
+
+for b = 1:a.imagingBoutCt
+   frames = a.images(:,2) >= a.imagingStart(b,2) & a.images(:,2) <= a.imagingStop(b,2);
+   a.images(frames,4) = b;   
+end
+
+a.imageCts = accumarray(a.images(:,4),1);
