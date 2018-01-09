@@ -455,3 +455,6 @@ for mm = 1:numel(a.currentMiceNums)
     end
     
 end
+
+%%
+uisave({'a'},'associationFSMDataAnalyzed.mat');
