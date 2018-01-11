@@ -207,7 +207,11 @@ end
 fileComplete = a.file(a.complete);
 for f = 1:a.numFiles
     ok = a.file == f & a.complete==1;
+    if sum(ok)>0
     a.maxTrialLength(f,1) = max(a.trialComplete(fileComplete == f,1) - a.baseline(ok,2)) + a.files(f).ITI +a.files(f).imagingTime;
+    else
+        a.maxTrialLength(f,1) = a.files(f).baseline + a.files(f).odorTime + a.files(f).delayTime + a.files(f).ITI +a.files(f).imagingTime;
+    end
 end
 
 cumCts = cumsum(a.trialCt);
