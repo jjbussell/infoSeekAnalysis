@@ -24,7 +24,7 @@ close all;
 % open neuron file
 uiopen('.mat');
 
-% open analyzed infoseek file
+% open analyzed association behavior file
 uiopen('.mat');
 
 %%
