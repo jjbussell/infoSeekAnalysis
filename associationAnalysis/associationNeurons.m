@@ -112,7 +112,9 @@ a.imagesTrimbyTrials = images(ismember(images(:,3),a.imagingTrials),:);
 
 % from neuron, frames 1363:end
 
-a.neurons = neuron.C_raw;
+a.neurons = neuron.C;
+
+% remove outliers
 
 % this may be wrong since behavior frame counts include early ones?
 a.neurons = a.neurons(:,1364:end); % spec to this file!
@@ -158,7 +160,7 @@ end
 % behaviorImagingFrames = ismember(images(:,4),a.imagingTrialBout);
 % a.imagesTrim = images(behaviorImagingFrames,:);
 
-%% ANALYSIS
+%% ANALYSIS - not plotted below
 
 % when in trial (by frames) do events occur?
 % average each neuron across trials, by type
@@ -217,6 +219,8 @@ cname = cnames;
 ccolor = ccolors;
 clabel = clabels;
 
+clims = [0 2];
+
 % condition neural activity
 % makes cell array with C(activity) for each condition
 cy = cellfun(@(z) a.(z),cname,'uniform',0);
@@ -261,25 +265,37 @@ for ci = 1:numel(cname) % for each condition
     ysem = std(y,[],1) ./ sqrt(size(y,1));
 
 
-    % unit responses in the analysis time window
-    yresp = mean(y(:,resp_okt),2);
+    % unit responses in the analysis time window    
     if ci == 1
+        yresp = mean(y(:,resp_okt),2);
         [~,cell_sort_ids] = sort(yresp);
     end;
 
 %         figure(1);
     nsubplot(numel(cname)+1,1,ci); 
     hold on;
-    if ci == 1
-        imagesc(t,a.neuronCt,y(cell_sort_ids,:));
-    else
-        imagesc(t,a.neuronCt,y);
-    end
-    plot([0 0],[-1 +1].*10^10,'k','yliminclude','off');
+%     if ci == 1
+%         imagesc(t,a.neuronCt,y(cell_sort_ids,:));
+        imagesc(t,[],y(cell_sort_ids,:));
+        colorbar;
+%     else
+%         imagesc(t,a.neuronCt,y);
+%         imagesc(t,[],y);
+%         imagesc(t,[],y,clims);
+%         image(y);
+%         colorbar;
+%     end
+    plot([5 5],[-1 +1].*10^10,'k','yliminclude','off');
+    plot([7 7],[-1 +1].*10^10,'k','yliminclude','off');
+    plot([10 10],[-1 +1].*10^10,'b','yliminclude','off');
 %         colormap(gray); cmap = flipud(colormap); colormap(cmap);
     axis tight;
     ylabel('Cell');
-    title(cn);
+    if ci == 1
+        title([a.imageMouseName,' ',day,' ',cn]);
+    else
+        title(cn);
+    end
     hold off;
 
 %         figure(1);
@@ -289,17 +305,26 @@ for ci = 1:numel(cname) % for each condition
     plot(t,ymean+ysem,'color',curcolor);
     h_for_legend(end+1)=plot(t,ymean,'color',curcolor,'linewidth',3); % only this plot is used for legend!!
     xlim(t([1 end])); 
+    if ci == 1
+%        suptitle([a.imageMouseName ' ' day]);
+        plot([5 5],[-1 +1].*10^10,'k','yliminclude','off');
+        plot([7 7],[-1 +1].*10^10,'k','yliminclude','off');
+        plot([10 10],[-1 +1].*10^10,'b','yliminclude','off');
+    end
     if ci == numel(cname)
         plot([0 0],[-1 +1].*10^10,'k','yliminclude','off');
-        legend(h_for_legend,clabel{:});
+        legend(h_for_legend,clabel{:}); % 'Location','southoutside','Orientation','horizontal'
     end;
     xlabel('Seconds relative to trial start');
     ylabel('Calcium activity');
+%     suptitle({a.imageMouseName, day});
     hold off;
   
+%     suptitle({'Responses across units in ', clabels{ci}, 'Trials'});
+    
 
 end;
-saveas(fig,fullfile(pathname,['Population']),'pdf');
+saveas(fig,fullfile(pathname,[a.imageMouseName,'_',day,'_Population']),'pdf');
 
 %% MAKE FIGURES FOR EACH TRIAL TYPE FOR ALL CELLS, with little plot for each cell
 
@@ -369,15 +394,15 @@ for ci = 1:numel(cname) % for each type
 %             end
         end
     end
-    suptitle({'Responses across units in ', clabels{ci}, 'Trials'});
+    suptitle([a.imageMouseName,' ',day,' Unit Responses - ', clabels{ci}, ' Trials']);
     hold off;
-    saveas(fig,fullfile(pathname,['Cells_',clabels{ci}]),'pdf');
+    saveas(fig,fullfile(pathname,[a.imageMouseName,'_',day,'_Cells_',clabels{ci}]),'pdf');
 end
 
 %% for each cell
 % mean PSTH for each event (4) by trial type, avg across trials
 c=1;
-% for c = 1:a.neuronCt
+for c = 1:a.neuronCt
     figure();
     
     fig = gcf;
@@ -406,11 +431,11 @@ c=1;
         plot(t,ymean,'color',curcolor,'linewidth',3);
         hold off;
     end
-        suptitle({'Responses for unit', num2str(c)});
+        suptitle([a.imageMouseName,' ',day,' Unit', num2str(c)]);
 
 
-        saveas(fig,fullfile(pathname,['Cell_',num2str(c)]),'pdf');
+        saveas(fig,fullfile(pathname,[a.imageMouseName,'_',day,'_Cell_',num2str(c)]),'pdf');
 
     
     
-% end
+end
