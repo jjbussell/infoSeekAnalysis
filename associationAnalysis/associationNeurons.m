@@ -60,10 +60,9 @@ imagingFrames = ismember(a.images(:,1),a.imagingFiles);
 a.frames = a.images(imagingFrames,:);
 a.behaviorFrames = size(a.frames,1); % all for this file
 
-<<<<<<< HEAD
 [a.neuronCt,a.neuronFrames] = size(neuron.C);
 
-%% FINDING BOUTS -- NEED TO GENERALIZE!!
+%% FIND IMAGING BOUTS
 
 for f = 1:a.numFiles
     imagingStarts = []; imagingStops = []; images = [];
@@ -94,30 +93,50 @@ end
 % 
 % imagingBoutsScope = csvread(fname,1,1);
 
-%% OKAY FRAMES FOR THIS DAY--remove frames in vids (neuron) not in behavior
+%% OKAY FRAMES FOR THIS DAY--SPECIFIC TO EACH DAY/FILE
+%match frames in vids (neuron) to behavior
 % what about dropped frames?!?
 
-% behavior frame bouts 8:76-->trials?
-
 % find trials and bouts in concat file
-% concat file goes to imaging bout 76
+
+% for JB242_20171207 trials 8:76 OK
 
 % NEED TO LIMIT BEHAVIOR FRAMES TO BOUTS MATCHING CONCAT
 
-imagingTrialsFirstTrial = images(min(find(images(:,4)==8)),3);
-imagingTrialsLastTrial = images(min(find(images(:,4)==76)),3);
+% for JB242_20171208, behavior frame bouts 3:63, 80:90, combine 91+92,
+% 93:124 match concat trim video
+% bout 52 of behavior has one less than imaging vid. so does 57, 106, 112
+
+% JB242_20171207
+% imagingTrialsFirstTrial = images(min(find(images(:,4)==8)),3);
+% imagingTrialsLastTrial = images(min(find(images(:,4)==76)),3);
+
+% JB242_20171208
+imagingTrialsFirstTrial = images(min(find(images(:,4)==3)),3);
+imagingTrialsMidTrial1 = images(min(find(images(:,4)==63)),3);
+imagingTrialsMidTrial2 = images(min(find(images(:,4)==80)),3);
+imagingTrialsMidTrial3 = images(min(find(images(:,4)==90)),3);
+imagingTrialsMidTrial4 = images(min(find(images(:,4)==93)),3);
+imagingTrialsMidTrial5 = images(min(find(images(:,4)==91)),3);
+imagingTrialsMidTrial6 = images(min(find(images(:,4)==92)),3);
+imagingTrialsLastTrial = images(min(find(images(:,4)==124)),3);
+
 
 a.imagingTrials(:,1) = imagingTrialsFirstTrial:imagingTrialsLastTrial;
 a.imagingTrialCt = numel(a.imagingTrials);
 a.imagesTrimbyTrials = images(ismember(images(:,3),a.imagingTrials),:);
 
-% from neuron, frames 1363:end
+% remove outliers?
+
+%% TRIM NEURON DATA to match behavior and deal with extra/dropped frames
 
 a.neurons = neuron.C;
 
-% remove outliers
-
+% for JB242_20171207, from neuron, frames 1363:end, leave out 1869 and 9516?
+% for dropped frames?!?
 % this may be wrong since behavior frame counts include early ones?
+
+
 a.neurons = a.neurons(:,1364:end); % spec to this file!
 a.neuronsTrim = [a.neurons(:,1:1868) a.neurons(:,1870:9515) a.neurons(:,9517:end)]; 
 
@@ -403,7 +422,7 @@ end
 %% for each cell
 % mean PSTH for each event (4) by trial type, avg across trials
 c=1;
-for c = 1:a.neuronCt
+% for c = 1:a.neuronCt
     figure();
     
     fig = gcf;
@@ -439,7 +458,4 @@ for c = 1:a.neuronCt
 
     
     
-end
-=======
-[a.neuronCt,a.neuronFrames] = size(neuron.C);
->>>>>>> eb1a274bc80f5586db1ba9409ece4207ffeb343b
+% end

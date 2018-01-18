@@ -100,9 +100,9 @@ a.finalOutcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoBigNP',...
 
 %% PLOT DAY SUMMARIES BY MOUSE FOR CURRENT MICE
 
-for mm = 1:numel(a.currentMiceNums)
-    m=a.currentMiceNums(mm);
-% for m = 1:a.mouseCt
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
+for m = 1:a.mouseCt
     figure();
     
     fig = gcf;
@@ -1159,9 +1159,14 @@ end
 
 a.currentValMice = a.currentMiceNums(ismember(a.currentMiceNums,a.valueMice));
 
-for mC = 1:numel(a.currentValMice)
-    m = a.currentValMice(mC);
-    mm = find(a.valueMice == m);
+% for mC = 1:numel(a.currentValMice)
+%     m = a.currentValMice(mC);
+%     mm = find(a.valueMice == m);
+
+a.tempValueMice = a.valueMice(4:end);
+    
+for mm = 1:numel(a.tempValueMice)
+    m =a.tempValueMice(mm);
     
     fig = figure();
     fig = gcf;
