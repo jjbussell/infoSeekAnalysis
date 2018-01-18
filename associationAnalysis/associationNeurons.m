@@ -103,30 +103,32 @@ end
 
 % NEED TO LIMIT BEHAVIOR FRAMES TO BOUTS MATCHING CONCAT
 
-% for JB242_20171208, behavior frame bouts 3:63, 80:90, combine 91+92,
-% 93:124 match concat trim video
-% bout 52 of behavior has one less than imaging vid. so does 57, 106, 112
-
 % JB242_20171207
 % imagingTrialsFirstTrial = images(min(find(images(:,4)==8)),3);
 % imagingTrialsLastTrial = images(min(find(images(:,4)==76)),3);
 
 % JB242_20171208
-imagingTrialsFirstTrial = images(min(find(images(:,4)==3)),3);
-imagingTrialsMidTrial1 = images(min(find(images(:,4)==63)),3);
-imagingTrialsMidTrial2 = images(min(find(images(:,4)==80)),3);
-imagingTrialsMidTrial3 = images(min(find(images(:,4)==90)),3);
-imagingTrialsMidTrial4 = images(min(find(images(:,4)==93)),3);
-imagingTrialsMidTrial5 = images(min(find(images(:,4)==91)),3);
-imagingTrialsMidTrial6 = images(min(find(images(:,4)==92)),3);
-imagingTrialsLastTrial = images(min(find(images(:,4)==124)),3);
+% for JB242_20171208, behavior frame bouts 3:63, 80:90, combine 91+92,
+% 93:124 match concat trim video
 
+% finding trial number for the included behavior-based imaging bouts
+imagingTrials(1,1) = images(min(find(images(:,4)==3)),3);
+imagingTrials(2,1) = images(min(find(images(:,4)==63)),3);
+imagingTrials(3,1) = images(min(find(images(:,4)==80)),3);
+imagingTrials(4,1) = images(min(find(images(:,4)==90)),3);
+imagingTrials(5,1) = images(min(find(images(:,4)==91)),3);
+imagingTrials(6,1) = images(min(find(images(:,4)==92)),3);
+imagingTrials(7,1) = images(min(find(images(:,4)==93)),3);
+imagingTrials(8,1) = images(min(find(images(:,4)==124)),3);
 
-a.imagingTrials(:,1) = imagingTrialsFirstTrial:imagingTrialsLastTrial;
+a.imagingTrials(:,1) = [(imagingTrials(1,1):imagingTrials(2,1))';...
+    (imagingTrials(3,1):imagingTrials(8,1))'];
+
+% a.imagingTrials(:,1) = imagingTrialsFirstTrial:imagingTrialsLastTrial;
 a.imagingTrialCt = numel(a.imagingTrials);
 a.imagesTrimbyTrials = images(ismember(images(:,3),a.imagingTrials),:);
 
-% remove outliers?
+%% REMOVE OUTLYING C VALUES?
 
 %% TRIM NEURON DATA to match behavior and deal with extra/dropped frames
 
@@ -136,11 +138,13 @@ a.neurons = neuron.C;
 % for dropped frames?!?
 % this may be wrong since behavior frame counts include early ones?
 
+% a.neurons = a.neurons(:,1364:end); % spec to this file!
+% a.neuronsTrim = [a.neurons(:,1:1868) a.neurons(:,1870:9515) a.neurons(:,9517:end)];
 
-a.neurons = a.neurons(:,1364:end); % spec to this file!
-a.neuronsTrim = [a.neurons(:,1:1868) a.neurons(:,1870:9515) a.neurons(:,9517:end)]; 
+% JB242_20171208
+% bout 52 of behavior has one less than imaging vid. so does 57, 106, 112
 
-% a.imagesTrim = images(images(:,4) >= 8 & images(:,4) <= 76,:);
+a.neuronsTrim = [a.neurons(:,1:18026) a.neurons(:,18028:19895) a.neurons(:,19897:26546) a.neurons(:,26548:31778) a.neurons(:,31780:end)];
 
 % so now have same frames neural data and behavior
 
@@ -288,15 +292,17 @@ for ci = 1:numel(cname) % for each condition
     % unit responses in the analysis time window    
     if ci == 1
         yresp = mean(y(:,resp_okt),2);
-        [~,cell_sort_ids] = sort(yresp);
+        [~,a.cell_sort_ids] = sort(yresp);
+        [~,a.cell_sort_descend_ids] = sort(yresp,'descend');
+        a.C_trialsSort = a.C_trials(a.cell_sort_descend_ids,:,:);
     end;
 
 %         figure(1);
     nsubplot(numel(cname)+1,1,ci); 
     hold on;
 %     if ci == 1
-%         imagesc(t,a.neuronCt,y(cell_sort_ids,:));
-        imagesc(t,[],y(cell_sort_ids,:));
+%         imagesc(t,a.neuronCt,y(a.cell_sort_ids,:));
+        imagesc(t,[],y(a.cell_sort_ids,:));
         colorbar;
 %     else
 %         imagesc(t,a.neuronCt,y);
@@ -348,8 +354,8 @@ saveas(fig,fullfile(pathname,[a.imageMouseName,'_',day,'_Population']),'pdf');
 
 %% MAKE FIGURES FOR EACH TRIAL TYPE FOR ALL CELLS, with little plot for each cell
 
-nRows = 9;
-nCols = 13;
+nRows = 10;
+nCols = 11;
 cname = cnames;
 ccolor = ccolors;
 clabel = clabels;
@@ -372,10 +378,17 @@ for ci = 1:numel(cname) % for each type
     curcolor = ccolor(ci,:); % color
 
     y = cy{ci};
+    ysort = y(a.cell_sort_descend_ids,:);
 
     for m = 1:nRows
         for n = 1:nCols
-            u = (m-1)*nCols+n; % for each cell
+            if m<nRows
+                u = (m-1)*nCols+n; % for each cell
+            elseif u == a.neuronCt
+                break;
+            else                
+                u = (m-1)*nCols+n;
+            end
 %             figure(cd);
             ax = subplot(nRows,nCols,(m-1)*nCols+n);
 
@@ -393,7 +406,7 @@ for ci = 1:numel(cname) % for each type
 %             if u==1
 %                 h_for_legend(end+1)=plot(ax,t,y(u,:),'Color',curcolor,'LineWidth',1);
 %             else
-                plot(ax,t,y(u,:),'Color',curcolor,'LineWidth',1);
+                plot(ax,t,ysort(u,:),'Color',curcolor,'LineWidth',1);
 %             end
         %     ax.Visible = 'off';
             ylabel(num2str(u));
@@ -422,7 +435,7 @@ end
 %% for each cell
 % mean PSTH for each event (4) by trial type, avg across trials
 c=1;
-% for c = 1:a.neuronCt
+for c = 1:a.neuronCt
     figure();
     
     fig = gcf;
@@ -437,14 +450,17 @@ c=1;
         ax = nsubplot(5,1,ci,1);
         ax.FontSize = 8;
         ylabel('Mean Ca activity across trials');
-        xlabel('Time relative to trial start');
+        if ci == numel(cname)
+            xlabel('Time relative to trial start');
+        end
         title(clabels{ci});
-        y = a.C_trials(c,:,a.imagingTrialType == ci);
+        y = a.C_trialsSort(c,:,a.imagingTrialType == ci);
         ymean = nanmean(y,3);
         ysem = std(y,[],3)./sqrt(size(y,3));
         curcolor = ccolor(ci,:); % color
         hold on;
         plot([5 5],[-1 +1].*10^10,'k','yliminclude','off');
+        plot([7 7],[-1 +1].*10^10,'k','yliminclude','off');
         plot([10 10],[-1 +1].*10^10,'b','yliminclude','off');
         plot(t,ymean-ysem,'color',curcolor);
         plot(t,ymean+ysem,'color',curcolor);        
@@ -455,7 +471,4 @@ c=1;
 
 
         saveas(fig,fullfile(pathname,[a.imageMouseName,'_',day,'_Cell_',num2str(c)]),'pdf');
-
-    
-    
-% end
+end
