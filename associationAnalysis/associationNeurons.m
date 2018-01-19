@@ -132,7 +132,7 @@ a.imagesTrimbyTrials = images(ismember(images(:,3),a.imagingTrials),:);
 
 %% TRIM NEURON DATA to match behavior and deal with extra/dropped frames
 
-a.neurons = neuron.C;
+a.neurons = neuron.C_raw;
 
 % for JB242_20171207, from neuron, frames 1363:end, leave out 1869 and 9516?
 % for dropped frames?!?
@@ -302,7 +302,8 @@ for ci = 1:numel(cname) % for each condition
     hold on;
 %     if ci == 1
 %         imagesc(t,a.neuronCt,y(a.cell_sort_ids,:));
-        imagesc(t,[],y(a.cell_sort_ids,:));
+        clims = [0 2];
+        imagesc(t,[],y(a.cell_sort_ids,:),clims);
         colorbar;
 %     else
 %         imagesc(t,a.neuronCt,y);
@@ -393,6 +394,7 @@ for ci = 1:numel(cname) % for each type
             ax = subplot(nRows,nCols,(m-1)*nCols+n);
 
             ax.FontSize = 8;
+            ax.YLim = [0 1];
             set(ax,'Box','off');
             set(ax,'TickDir','out');
             set(ax,'ticklen',[.01 .01]);
@@ -449,6 +451,7 @@ for c = 1:a.neuronCt
         
         ax = nsubplot(5,1,ci,1);
         ax.FontSize = 8;
+        ax.YLim = [0 2];
         ylabel('Mean Ca activity across trials');
         if ci == numel(cname)
             xlabel('Time relative to trial start');
