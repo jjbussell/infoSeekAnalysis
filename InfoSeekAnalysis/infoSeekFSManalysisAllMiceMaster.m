@@ -298,6 +298,9 @@ for m = 1:a.mouseCt
     % initial info side
     a.initinfoside(m,1) =  a.files(find(a.fileMouse == m,1)).infoSide;
     
+
+    
+    
    if isempty(find(mouseFileTypes == 5,1))
       a.firstChoice(m,1) = 0;
       a.mouseChoiceDays{m} = [];
@@ -517,8 +520,6 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 
 %% MEAN CHOICES / STATS AND CHOICE RANGES - FIX
 
-% TAKE NON-REVERSE MICE OUT OF GLM CALCS
-
 trialsToCount = 300;
 
 if ~isempty(a.choiceMice)
@@ -661,6 +662,8 @@ end
 % %    ok = a.allDay == d & a.trialType == 1;
 % %    overallDayMean(d) = mean(a.info(ok));  
 % % end
+
+
 
 %% SORT BY INFO PREFERENCE
 if ~isempty(a.choiceMice)
@@ -838,6 +841,7 @@ a.rxnSpeed = 1./a.rxn;
 
 a.goodRxn = a.rxn<8000 & a.rxn>100;
 
+%%
 % a.initInfoLicks = mean(a.earlyLicks(a.initinfoside_info == 1));
 % a.initNoInfoLicks = mean(a.earlyLicks(a.initinfoside_info == -1));
 % a.earlyLickIdx = (a.initInfoLicks - a.initNoInfoLicks)/(a.initInfoLicks + a.initNoInfoLicks);
@@ -871,6 +875,7 @@ a.goodRxn = a.rxn<8000 & a.rxn>100;
 %    a.rxnSpeedIdx(m,2) = (a.postRevRxnSpeed(m,1)-a.postRevRxnSpeed(m,2))/(a.postRevRxnSpeed(m,1)+a.postRevRxnSpeed(m,2)); 
 % end
 
+%%
 % RELATIVE TO CURRENT INFO SIDE
 for m=1:a.mouseCt
    ok1 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.preReverse == 1;
@@ -917,6 +922,7 @@ end
 
 % ttest2(mean licks to initial-info side, mean licks to initial-noinfo side)
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DAY SUMMARY
@@ -956,14 +962,17 @@ for m = 1:a.mouseCt
         a.daySummary.totalRewards{m,d} = sum(a.rewardCorr(ok));
         a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
         a.daySummary.percentInfo{m,d} = mean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1 & a.fileTrialTypes == 5));
+        a.daySummary.percentIIS{m,d} = mean(a.choice_all(ok & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5));
         a.daySummary.rxnInfoForced{m,d} = mean(a.rxn(a.infoForcedCorr & ok));
         a.daySummary.rxnInfoChoice{m,d} = mean(a.rxn(a.infoChoiceCorr & ok));
         a.daySummary.rxnRandForced{m,d} = mean(a.rxn(a.randForcedCorr & ok));
         a.daySummary.rxnRandChoice{m,d} = mean(a.rxn(a.randChoiceCorr & ok));
+        a.daySummary.rxnSpeedIdx{m,d} = (mean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) - mean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)))/(mean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) + mean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)));
         a.daySummary.infoBigLicks{m,d} = a.AlicksBetween(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicks{m,d} = a.BlicksBetween(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicks{m,d} = a.ClicksBetween(m,d)/sum(a.odorCtrials & ok);
         a.daySummary.randDLicks{m,d} = a.DlicksBetween(m,d)/sum(a.odorDtrials & ok);
+        a.daySummary.earlyLickIdx{m,d} = (mean(a.earlyLicks(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) - mean(a.earlyLicks(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)))/(mean(a.earlyLicks(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) + mean(a.earlyLicks(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)));
         a.daySummary.infoBigLicksEarly{m,d} = a.AlicksEarly(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicksEarly{m,d} = a.BlicksEarly(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicksEarly{m,d} = a.ClicksEarly(m,d)/sum(a.odorCtrials & ok);
@@ -1027,6 +1036,66 @@ for mm = 1:sum(a.FSMmice)
     end
 end
 
+%%
+for m = 1:a.mouseCt
+    infoBigProb = [];
+    randBigProb = [];
+    for d = 1:a.mouseDayCt(m)
+        infoBigProb(d) = a.daySummary.infoBigProb{m,d};
+        randBigProb(d) = a.daySummary.randBigProb{m,d};
+    end
+    a.infoBigProbs{m,1} = infoBigProb;
+    a.randBigProbs{m,1} = randBigProb;
+end
+
+%% DAYS AROUND REVERSES
+
+a.reversalDays = NaN(numel(a.reverseMice),3);
+
+for m = 1:numel(a.reverseMice)
+    a.reversalDays(m,1) = a.reverseDay{m,1}-1; % day prior to 1st reversal
+    if ~isempty(a.reverseDay{m,2})
+        a.reversalDays(m,2) = a.reverseDay{m,2}-1; % day prior to second reversal
+        
+        % last day of second reversal (either r+3/last day or last day before get
+        % ready for values)
+        if ~ismember(m,a.valueMice)
+            if a.reverseDay{m,2}+3 >= a.mouseDayCt(m)
+                a.reversalDays(m,3) = a.mouseDayCt(m);
+            else
+                a.reversalDays(m,3) = a.reverseDay{m,2}+3;
+            end
+        else
+            mouseValueDays = a.valueDays{m,1};
+            mouseProbDays = a.infoBigProbs{m,1};
+            mouseValues = mouseProbDays(mouseValueDays);
+            if sum(mouseValues > 25) > 0
+                a.reversalDays(m,3) = find(mouseProbDays==25,1,'last');
+            else
+                a.reversalDays(m,3) = mouseValueDays(1);
+            end
+        end
+    end
+end
+
+%% CHOICE, RXN SPEED, and EARLY LICKS AROUND REVERSALS
+
+a.reversalPrefs = NaN(numel(a.reverseMice),3);
+a.reversalRxn = NaN(numel(a.reverseMice),3);
+a.reversalLicks = NaN(numel(a.reverseMice),3);
+for m = 1:numel(a.reverseMice)-1
+    for n = 1:3
+        if ~isnan(a.reversalDays(m,n))
+            a.reversalPrefs(m,n) = a.daySummary.percentIIS{m,a.reversalDays(m,n)};
+            a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)};
+            a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)};
+        end
+    end
+end
+
+%% RXN SPEED AND EARLY LICKS ON FORCED TRIALS BY REVERSAL DAYS, RELATIVE TO INITIAL INFO SIDE
+
+% a.forcedCorrTrials == 1 & a.choice_all
 %%
 save('infoSeekFSMDataAnalyzed.mat','a');
 % save('JB195imagingDataAnalyzed.mat','a');

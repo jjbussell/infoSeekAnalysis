@@ -205,6 +205,8 @@ a.C_US = nanmean(a.C_trials(:,:,a.imagingTrialType == 5),3);
 % a.C_CSplus
 % a.C_CSminus
 
+uisave({'a','neuron'},[name '_AssociationNeurons.mat']);
+
 
 %% PLOTTING:
 
@@ -230,6 +232,10 @@ clabels = {'CS plus 1','CS plus 2', 'CS minus 1', 'CS minus 2', 'US'};
 eventTypes = {'Trial'};
 cAll = cnames;
 
+%% ACTIVITY LIMITS
+
+clims = [-0.2 1.5];
+
 %% POPULATION ACTIVITY
 
 figure();
@@ -243,7 +249,7 @@ cname = cnames;
 ccolor = ccolors;
 clabel = clabels;
 
-clims = [0 2];
+
 
 % condition neural activity
 % makes cell array with C(activity) for each condition
@@ -302,7 +308,7 @@ for ci = 1:numel(cname) % for each condition
     hold on;
 %     if ci == 1
 %         imagesc(t,a.neuronCt,y(a.cell_sort_ids,:));
-        clims = [0 2];
+%         clims = [0 2];
         imagesc(t,[],y(a.cell_sort_ids,:),clims);
         colorbar;
 %     else
@@ -394,7 +400,7 @@ for ci = 1:numel(cname) % for each type
             ax = subplot(nRows,nCols,(m-1)*nCols+n);
 
             ax.FontSize = 8;
-            ax.YLim = [0 1];
+            ax.YLim = clims;
             set(ax,'Box','off');
             set(ax,'TickDir','out');
             set(ax,'ticklen',[.01 .01]);
@@ -451,7 +457,7 @@ for c = 1:a.neuronCt
         
         ax = nsubplot(5,1,ci,1);
         ax.FontSize = 8;
-        ax.YLim = [0 2];
+        ax.YLim = [-0.2 2];
         ylabel('Mean Ca activity across trials');
         if ci == numel(cname)
             xlabel('Time relative to trial start');

@@ -1697,7 +1697,103 @@ end
 
     saveas(fig,fullfile(pathname,'PrevsPostRxn'),'pdf');
 %     close(fig);
+
+
+%% PLOT MEAN CHOICES AROUND REVERSALS
+
+% if a.choiceMouseCt > 1
+    fig = figure();
     
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [0 1];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
+    
+    for n=1:3
+       plot(n,nanmean(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
+       errorbar(n,nanmean(a.reversalPrefs(:,n)),sem(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'CapSize',100);
+    end
+    for m = 1:numel(a.reverseMice)-1
+        if ~isnan(a.reversalPrefs(m,3))
+            plot(a.reversalPrefs(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        end
+    end
+    reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel({'% choice of', 'initial info side'});
+% end
+
+%% PLOT RXN SPEED IDX AROUND REVERSALS
+
+% if a.choiceMouseCt > 1
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+%     ax.YLim = [0 1];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
+    
+    for n=1:3
+       plot(n,nanmean(a.reversalRxn(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
+       errorbar(n,nanmean(a.reversalRxn(:,n)),sem(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'CapSize',100);
+    end
+    for m = 1:numel(a.reverseMice)-1
+        if ~isnan(a.reversalPrefs(m,3))
+            plot(a.reversalRxn(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        end
+    end
+    reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel('Reaction Speed Index');
+% end
+
+%% PLOT EARLY LICK IDX AROUND REVERSALS
+
+% if a.choiceMouseCt > 1
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+%     ax.YLim = [0 1];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
+    
+    for n=1:3
+       plot(n,nanmean(a.reversalLicks(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
+       errorbar(n,nanmean(a.reversalLicks(:,n)),sem(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'CapSize',100);
+    end
+    for m = 1:numel(a.reverseMice)-1
+        if ~isnan(a.reversalPrefs(m,3))
+            plot(a.reversalLicks(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        end
+    end
+    reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel('Early Lick Index');
+% end
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
