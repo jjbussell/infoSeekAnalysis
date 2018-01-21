@@ -254,7 +254,8 @@ for fm = 1:a.numFiles
     end
    else
    a.fileMouse(fm) = find(strcmp(a.parameters(fm,2),a.mouseList));
-   a.fileDay(fm) = find(strcmp(a.parameters(fm,3),a.mouseDays{1,a.fileMouse(fm)})); 
+   a.fileDay(fm) = find(strcmp(a.parameters(fm,3),a.mouseDays{1,a.fileMouse(fm)}));
+   a.trialTypes(fm) = a.parameters{fm,7};
    end
 end
 
@@ -286,7 +287,7 @@ a.reverseDay = cell(a.mouseCt,1);
 a.prereverseFiles = ones(a.numFiles,1); %flag 1 = file with choices before reverse
 a.prereverseFiles(cell2mat(a.parameters(:,7))~=5) = 0;
 a.reverseFiles = zeros(a.numFiles,1); % flag 1 = file before first reverse, -1 = file during first reverse
-a.valueMice = zeros(a.mouseCt,1);
+% a.valueMice = zeros(a.mouseCt,1);
 
 for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
@@ -297,9 +298,6 @@ for m = 1:a.mouseCt
     
     % initial info side
     a.initinfoside(m,1) =  a.files(find(a.fileMouse == m,1)).infoSide;
-    
-
-    
     
    if isempty(find(mouseFileTypes == 5,1))
       a.firstChoice(m,1) = 0;
@@ -334,15 +332,15 @@ for m = 1:a.mouseCt
         end
     end
     
-    mouseValueFile = find(diff([cell2mat(a.parameters(a.fileMouse==m,22)),cell2mat(a.parameters(a.fileMouse==m,24))],1,2)~=0,1,'first');
-    a.valueFile{m,1} = mouseFilesIdx(mouseValueFile:end);
-    a.valueDays{m,1} = mouseFileDays(mouseValueFile:end);    
-    if ~isempty(mouseValueFile)
-        a.valueMice(m,1) = 1;
-    end;    
+%     mouseValueFile = find(diff([cell2mat(a.parameters(a.fileMouse==m & a.trialTypes == 5,22)),cell2mat(a.parameters(a.fileMouse==m & a.trialTypes == 5,24))],1,2)~=0,1,'first');
+%     a.valueFile{m,1} = mouseFilesIdx(mouseValueFile:end);
+%     a.valueDays{m,1} = mouseFileDays(mouseValueFile:end);    
+%     if ~isempty(mouseValueFile)
+%         a.valueMice(m,1) = 1;
+%     end;    
 end
 
-a.valueMice = find(a.valueMice);
+% a.valueMice = find(a.valueMice);
     
 a.preReverse = ones(size(a.file,1),1);
 a.reverse = zeros(size(a.file,1),1);
@@ -472,8 +470,6 @@ else
     a.reverseMice = [];
 end
 a.reverseMiceList = a.mouseList(a.reverseMice);
-
-a.valueMiceList = a.mouseList(a.valueMice);
 
 % FSM mice
 a.FSMmice = zeros(a.mouseCt,1);
@@ -678,87 +674,157 @@ if ~isempty(a.choiceMice)
 end
 
 %% DIFFERENT SIDE VALUES
+% 
+% a.valueFileCat = cat(2,a.valueFile{:});
+% for ff = 1:numel(a.valueFileCat)
+%     f = a.valueFileCat(ff);
+%     a.valChange(ff,1) = a.parameters{f,22};
+%     a.valChange(ff,2) = a.parameters{f,24};
+%     a.valChange(ff,3) = a.valChange(ff,1) / a.valChange(ff,2);
+%     a.valChangeMouse(ff,1) = a.fileMouse(f);
+%     a.choiceByAmtbyFile{ff,1} = a.choice_all(a.file == f);
+% end
+% 
+% if isfield(a,'valChange')
+%     a.values = unique(a.valChange(:,1));
+%     a.relValues = unique(a.valChange(:,1)/4);
+% else
+%     a.values = [];
+%     a.relValues = [];
+% end
 
-a.valueFileCat = cat(2,a.valueFile{:});
-for ff = 1:numel(a.valueFileCat)
-    f = a.valueFileCat(ff);
-    a.valChange(ff,1) = a.parameters{f,22};
-    a.valChange(ff,2) = a.parameters{f,24};
-    a.valChange(ff,3) = a.valChange(ff,1) / a.valChange(ff,2);
-    a.valChangeMouse(ff,1) = a.fileMouse(f);
-    a.choiceByAmtbyFile{ff,1} = a.choice_all(a.file == f);
+%% FIND LAST DAY AT EACH VALUE FOR EACH MOUSE
+for f = 1:a.numFiles
+    a.fileValue(f,1) = a.parameters{f,22};
+    a.fileValue(f,2) = a.parameters{f,24};
+    a.fileValue(f,3) = a.fileValue(f,1) / a.fileValue(f,2);
 end
 
-if isfield(a,'valChange')
-    a.values = unique(a.valChange(:,1));
-    a.relValues = unique(a.valChange(:,1)/4);
-else
-    a.values = [];
-    a.relValues = [];
-end
+a.values = unique(a.fileValue(:,1));
+a.relValues = unique(a.fileValue(:,3));
 
-% mean/SEM only the last 100 trials of that value!! no, ALL? What about
-% repeated values?
+% HARDCODED-->CHANGE!!!!!!!!!!!!!!!
+% HARD CODED TO CHANGE
+a.valueMice = [6 7 8 9];
+a.valueMiceList = a.mouseList(a.valueMice);
+
 for mm = 1:numel(a.valueMice)
-    m = a.valueMice(mm);
-    mouseValFiles = a.valueFile{m,1};
-    mouseValDays = a.valueDays{m,1};
-%     mouseFileDays = a.fileDay(a.fileMouse == m);
-    for vv = 1:numel(a.values)
-       v = a.values(vv);
-       a.valFiles{mm,vv} = a.valueFileCat(a.valChange(:,1) == v & a.valChangeMouse(:,1) == m);
-       
-       currValFiles = find(ismember(mouseValFiles,a.valFiles{mm,vv}));
-       currValDays = mouseValDays(currValFiles);
-       currValDiff = [1 diff(currValDays)];
-       valSplit = find(currValDiff > 1);
-       if ~isempty(valSplit)
-           firstValDay = currValDays(valSplit-1);
-           secondValDay = currValDays(end);
-           valDays = [firstValDay, secondValDay];
-       elseif ~isempty(currValDays)
-           valDays = currValDays(end);
-       else
-           valDays = [];
-       end
-       % want to find last day in first string and last day in second
-       % string
-       
-       % get actual days/file numbers for valDays (by mouse) to get choices
-       
-       a.valChoiceFiles{mm,vv} = find(ismember(a.fileDay,valDays)&a.fileMouse==m);
-       a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valChoiceFiles{mm,vv},2)==1);
-%        a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valFiles{mm,vv},2)==1); % takes all choices from all files with those values
-       
-       currentValChoices = a.valChoices{mm,vv};
-       if numel(currentValChoices) >= 100
-%            a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices(end-100:end));
-%            a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices(end-100:end));
-%            a.choiceByAmtByMouse{mm,vv} = currentValChoices(end-99:end);
-           a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices);
-           a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices);
-           a.choiceByAmtByMouse{mm,vv} = currentValChoices;           
-       else
-           a.valChoiceMeanbyMouse(mm,vv) = NaN;
-           a.valChoiceSEMbyMouse(mm,vv) = NaN;
-           a.choiceByAmtByMouse{mm,vv} = NaN;
-       end
-    end
+   m = a.valueMice(mm);
+   a.valueMouseFiles{mm,1} = find(a.fileMouse == m);
+   a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,1);
 end
 
-for vv = 1:numel(a.values)
-   v = a.values(vv);
-   a.choiceByAmt{v,1} = cell2mat(a.choiceByAmtbyFile(a.valChange(:,1)==v,1));
-   currentChoiceByAmt = a.choiceByAmt{v,1};
-%    a.choiceByAmtMean(v,1) = mean(a.choiceByAmt{v,1});
-%    a.choiceByAmtSEM(v,1) = sem(a.choiceByAmt{v,1});
+% file within mouse's files after which value tests start
+% HARDCODED-->CHANGE!!!!!!!!!!!!!!!
+ a.valueStarts = [35 40 48 50];
+     
+for mm = 1:numel(a.valueMice)
+   m = a.valueMice(mm); 
+   allMouseValueFiles = a.valueMouseFiles{mm,1};
+   mouseValueFiles = allMouseValueFiles(a.valueStarts(mm):end);
+   allMouseValues = a.valueMouseValues{mm,1};
+   mouseValues = allMouseValues(a.valueStarts(mm):end);
+   a.mouseValueDays{mm,1} = a.fileDay(mouseValueFiles);
+   a.mouseValueChangeFiles{mm,1}=mouseValueFiles(find(diff(mouseValues)~=0));
+   % NOTE: choosing entire day from file before value changed
+   a.mouseValueChangeDays{mm,1} = a.fileDay(a.mouseValueChangeFiles{mm,1});
+   mouseValueChangeDays = a.mouseValueChangeDays{mm,1};
+   a.mouseValueChangeValues{mm,1} = a.fileValue(a.mouseValueChangeFiles{mm,1},3);
+   mouseValueChangeValues = a.mouseValueChangeValues{mm,1};
+   for vv = 1:numel(a.values)
+       v = a.relValues(vv);
+       a.mouseValueFinalDays{mm,vv} = mouseValueChangeDays(mouseValueChangeValues == v);
+   end
 end
 
-for vv = 1:numel(a.values)
-    v = a.values(vv);
-    a.choiceByAmtMean(v,1) = nanmean(cell2mat(a.choiceByAmtByMouse(:,v)));
-    a.choiceByAmtSEM(v,1) = sem(cell2mat(a.choiceByAmtByMouse(:,v)));
+% Can pull daySummary.percentInfo for all value days (course of value
+% tradeoffs)
+
+%% CHOICES ON MOUSE VALUE FINAL DAYS (2 per value per mouse)
+
+for mm = 1:numel(a.valueMice)
+   m = a.valueMice(mm);
+   for vv = 1:numel(a.values)
+       v = a.relValues(vv);
+       days = a.mouseValueFinalDays{mm,vv};
+       a.valueChoiceTrials{mm,vv} = a.choice_all(ismember(a.mouseDay,days) & a.mice(:,m) == 1 & a.choiceCorrTrials == 1);
+       a.valChoiceMeanbyMouse(mm,vv) = nanmean(a.valueChoiceTrials{mm,vv});
+       a.valChoiceSEMbyMouse(mm,vv) = sem(a.valueChoiceTrials{mm,vv});
+   end
 end
+
+%%
+for vv = 1:numel(a.values)
+   v = a.relValues(vv);
+    a.valChoices{vv,1} = vertcat(a.valueChoiceTrials{:,vv});
+    a.choiceByAmtMean(vv,1) = nanmean(a.valChoices{vv,1});
+    a.choiceByAmtSEM(vv,1) = sem(a.valChoices{vv,1});
+end
+
+
+%%
+%  mean/SEM only the last 100 trials of that value!! no, ALL? What about
+% repeated values?
+% for mm = 1:numel(a.valueMice)
+%     m = a.valueMice(mm);
+%     mouseValFiles = a.valueFile{m,1};
+%     mouseValDays = a.valueDays{m,1};
+% %     mouseFileDays = a.fileDay(a.fileMouse == m);
+%     for vv = 1:numel(a.values)
+%        v = a.values(vv);
+%        a.valFiles{mm,vv} = a.valueFileCat(a.valChange(:,1) == v & a.valChangeMouse(:,1) == m);
+%        
+%        currValFiles = find(ismember(mouseValFiles,a.valFiles{mm,vv}));
+%        currValDays = mouseValDays(currValFiles);
+%        currValDiff = [1 diff(currValDays)];
+%        valSplit = find(currValDiff > 1);
+%        if ~isempty(valSplit)
+%            firstValDay = currValDays(valSplit-1);
+%            secondValDay = currValDays(end);
+%            valDays = [firstValDay, secondValDay];
+%        elseif ~isempty(currValDays)
+%            valDays = currValDays(end);
+%        else
+%            valDays = [];
+%        end
+%        % want to find last day in first string and last day in second
+%        % string
+%        
+%        % get actual days/file numbers for valDays (by mouse) to get choices
+%        
+%        a.valChoiceFiles{mm,vv} = find(ismember(a.fileDay,valDays)&a.fileMouse==m);
+%        a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valChoiceFiles{mm,vv},2)==1);
+% %        a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valFiles{mm,vv},2)==1); % takes all choices from all files with those values
+%        
+%        currentValChoices = a.valChoices{mm,vv};
+%        if numel(currentValChoices) >= 100
+% %            a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices(end-100:end));
+% %            a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices(end-100:end));
+% %            a.choiceByAmtByMouse{mm,vv} = currentValChoices(end-99:end);
+%            a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices);
+%            a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices);
+%            a.choiceByAmtByMouse{mm,vv} = currentValChoices;           
+%        else
+%            a.valChoiceMeanbyMouse(mm,vv) = NaN;
+%            a.valChoiceSEMbyMouse(mm,vv) = NaN;
+%            a.choiceByAmtByMouse{mm,vv} = NaN;
+%        end
+%     end
+% end
+% 
+% for vv = 1:numel(a.values)
+%    v = a.values(vv);
+%    a.choiceByAmt{v,1} = cell2mat(a.choiceByAmtbyFile(a.valChange(:,1)==v,1));
+%    currentChoiceByAmt = a.choiceByAmt{v,1};
+% %    a.choiceByAmtMean(v,1) = mean(a.choiceByAmt{v,1});
+% %    a.choiceByAmtSEM(v,1) = sem(a.choiceByAmt{v,1});
+% end
+% 
+% for vv = 1:numel(a.values)
+%     v = a.values(vv);
+%     a.choiceByAmtMean(v,1) = nanmean(cell2mat(a.choiceByAmtByMouse(:,v)));
+%     a.choiceByAmtSEM(v,1) = sem(cell2mat(a.choiceByAmtByMouse(:,v)));
+% end
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY - UNUSED?
 
@@ -1066,7 +1132,8 @@ for m = 1:numel(a.reverseMice)
                 a.reversalDays(m,3) = a.reverseDay{m,2}+3;
             end
         else
-            mouseValueDays = a.valueDays{m,1};
+            mm = find(a.valueMice == m);
+            mouseValueDays = a.mouseValueDays{mm,1};
             mouseProbDays = a.infoBigProbs{m,1};
             mouseValues = mouseProbDays(mouseValueDays);
             if sum(mouseValues > 25) > 0

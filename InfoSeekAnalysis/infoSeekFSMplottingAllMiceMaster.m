@@ -1163,7 +1163,7 @@ a.currentValMice = a.currentMiceNums(ismember(a.currentMiceNums,a.valueMice));
 %     m = a.currentValMice(mC);
 %     mm = find(a.valueMice == m);
 
-a.tempValueMice = a.valueMice(4:end);
+a.tempValueMice = a.valueMice;
     
 for mm = 1:numel(a.tempValueMice)
     m =a.tempValueMice(mm);
@@ -1178,8 +1178,8 @@ for mm = 1:numel(a.tempValueMice)
     ax = nsubplot(2,1,1,1);
     title(a.mouseList(m));
     ax.FontSize = 8;
-    ax.XLim = [0 2.5];
-    ax.XTick = [0 a.relValues' 2];
+%     ax.XLim = [0 2.5];
+    ax.XTick = [0 a.relValues'];
     ax.YTick = [0 0.25 0.50 0.75 1];
     ax.YLim = [0 1];
     s=a.relValues';
@@ -1189,9 +1189,11 @@ for mm = 1:numel(a.tempValueMice)
     mouseVals = ~isnan(a.valChoiceMeanbyMouse(mm,:));
     plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
     plot(a.relValues(mouseVals),a.valChoiceMeanbyMouse(mm,mouseVals),'Color','r','LineWidth',3,'Marker','o','MarkerFaceColor','r','MarkerSize',3);
-    bar(2,a.meanChoice(m,1),0.2,'FaceColor','r','EdgeColor','none');
+    plot(a.relValues(mouseVals),a.valChoiceMeanbyMouse(mm,mouseVals)+a.valChoiceSEMbyMouse(mm,mouseVals),'Color','r','LineWidth',1,'Marker','none','MarkerFaceColor','r','MarkerSize',3);
+    plot(a.relValues(mouseVals),a.valChoiceMeanbyMouse(mm,mouseVals)-a.valChoiceSEMbyMouse(mm,mouseVals),'Color','r','LineWidth',1,'Marker','none','MarkerFaceColor','r','MarkerSize',3);
+    %     bar(2,a.meanChoice(m,1),0.2,'FaceColor','r','EdgeColor','none');
 %     bar([a.relValues(mouseVals); 2],[a.valChoiceMeanbyMouse(mm,mouseVals) a.meanChoice(m,1)],0.2,'FaceColor','k');
-    xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
+    xticklabels(['0' strtrim(cellstr(num2str(s'))')]);
 
     ax = nsubplot(2,1,2,1);    
     ax.FontSize = 8;
@@ -1204,7 +1206,7 @@ for mm = 1:numel(a.tempValueMice)
     ax.YTick = [0 a.relValues' 1.75 2];
     ax.YLim = [0 2];
     plot([-10000000 1000000],[1 1],'Color',grey,'yliminclude','off','xliminclude','off','LineWidth',0.5);
-    bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.valueDays{m,1}))/4],'FaceColor','k','EdgeColor','none'); 
+    bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.mouseValueDays{mm,1}))/4],'FaceColor','k','EdgeColor','none'); 
     
     yyaxis right
     ax = gca;
@@ -1213,7 +1215,7 @@ for mm = 1:numel(a.tempValueMice)
     ax.YTick = [0 0.25 0.50 0.75 1];
     ax.YLim = [0 1];
     plot([-10000000 1000000],[0.5 0.5],'Color','r','yliminclude','off','xliminclude','off','LineWidth',0.5);
-    plot(1:numel(a.valueDays{m,1})+1,[a.meanChoice(m,1) cell2mat(a.daySummary.percentInfo(m,a.valueDays{m,1}))],'Color','r','LineWidth',3,'LineStyle','-','Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);    
+    plot(1:numel(a.mouseValueDays{mm,1})+1,[a.meanChoice(m,1) cell2mat(a.daySummary.percentInfo(m,a.mouseValueDays{mm,1}))],'Color','r','LineWidth',3,'LineStyle','-','Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);    
 
     saveas(fig,fullfile(pathname,['values' a.mouseList{m}]),'pdf');
 end
