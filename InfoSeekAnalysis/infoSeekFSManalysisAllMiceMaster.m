@@ -967,12 +967,12 @@ for m = 1:a.mouseCt
         a.daySummary.rxnInfoChoice{m,d} = mean(a.rxn(a.infoChoiceCorr & ok));
         a.daySummary.rxnRandForced{m,d} = mean(a.rxn(a.randForcedCorr & ok));
         a.daySummary.rxnRandChoice{m,d} = mean(a.rxn(a.randChoiceCorr & ok));
-        a.daySummary.rxnSpeedIdx{m,d} = (mean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) - mean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)))/(mean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) + mean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)));
+        a.daySummary.rxnSpeedIdx{m,d} = (nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) - nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)))/(nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) + nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)));
         a.daySummary.infoBigLicks{m,d} = a.AlicksBetween(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicks{m,d} = a.BlicksBetween(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicks{m,d} = a.ClicksBetween(m,d)/sum(a.odorCtrials & ok);
         a.daySummary.randDLicks{m,d} = a.DlicksBetween(m,d)/sum(a.odorDtrials & ok);
-        a.daySummary.earlyLickIdx{m,d} = (mean(a.earlyLicks(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) - mean(a.earlyLicks(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)))/(mean(a.earlyLicks(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) + mean(a.earlyLicks(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)));
+        a.daySummary.earlyLickIdx{m,d} = (nanmean(a.earlyLicks(ok==1 & a.forcedCorrTrials == 1 & a.choice_all == 1)) - nanmean(a.earlyLicks(ok==1 & a.forcedCorrTrials == 1 & a.choice_all == 0)))/(nanmean(a.earlyLicks(ok==1 & a.forcedCorrTrials == 1 & a.choice_all == 1)) + nanmean(a.earlyLicks(ok==1 & a.forcedCorrTrials == 1 & a.choice_all == 0)));
         a.daySummary.infoBigLicksEarly{m,d} = a.AlicksEarly(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicksEarly{m,d} = a.BlicksEarly(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicksEarly{m,d} = a.ClicksEarly(m,d)/sum(a.odorCtrials & ok);
@@ -1078,17 +1078,28 @@ for m = 1:numel(a.reverseMice)
     end
 end
 
-%% CHOICE, RXN SPEED, and EARLY LICKS AROUND REVERSALS
+%% CHOICE, RXN SPEED, EARLY LICKS, AND REWARD RATE AROUND REVERSALS
 
 a.reversalPrefs = NaN(numel(a.reverseMice),3);
 a.reversalRxn = NaN(numel(a.reverseMice),3);
 a.reversalLicks = NaN(numel(a.reverseMice),3);
-for m = 1:numel(a.reverseMice)-1
+for m = 1:numel(a.reverseMice)
     for n = 1:3
         if ~isnan(a.reversalDays(m,n))
             a.reversalPrefs(m,n) = a.daySummary.percentIIS{m,a.reversalDays(m,n)};
-            a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)};
-            a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)};
+%             if isnan(a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)})
+%                 a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)-1};
+%             else
+                a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)};
+%             end
+%             if isnan(a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)})
+%                 a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)-1};
+%             else
+                a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)};
+%             end
+%             a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)})/(a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}+a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)});
+            a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)});
+        
         end
     end
 end

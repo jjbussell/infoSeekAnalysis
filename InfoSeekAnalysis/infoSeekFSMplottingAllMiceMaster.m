@@ -1765,7 +1765,7 @@ end
 
 %% PLOT EARLY LICK IDX AROUND REVERSALS
 
-% if a.choiceMouseCt > 1
+% if numel(a.reverseMice) > 1
     fig = figure();
     
     fig = gcf;
@@ -1793,6 +1793,38 @@ end
     reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
     set(gca,'XTickLabel',reverseLabels);
     ylabel('Early Lick Index');
+% end
+
+%% PLOT EARLY LICK IDX AROUND REVERSALS
+
+% if numel(a.reverseMice) > 1
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+%     ax.YLim = [0 1];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
+    
+    for n=1:3
+       plot(n,nanmean(a.reversalRewardRateIdx(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
+       errorbar(n,nanmean(a.reversalRewardRateIdx(:,n)),sem(a.reversalRewardRateIdx(:,n)),'Color','k','LineWidth',2,'CapSize',100);
+    end
+    for m = 1:numel(a.reverseMice)
+        if ~isnan(a.reversalRewardRateIdx(m,3))
+            plot(a.reversalRewardRateIdx(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        end
+    end
+    reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel('Info Reward Rate - No Info Reward Rate');
 % end
 
 %%
