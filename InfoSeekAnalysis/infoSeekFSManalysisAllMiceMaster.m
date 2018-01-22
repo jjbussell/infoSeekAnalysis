@@ -670,7 +670,12 @@ if ~isempty(a.choiceMice)
     %% STATS
 
     a.icp_all = a.sortedChoice(:,1)*100;
+    
+%     a.icp_all = a.meanChoice(1:end-1,1)*100;
+    
     a.overallP = signrank(a.icp_all-50);
+    
+    
 end
 
 %% DIFFERENT SIDE VALUES
@@ -753,12 +758,25 @@ for mm = 1:numel(a.valueMice)
    end
 end
 
-%%
+%% OVERALL CHOICES BY AMOUNT
+
 for vv = 1:numel(a.values)
    v = a.relValues(vv);
     a.valChoices{vv,1} = vertcat(a.valueChoiceTrials{:,vv});
     a.choiceByAmtMean(vv,1) = nanmean(a.valChoices{vv,1});
     a.choiceByAmtSEM(vv,1) = sem(a.valChoices{vv,1});
+end
+
+%% HARDCODED OVERALL BY AMOUNT BY PROB
+
+for vv = 1:numel(a.values)
+   v = a.relValues(vv);
+    a.valChoicesProb{vv,1} = vertcat(a.valueChoiceTrials{1:2,vv});
+    a.valChoicesProb{vv,2} = vertcat(a.valueChoiceTrials{3:4,vv});
+    a.choiceByAmtProbMean(vv,1) = nanmean(a.valChoicesProb{vv,1});
+    a.choiceByAmtProbMean(vv,2) = nanmean(a.valChoicesProb{vv,2});
+    a.choiceByAmtProbSEM(vv,1) = sem(a.valChoicesProb{vv,1});
+    a.choiceByAmtProbSEM(vv,2) = sem(a.valChoicesProb{vv,2});
 end
 
 
@@ -1150,10 +1168,25 @@ end
 a.reversalPrefs = NaN(numel(a.reverseMice),3);
 a.reversalRxn = NaN(numel(a.reverseMice),3);
 a.reversalLicks = NaN(numel(a.reverseMice),3);
+a.reversalMultiPrefs = NaN(numel(a.reverseMice),8);
 for m = 1:numel(a.reverseMice)
     for n = 1:3
         if ~isnan(a.reversalDays(m,n))
             a.reversalPrefs(m,n) = a.daySummary.percentIIS{m,a.reversalDays(m,n)};
+            if n == 1
+                for k = 1:4
+                    if ~isempty(a.daySummary.percentIIS{m,a.reversalDays(m,n)+k-1})
+                    a.reversalMultiPrefs(m,k) = a.daySummary.percentIIS{m,a.reversalDays(m,n)+k-1};
+                    end
+                end
+            elseif n==2
+                for k = 1:4
+                    if ~isempty(a.daySummary.percentIIS{m,a.reversalDays(m,n)+k-1})
+                    a.reversalMultiPrefs(m,k+4) = a.daySummary.percentIIS{m,a.reversalDays(m,n)+k-1};
+                    end
+                end
+            end
+            
 %             if isnan(a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)})
 %                 a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)-1};
 %             else
@@ -1163,17 +1196,53 @@ for m = 1:numel(a.reverseMice)
 %                 a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)-1};
 %             else
                 a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)};
+                a.reversalInfoBigEarlyLicks(m,n) = a.daySummary.infoBigLicksEarly{m,a.reversalDays(m,n)};
+                a.reversalInfoSmallEarlyLicks(m,n) = a.daySummary.infoSmallLicksEarly{m,a.reversalDays(m,n)};
+                a.reversalRandCEarlyLicks(m,n) = a.daySummary.randCLicksEarly{m,a.reversalDays(m,n)};
+                a.reversalRandDEarlyLicks(m,n) = a.daySummary.randDLicksEarly{m,a.reversalDays(m,n)};
+                a.reversalInfoBigLicks(m,n) = a.daySummary.infoBigLicks{m,a.reversalDays(m,n)};
+                a.reversalInfoSmallLicks(m,n) = a.daySummary.infoSmallLicks{m,a.reversalDays(m,n)};
+                a.reversalRandCLicks(m,n) = a.daySummary.randCLicks{m,a.reversalDays(m,n)};
+                a.reversalRandDLicks(m,n) = a.daySummary.randDLicks{m,a.reversalDays(m,n)};
 %             end
 %             a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)})/(a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}+a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)});
-            a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)});
-        
+              if n==2
+                a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)});
+              else
+                a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)});   
+              end
         end
     end
 end
 
-%% RXN SPEED AND EARLY LICKS ON FORCED TRIALS BY REVERSAL DAYS, RELATIVE TO INITIAL INFO SIDE
+%%
+a.meanReversalMultiPrefs = nanmean(a.reversalMultiPrefs);
+a.SEMReversalMultiPrefs = sem(a.reversalMultiPrefs);
 
-% a.forcedCorrTrials == 1 & a.choice_all
+a.reversalPrefs_stats = a.reversalPrefs*100;
+a.reversal1P = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,2));
+a.reversal2P = signrank(a.reversalPrefs_stats(:,2),a.reversalPrefs_stats(:,3));
+a.reversalP = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,3));
+
+a.reversalRxnP(1,1) = signrank(a.reversalRxn(:,1),a.reversalRxn(:,2));
+a.reversalRxnP(1,2) = signrank(a.reversalRxn(:,2),a.reversalRxn(:,3));
+a.reversalRxnP(1,3) = signrank(a.reversalRxn(:,1),a.reversalRxn(:,3));
+
+a.reversalLicksP(1,1) = signrank(a.reversalLicks(:,1),a.reversalLicks(:,2));
+a.reversalLicksP(1,2) = signrank(a.reversalLicks(:,2),a.reversalLicks(:,3));
+a.reversalLicksP(1,3) = signrank(a.reversalLicks(:,1),a.reversalLicks(:,3));
+
+a.reversalRewardRateP(1,1) = signrank(a.reversalRewardRateIdx(:,1),a.reversalRewardRateIdx(:,2));
+a.reversalRewardRateP(1,2) = signrank(a.reversalRewardRateIdx(:,2),a.reversalRewardRateIdx(:,3));
+a.reversalRewardRateP(1,3) = signrank(a.reversalRewardRateIdx(:,1),a.reversalRewardRateIdx(:,3));
+
+for p =1:3
+    a.reversalPVals(1,p) = signrank(a.reversalPrefs_stats(:,p)-50);
+    a.reversalRxnPVals(1,p) = signrank(a.reversalRxn(:,p));
+    a.reversalLicksPVals(1,p) = signrank(a.reversalLicks(:,p));
+    a.reversalRewardRatePVals(1,p) = signrank(a.reversalRewardRateIdx(:,p));
+end
+
 %%
 save('infoSeekFSMDataAnalyzed.mat','a');
 % save('JB195imagingDataAnalyzed.mat','a');
