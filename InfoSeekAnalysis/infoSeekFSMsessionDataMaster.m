@@ -420,6 +420,11 @@ b.images(:,1) = ff;
 %% TRIAL PARAMS
 
     b.trialParams = data(data(:,3) == 17, :);
+    
+    if(size(b.trialParams,1) < trialCt)
+        b.trialParams(end+1,:) = [totalTime, trialCt, 17, 0, 5];
+    end
+    
     b.trialParams = [zeros(size(b.trialParams,1),1) b.trialParams];
     b.trialParams(:,1) = ff;
 
