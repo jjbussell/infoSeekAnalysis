@@ -351,7 +351,10 @@ end
 
     
 for m = 1:a.mouseCt
-    ok = a.mice(:,m) == 1;    
+    ok = a.mice(:,m) == 1;
+    mouseReverse = [];
+    mousePrereverse = [];
+    mouseTypes = [];
     mouseReverse = a.reverse(ok);
     mousePrereverse = a.preReverse(ok);
     mouseTypes = a.choiceTypeCorr(ok);

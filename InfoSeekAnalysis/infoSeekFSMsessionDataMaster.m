@@ -130,11 +130,16 @@ for f = 1:numFiles
 %% TRIAL COUNTS
 
     trialCt = max(data(:,2));
-    b.trialNums(:,1) = 1:trialCt;
+
 
     trialStarts = data(data(:,3) == 10,:);
     b.trialStart = data(data(:,3) == 10,:);
-
+   
+    if(size(b.trialStart,1)<trialCt)
+        trialCt = size(b.trialStart,1);
+    end
+    
+    b.trialNums(:,1) = 1:trialCt;
 
     if loadData == 0
         b.fileAll(1:trialCt,1) = f;
