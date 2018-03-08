@@ -131,7 +131,17 @@ for f = 1:numFiles
     b.images = [];
     b.images = data(data(:,3) == 20, [1 2]);
     b.images = [zeros(size(b.images,1),1) b.images];
-    b.images(:,1) = ff;    
+    b.images(:,1) = ff; 
+    
+    b.imagingStart = [];
+    b.imagingStart = data(data(:,3) == 22, [1 2]);
+    b.imagingStart = [zeros(size(b.imagingStart,1),1) b.imagingStart];
+    b.imagingStart(:,1) = ff;
+    
+    b.imagingStop = [];
+    b.imagingStop = data(data(:,3) == 23, [1 2]);
+    b.imagingStop = [zeros(size(b.imagingStop,1),1) b.imagingStop];
+    b.imagingStop(:,1) = ff;    
     
 %% STATE TRANSITIONS
 
@@ -165,17 +175,30 @@ for f = 1:numFiles
 
 %% BASELINE ENTRIES
     
-    % can be more than one per trial!
+    % can be more than one per trial! or none for last trial
+    baseline = [];
     baseline = b.transitions(b.transitions(:,5)==3,:);
     
     for t=1:trialCt
        baselineIdx = find(baseline(:,3)==t,1,'last');
-       b.baseline(t,:) = baseline(baselineIdx,:);
+       if ~isempty(baselineIdx)
+           b.baseline(t,:) = baseline(baselineIdx,:);
+       else
+           b.baseline(t,:) = [0,0,0,0,0,0];
+       end
        baselineDiff = b.baseline(t,2) - b.entries(:,2);
        baselineDiff(baselineDiff < 0) = inf;
        [entryVal,entryIdx] = min(baselineDiff);
-       b.entry(t,:) = b.entries(entryIdx,:);
-       b.exit(t,:) = b.exits(entryIdx,:);
+       if ~isempty(entryIdx)
+           b.entry(t,:) = b.entries(entryIdx,:);
+       else
+           b.entry(t,:) = [0,0,0,0,0,0];
+       end
+       if entryIdx <= size(b.exits,1)
+           b.exit(t,:) = b.exits(entryIdx,:);
+       else
+           b.exit(t,:) = [0,0,0,0,0,0];
+       end
     end
     
 %% COMPLETE
@@ -200,7 +223,7 @@ for f = 1:numFiles
     b.licks = [zeros(size(b.licks,1),1) b.licks];
     b.licks(:,1) = ff;
     
-    b.licks(:,4:11) = 0;
+    b.licks(:,4:11) = NaN;
     
     for L = 1:size(b.licks,1)
         lickEntDiff = [];
@@ -252,6 +275,7 @@ for t = 1:trialCt
     b.trialLicks(t,4) = sum(b.licks(:,8) == t & b.licks(:,11) == 3);
     b.trialLicks(t,5) = sum(b.licks(:,8) == t & b.licks(:,11) == 4);
     b.allLicksTrialStart{t,1} = b.licks(:,2) - b.entry(t,2);
+    b.lickTimes{t,1} = b.licks(b.licks(:,8) == t,10);
 end
     
 %%
@@ -276,6 +300,8 @@ end
 
         a.trialCts = [a.trialCts trialCt];
         a.images = [a.images; b.images];
+        a.imagingStart = [a.imagingStart; b.imagingStart];
+        a.imagingStop = [a.imagingStop; b.imagingStop];
         a.transitions = [a.transitions; b.transitions];        
         a.mouse = [a.mouse; repmat(mouse,trialCt,1)];
         a.trialNums = [a.trialNums; b.trialNums];
@@ -294,6 +320,7 @@ end
         a.licks = [a.licks; b.licks];
         a.trialLicks = [a.trialLicks; b.trialLicks];
         a.allLicksTrialStart = [a.allLicksTrialStart; b.allLicksTrialStart];
+        a.lickTimes = [a.lickTimes; b.lickTimes];
     end
 end % for each file
 

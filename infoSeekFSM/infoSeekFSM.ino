@@ -301,6 +301,7 @@ void loop() {
       REL_THRESH        =        Serial.parseInt();
       touch_right       =        Serial.parseInt();
       touch_left        =        Serial.parseInt();
+      optoFlag          =        Serial.parseInt();
 
       unsigned long entryThreshold = 20;
       int lickCheck = 1;
@@ -744,7 +745,7 @@ void readTTL(){
 
 /////////////////  BEAM BREAKS  /////////////////////////
 int beamBreak(int sensorPin) {
-  if (analogRead(sensorPin) < 400) {
+  if (analogRead(sensorPin) < 250) {
     return 1;
   }
 

@@ -1159,9 +1159,14 @@ end
 
 a.currentValMice = a.currentMiceNums(ismember(a.currentMiceNums,a.valueMice));
 
-for mC = 1:numel(a.currentValMice)
-    m = a.currentValMice(mC);
-    mm = find(a.valueMice == m);
+% for mC = 1:numel(a.currentValMice)
+%     m = a.currentValMice(mC);
+%     mm = find(a.valueMice == m);
+
+a.tempValueMice = a.valueMice;
+    
+for mm = 1:numel(a.tempValueMice)
+    m =a.tempValueMice(mm);
     
     fig = figure();
     fig = gcf;
@@ -1173,8 +1178,8 @@ for mC = 1:numel(a.currentValMice)
     ax = nsubplot(2,1,1,1);
     title(a.mouseList(m));
     ax.FontSize = 8;
-    ax.XLim = [0 2.5];
-    ax.XTick = [0 a.relValues' 2];
+%     ax.XLim = [0 2.5];
+    ax.XTick = [0 a.relValues'];
     ax.YTick = [0 0.25 0.50 0.75 1];
     ax.YLim = [0 1];
     s=a.relValues';
@@ -1184,9 +1189,11 @@ for mC = 1:numel(a.currentValMice)
     mouseVals = ~isnan(a.valChoiceMeanbyMouse(mm,:));
     plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
     plot(a.relValues(mouseVals),a.valChoiceMeanbyMouse(mm,mouseVals),'Color','r','LineWidth',3,'Marker','o','MarkerFaceColor','r','MarkerSize',3);
-    bar(2,a.meanChoice(m,1),0.2,'FaceColor','r','EdgeColor','none');
+    plot(a.relValues(mouseVals),a.valChoiceMeanbyMouse(mm,mouseVals)+a.valChoiceSEMbyMouse(mm,mouseVals),'Color','r','LineWidth',1,'Marker','none','MarkerFaceColor','r','MarkerSize',3);
+    plot(a.relValues(mouseVals),a.valChoiceMeanbyMouse(mm,mouseVals)-a.valChoiceSEMbyMouse(mm,mouseVals),'Color','r','LineWidth',1,'Marker','none','MarkerFaceColor','r','MarkerSize',3);
+    %     bar(2,a.meanChoice(m,1),0.2,'FaceColor','r','EdgeColor','none');
 %     bar([a.relValues(mouseVals); 2],[a.valChoiceMeanbyMouse(mm,mouseVals) a.meanChoice(m,1)],0.2,'FaceColor','k');
-    xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
+    xticklabels(['0' strtrim(cellstr(num2str(s'))')]);
 
     ax = nsubplot(2,1,2,1);    
     ax.FontSize = 8;
@@ -1199,7 +1206,7 @@ for mC = 1:numel(a.currentValMice)
     ax.YTick = [0 a.relValues' 1.75 2];
     ax.YLim = [0 2];
     plot([-10000000 1000000],[1 1],'Color',grey,'yliminclude','off','xliminclude','off','LineWidth',0.5);
-    bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.valueDays{m,1}))/4],'FaceColor','k','EdgeColor','none'); 
+    bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.mouseValueDays{mm,1}))/4],'FaceColor','k','EdgeColor','none'); 
     
     yyaxis right
     ax = gca;
@@ -1208,7 +1215,7 @@ for mC = 1:numel(a.currentValMice)
     ax.YTick = [0 0.25 0.50 0.75 1];
     ax.YLim = [0 1];
     plot([-10000000 1000000],[0.5 0.5],'Color','r','yliminclude','off','xliminclude','off','LineWidth',0.5);
-    plot(1:numel(a.valueDays{m,1})+1,[a.meanChoice(m,1) cell2mat(a.daySummary.percentInfo(m,a.valueDays{m,1}))],'Color','r','LineWidth',3,'LineStyle','-','Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);    
+    plot(1:numel(a.mouseValueDays{mm,1})+1,[a.meanChoice(m,1) cell2mat(a.daySummary.percentInfo(m,a.mouseValueDays{mm,1}))],'Color','r','LineWidth',3,'LineStyle','-','Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);    
 
     saveas(fig,fullfile(pathname,['values' a.mouseList{m}]),'pdf');
 end
@@ -1225,22 +1232,24 @@ set(fig,'PaperOrientation','landscape');
 ax = nsubplot(1,1,1,1);
 hold on;
 % ax.FontSize = 8;
-ax.XLim = [0 2.5];
+% ax.XLim = [0 2.5];
 ax.XTick = [0 a.relValues' 2];
 xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
 ax.YTick = [0 0.25 0.50 0.75 1];
 ax.YLim = [0 1];
-ylabel({'Info choice probability', 'across all mice'});
+ylabel({'Info choice probability', 'across mice'});
 xlabel('Info side relative water amount');
 % p = patch([[a.relValues'] fliplr([a.relValues'])], [[a.choiceByAmtMean-a.choiceByAmtSEM]',[fliplr([a.choiceByAmtMean+a.choiceByAmtSEM]')]],[0.8 0.8 0.8]);
 % p.EdgeColor = 'none';
 % plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
 % bar(a.relValues,a.choiceByAmtMean,'FaceColor','k');
-plot(a.relValues,a.choiceByAmtMean,'Color','r','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.choiceByAmtMean+a.choiceByAmtSEM,'Color','r','LineWidth',1,'Marker','none');
-plot(a.relValues,a.choiceByAmtMean-a.choiceByAmtSEM,'Color','r','LineWidth',1,'Marker','none');
-bar(2,a.overallPref,0.2,'FaceColor','r','EdgeColor','none');
-errorbar(2,a.overallPref,a.overallPref - a.overallCI(1),a.overallCI(2) - a.overallPref,'CapSize',20,'LineStyle','none','LineWidth',2,'Color','k');
+plot(a.relValues,a.choiceByAmtProbMean(:,1),'Color','m','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+plot(a.relValues,a.choiceByAmtProbMean(:,2),'Color','g','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+plot(a.relValues,a.choiceByAmtMean+a.choiceByAmtSEM,'Color','k','LineWidth',1,'Marker','none');
+plot(a.relValues,a.choiceByAmtMean-a.choiceByAmtSEM,'Color','k','LineWidth',1,'Marker','none');
+% bar(2,a.overallPref,0.2,'FaceColor','r','EdgeColor','none');
+% errorbar(2,a.overallPref,a.overallPref - a.overallCI(1),a.overallCI(2) - a.overallPref,'CapSize',20,'LineStyle','none','LineWidth',2,'Color','k');
 
 % errorbar(a.relValues,a.choiceByAmtMean,a.choiceByAmtSEM,'Color','k','LineStyle','none','CapSize',10,'LineWidth',2);
 plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
@@ -1692,7 +1701,244 @@ end
 
     saveas(fig,fullfile(pathname,'PrevsPostRxn'),'pdf');
 %     close(fig);
+
+%% PLOT MEAN CHOICES AROUND REVERSALS
+
+
+
+    fig = figure();
     
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [0 1];
+    ax.XLim = [0.5 9.5];
+    ax.XTick = [1:8];
+    
+    plot([1:4], a.meanReversalMultiPrefs(1:4),'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerSize',5);
+    plot([1:4], a.meanReversalMultiPrefs(1:4)+a.SEMReversalMultiPrefs(1:4),'Color','k','LineWidth',1,'Marker','none');
+    plot([1:4], a.meanReversalMultiPrefs(1:4)-a.SEMReversalMultiPrefs(1:4),'Color','k','LineWidth',1,'Marker','none');
+    plot([5:8], a.meanReversalMultiPrefs(5:8),'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerSize',5)
+    plot([5:8], a.meanReversalMultiPrefs(5:8)+a.SEMReversalMultiPrefs(1:4),'Color','k','LineWidth',1,'Marker','none');
+    plot([5:8], a.meanReversalMultiPrefs(5:8)-a.SEMReversalMultiPrefs(1:4),'Color','k','LineWidth',1,'Marker','none');
+    plot([1.5 1.5],[-10000000 1000000],'color','r','linewidth',1,'linestyle','--','yliminclude','off','xliminclude','off');
+    plot([5.5 5.5],[-10000000 1000000],'color','r','linewidth',1,'linestyle','--','yliminclude','off','xliminclude','off');
+    
+    reverseLabels = {'Pre-reverse','1','2','3','Pre-reverse','1','2','3'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel({'% choice of', 'initial info side'});
+    hold off;
+    
+    saveas(fig,fullfile(pathname,'ReversalMultiChoices'),'pdf');
+    
+%% PLOT MEAN CHOICES AROUND REVERSALS (single days)
+
+% if a.choiceMouseCt > 1
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [0 1];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
+    
+    for n=1:3
+       plot(n,nanmean(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
+       errorbar(n,nanmean(a.reversalPrefs(:,n)),sem(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'CapSize',100);
+    end
+    for m = 1:numel(a.reverseMice)-1
+        if ~isnan(a.reversalPrefs(m,3))
+            plot(a.reversalPrefs(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        end
+    end
+    reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel({'% choice of', 'initial info side'});
+    
+    saveas(fig,fullfile(pathname,'ReversalChoices'),'pdf');
+    
+% end
+
+%% PLOT RXN SPEED IDX AROUND REVERSALS
+
+% if a.choiceMouseCt > 1
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+%     ax.YLim = [0 1];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
+    
+    for n=1:3
+       plot(n,nanmean(a.reversalRxn(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
+       errorbar(n,nanmean(a.reversalRxn(:,n)),sem(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'CapSize',100);
+    end
+    for m = 1:numel(a.reverseMice)-1
+        if ~isnan(a.reversalPrefs(m,3))
+            plot(a.reversalRxn(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        end
+    end
+    reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel('Reaction Speed Index');
+    
+    saveas(fig,fullfile(pathname,'ReversalRxn'),'pdf');
+% end
+
+%% PLOT EARLY LICK IDX AROUND REVERSALS
+
+% if numel(a.reverseMice) > 1
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+%     ax.YLim = [0 1];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
+    
+    for n=1:3
+       plot(n,nanmean(a.reversalLicks(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
+       errorbar(n,nanmean(a.reversalLicks(:,n)),sem(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'CapSize',100);
+    end
+    for m = 1:numel(a.reverseMice)-1
+        if ~isnan(a.reversalPrefs(m,3))
+            plot(a.reversalLicks(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        end
+    end
+    reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel('Early Lick Index');
+    
+    saveas(fig,fullfile(pathname,'ReversalLicks'),'pdf');
+% end
+
+%% PLOT LICKS AROUND REVERSALS
+
+% if numel(a.reverseMice) > 1
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    
+    ax = nsubplot(1,2,1,1);
+    ax.FontSize = 8;
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+%     ax.YLim = [0 40];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
+    
+   plot(nanmean(a.reversalInfoBigEarlyLicks([1:3,5:15],:)),'Color','g','LineWidth',3,'Marker','o','MarkerFaceColor','g','MarkerSize',5); 
+%    plot(nanmean(a.reversalInfoBigEarlyLicks([1:3,5:15],:)+sem(a.reversalInfoBigEarlyLicks([1:3,5:15],:))),'Color','g','LineWidth',1);
+%    plot(nanmean(a.reversalInfoBigEarlyLicks([1:3,5:15],:)-sem(a.reversalInfoBigEarlyLicks([1:3,5:15],:))),'Color','g','LineWidth',1);
+   plot(nanmean(a.reversalInfoSmallEarlyLicks([1:3,5:15],:)),'Color','m','LineWidth',3,'Marker','o','MarkerFaceColor','m','MarkerSize',5); 
+%    plot(nanmean(a.reversalInfoSmallEarlyLicks([1:3,5:15],:)+sem(a.reversalInfoSmallEarlyLicks([1:3,5:15],:))),'Color','m','LineWidth',1);
+%    plot(nanmean(a.reversalInfoSmallEarlyLicks([1:3,5:15],:)-sem(a.reversalInfoSmallEarlyLicks([1:3,5:15],:))),'Color','m','LineWidth',1);
+   plot(nanmean(a.reversalRandCEarlyLicks([1:3,5:15],:)),'Color',cornflower,'LineWidth',3,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
+%    plot(nanmean(a.reversalRandCEarlyLicks([1:3,5:15],:)+sem(a.reversalRandCEarlyLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1);
+%    plot(nanmean(a.reversalRandCEarlyLicks([1:3,5:15],:)-sem(a.reversalRandCEarlyLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1);
+   plot(nanmean(a.reversalRandDEarlyLicks([1:3,5:15],:)),'Color',cornflower,'LineWidth',3,'LineStyle','--','Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
+%    plot(nanmean(a.reversalRandDEarlyLicks([1:3,5:15],:)+sem(a.reversalRandDEarlyLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1,'LineStyle','--');   
+%    plot(nanmean(a.reversalRandDEarlyLicks([1:3,5:15],:)-sem(a.reversalRandDEarlyLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1,'LineStyle','--');   
+
+    reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel('Mean Pre-Odor Licks');
+    hold off;
+    
+    ax = nsubplot(1,2,1,2);
+    ax.FontSize = 8;
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+%     ax.YLim = [0 40];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
+
+   plot(nanmean(a.reversalInfoBigLicks([1:3,5:15],:)),'Color','g','LineWidth',3,'Marker','o','MarkerFaceColor','g','MarkerSize',5); 
+%    plot(nanmean(a.reversalInfoBigLicks([1:3,5:15],:)+sem(a.reversalInfoBigLicks([1:3,5:15],:))),'Color','g','LineWidth',1);
+%    plot(nanmean(a.reversalInfoBigLicks([1:3,5:15],:)-sem(a.reversalInfoBigLicks([1:3,5:15],:))),'Color','g','LineWidth',1);
+   plot(nanmean(a.reversalInfoSmallLicks([1:3,5:15],:)),'Color','m','LineWidth',3,'Marker','o','MarkerFaceColor','m','MarkerSize',5); 
+%    plot(nanmean(a.reversalInfoSmallLicks([1:3,5:15],:)+sem(a.reversalInfoSmallLicks([1:3,5:15],:))),'Color','m','LineWidth',1);
+%    plot(nanmean(a.reversalInfoSmallLicks([1:3,5:15],:)-sem(a.reversalInfoSmallLicks([1:3,5:15],:))),'Color','m','LineWidth',1);
+   plot(nanmean(a.reversalRandCLicks([1:3,5:15],:)),'Color',cornflower,'LineWidth',3,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
+%    plot(nanmean(a.reversalRandCLicks([1:3,5:15],:)+sem(a.reversalRandCLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1);
+%    plot(nanmean(a.reversalRandCLicks([1:3,5:15],:)-sem(a.reversalRandCLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1);
+   plot(nanmean(a.reversalRandDLicks([1:3,5:15],:)),'Color',cornflower,'LineWidth',3,'LineStyle','--','Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
+%    plot(nanmean(a.reversalRandDLicks([1:3,5:15],:)+sem(a.reversalRandDLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1,'LineStyle','--');   
+%    plot(nanmean(a.reversalRandDLicks([1:3,5:15],:)-sem(a.reversalRandDLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1,'LineStyle','--');   
+   
+    reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel('Mean Anticipatory Licks');
+    hold off;    
+    
+    saveas(fig,fullfile(pathname,'ReversalMeanLicks'),'pdf');
+% end
+
+%% PLOT REWARD RATE DIFF AROUND REVERSALS
+
+% if numel(a.reverseMice) > 1
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+%     ax.YLim = [0 1];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
+    
+    for n=1:3
+       plot(n,nanmean(a.reversalRewardRateIdx(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
+       errorbar(n,nanmean(a.reversalRewardRateIdx(:,n)),sem(a.reversalRewardRateIdx(:,n)),'Color','k','LineWidth',2,'CapSize',100);
+    end
+    for m = 1:numel(a.reverseMice)
+        if ~isnan(a.reversalRewardRateIdx(m,3))
+            plot(a.reversalRewardRateIdx(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        end
+    end
+    reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
+    set(gca,'XTickLabel',reverseLabels);
+    ylabel('Reward Rate of Initial Info Side - Reward Rate of Initial No Info Side');
+    
+    saveas(fig,fullfile(pathname,'ReversalRewardRate'),'pdf');
+    
+% end
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -254,7 +254,8 @@ for fm = 1:a.numFiles
     end
    else
    a.fileMouse(fm) = find(strcmp(a.parameters(fm,2),a.mouseList));
-   a.fileDay(fm) = find(strcmp(a.parameters(fm,3),a.mouseDays{1,a.fileMouse(fm)})); 
+   a.fileDay(fm) = find(strcmp(a.parameters(fm,3),a.mouseDays{1,a.fileMouse(fm)}));
+   a.trialTypes(fm) = a.parameters{fm,7};
    end
 end
 
@@ -286,7 +287,7 @@ a.reverseDay = cell(a.mouseCt,1);
 a.prereverseFiles = ones(a.numFiles,1); %flag 1 = file with choices before reverse
 a.prereverseFiles(cell2mat(a.parameters(:,7))~=5) = 0;
 a.reverseFiles = zeros(a.numFiles,1); % flag 1 = file before first reverse, -1 = file during first reverse
-a.valueMice = zeros(a.mouseCt,1);
+% a.valueMice = zeros(a.mouseCt,1);
 
 for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
@@ -331,15 +332,15 @@ for m = 1:a.mouseCt
         end
     end
     
-    mouseValueFile = find(diff([cell2mat(a.parameters(a.fileMouse==m,22)),cell2mat(a.parameters(a.fileMouse==m,24))],1,2)~=0,1,'first');
-    a.valueFile{m,1} = mouseFilesIdx(mouseValueFile:end);
-    a.valueDays{m,1} = mouseFileDays(mouseValueFile:end);    
-    if ~isempty(mouseValueFile)
-        a.valueMice(m,1) = 1;
-    end;    
+%     mouseValueFile = find(diff([cell2mat(a.parameters(a.fileMouse==m & a.trialTypes == 5,22)),cell2mat(a.parameters(a.fileMouse==m & a.trialTypes == 5,24))],1,2)~=0,1,'first');
+%     a.valueFile{m,1} = mouseFilesIdx(mouseValueFile:end);
+%     a.valueDays{m,1} = mouseFileDays(mouseValueFile:end);    
+%     if ~isempty(mouseValueFile)
+%         a.valueMice(m,1) = 1;
+%     end;    
 end
 
-a.valueMice = find(a.valueMice);
+% a.valueMice = find(a.valueMice);
     
 a.preReverse = ones(size(a.file,1),1);
 a.reverse = zeros(size(a.file,1),1);
@@ -350,7 +351,10 @@ end
 
     
 for m = 1:a.mouseCt
-    ok = a.mice(:,m) == 1;    
+    ok = a.mice(:,m) == 1;
+    mouseReverse = [];
+    mousePrereverse = [];
+    mouseTypes = [];
     mouseReverse = a.reverse(ok);
     mousePrereverse = a.preReverse(ok);
     mouseTypes = a.choiceTypeCorr(ok);
@@ -470,8 +474,6 @@ else
 end
 a.reverseMiceList = a.mouseList(a.reverseMice);
 
-a.valueMiceList = a.mouseList(a.valueMice);
-
 % FSM mice
 a.FSMmice = zeros(a.mouseCt,1);
 for m = 1:a.mouseCt
@@ -516,8 +518,6 @@ a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
 % end
 
 %% MEAN CHOICES / STATS AND CHOICE RANGES - FIX
-
-% TAKE NON-REVERSE MICE OUT OF GLM CALCS
 
 trialsToCount = 300;
 
@@ -662,6 +662,8 @@ end
 % %    overallDayMean(d) = mean(a.info(ok));  
 % % end
 
+
+
 %% SORT BY INFO PREFERENCE
 if ~isempty(a.choiceMice)
     [a.sortedChoice,a.sortIdx] = sortrows(a.meanChoice(~isnan(a.meanChoice(:,1)),:),1);
@@ -671,91 +673,179 @@ if ~isempty(a.choiceMice)
     %% STATS
 
     a.icp_all = a.sortedChoice(:,1)*100;
+    
+%     a.icp_all = a.meanChoice(1:end-1,1)*100;
+    
     a.overallP = signrank(a.icp_all-50);
+    
+    
 end
 
 %% DIFFERENT SIDE VALUES
+% 
+% a.valueFileCat = cat(2,a.valueFile{:});
+% for ff = 1:numel(a.valueFileCat)
+%     f = a.valueFileCat(ff);
+%     a.valChange(ff,1) = a.parameters{f,22};
+%     a.valChange(ff,2) = a.parameters{f,24};
+%     a.valChange(ff,3) = a.valChange(ff,1) / a.valChange(ff,2);
+%     a.valChangeMouse(ff,1) = a.fileMouse(f);
+%     a.choiceByAmtbyFile{ff,1} = a.choice_all(a.file == f);
+% end
+% 
+% if isfield(a,'valChange')
+%     a.values = unique(a.valChange(:,1));
+%     a.relValues = unique(a.valChange(:,1)/4);
+% else
+%     a.values = [];
+%     a.relValues = [];
+% end
 
-a.valueFileCat = cat(2,a.valueFile{:});
-for ff = 1:numel(a.valueFileCat)
-    f = a.valueFileCat(ff);
-    a.valChange(ff,1) = a.parameters{f,22};
-    a.valChange(ff,2) = a.parameters{f,24};
-    a.valChange(ff,3) = a.valChange(ff,1) / a.valChange(ff,2);
-    a.valChangeMouse(ff,1) = a.fileMouse(f);
-    a.choiceByAmtbyFile{ff,1} = a.choice_all(a.file == f);
+%% FIND LAST DAY AT EACH VALUE FOR EACH MOUSE
+for f = 1:a.numFiles
+    a.fileValue(f,1) = a.parameters{f,22};
+    a.fileValue(f,2) = a.parameters{f,24};
+    a.fileValue(f,3) = a.fileValue(f,1) / a.fileValue(f,2);
 end
 
-if isfield(a,'valChange')
-    a.values = unique(a.valChange(:,1));
-    a.relValues = unique(a.valChange(:,1)/4);
-else
-    a.values = [];
-    a.relValues = [];
-end
+a.values = unique(a.fileValue(:,1));
+a.relValues = unique(a.fileValue(:,3));
 
-% mean/SEM only the last 100 trials of that value!! no, ALL? What about
-% repeated values?
+% HARDCODED-->CHANGE!!!!!!!!!!!!!!!
+% HARD CODED TO CHANGE
+a.valueMice = [6 7 8 9];
+a.valueMiceList = a.mouseList(a.valueMice);
+
 for mm = 1:numel(a.valueMice)
-    m = a.valueMice(mm);
-    mouseValFiles = a.valueFile{m,1};
-    mouseValDays = a.valueDays{m,1};
-%     mouseFileDays = a.fileDay(a.fileMouse == m);
-    for vv = 1:numel(a.values)
-       v = a.values(vv);
-       a.valFiles{mm,vv} = a.valueFileCat(a.valChange(:,1) == v & a.valChangeMouse(:,1) == m);
-       
-       currValFiles = find(ismember(mouseValFiles,a.valFiles{mm,vv}));
-       currValDays = mouseValDays(currValFiles);
-       currValDiff = [1 diff(currValDays)];
-       valSplit = find(currValDiff > 1);
-       if ~isempty(valSplit)
-           firstValDay = currValDays(valSplit-1);
-           secondValDay = currValDays(end);
-           valDays = [firstValDay, secondValDay];
-       elseif ~isempty(currValDays)
-           valDays = currValDays(end);
-       else
-           valDays = [];
-       end
-       % want to find last day in first string and last day in second
-       % string
-       
-       % get actual days/file numbers for valDays (by mouse) to get choices
-       
-       a.valChoiceFiles{mm,vv} = find(ismember(a.fileDay,valDays)&a.fileMouse==m);
-       a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valChoiceFiles{mm,vv},2)==1);
-%        a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valFiles{mm,vv},2)==1); % takes all choices from all files with those values
-       
-       currentValChoices = a.valChoices{mm,vv};
-       if numel(currentValChoices) >= 100
-%            a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices(end-100:end));
-%            a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices(end-100:end));
-%            a.choiceByAmtByMouse{mm,vv} = currentValChoices(end-99:end);
-           a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices);
-           a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices);
-           a.choiceByAmtByMouse{mm,vv} = currentValChoices;           
-       else
-           a.valChoiceMeanbyMouse(mm,vv) = NaN;
-           a.valChoiceSEMbyMouse(mm,vv) = NaN;
-           a.choiceByAmtByMouse{mm,vv} = NaN;
-       end
-    end
+   m = a.valueMice(mm);
+   a.valueMouseFiles{mm,1} = find(a.fileMouse == m);
+   a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,1);
 end
 
-for vv = 1:numel(a.values)
-   v = a.values(vv);
-   a.choiceByAmt{v,1} = cell2mat(a.choiceByAmtbyFile(a.valChange(:,1)==v,1));
-   currentChoiceByAmt = a.choiceByAmt{v,1};
-%    a.choiceByAmtMean(v,1) = mean(a.choiceByAmt{v,1});
-%    a.choiceByAmtSEM(v,1) = sem(a.choiceByAmt{v,1});
+% file within mouse's files after which value tests start
+% HARDCODED-->CHANGE!!!!!!!!!!!!!!!
+ a.valueStarts = [35 40 48 50];
+     
+for mm = 1:numel(a.valueMice)
+   m = a.valueMice(mm); 
+   allMouseValueFiles = a.valueMouseFiles{mm,1};
+   mouseValueFiles = allMouseValueFiles(a.valueStarts(mm):end);
+   allMouseValues = a.valueMouseValues{mm,1};
+   mouseValues = allMouseValues(a.valueStarts(mm):end);
+   a.mouseValueDays{mm,1} = a.fileDay(mouseValueFiles);
+   a.mouseValueChangeFiles{mm,1}=mouseValueFiles(find(diff(mouseValues)~=0));
+   % NOTE: choosing entire day from file before value changed
+   a.mouseValueChangeDays{mm,1} = a.fileDay(a.mouseValueChangeFiles{mm,1});
+   mouseValueChangeDays = a.mouseValueChangeDays{mm,1};
+   a.mouseValueChangeValues{mm,1} = a.fileValue(a.mouseValueChangeFiles{mm,1},3);
+   mouseValueChangeValues = a.mouseValueChangeValues{mm,1};
+   for vv = 1:numel(a.values)
+       v = a.relValues(vv);
+       a.mouseValueFinalDays{mm,vv} = mouseValueChangeDays(mouseValueChangeValues == v);
+   end
 end
 
-for vv = 1:numel(a.values)
-    v = a.values(vv);
-    a.choiceByAmtMean(v,1) = nanmean(cell2mat(a.choiceByAmtByMouse(:,v)));
-    a.choiceByAmtSEM(v,1) = sem(cell2mat(a.choiceByAmtByMouse(:,v)));
+% Can pull daySummary.percentInfo for all value days (course of value
+% tradeoffs)
+
+%% CHOICES ON MOUSE VALUE FINAL DAYS (2 per value per mouse)
+
+for mm = 1:numel(a.valueMice)
+   m = a.valueMice(mm);
+   for vv = 1:numel(a.values)
+       v = a.relValues(vv);
+       days = a.mouseValueFinalDays{mm,vv};
+       a.valueChoiceTrials{mm,vv} = a.choice_all(ismember(a.mouseDay,days) & a.mice(:,m) == 1 & a.choiceCorrTrials == 1);
+       a.valChoiceMeanbyMouse(mm,vv) = nanmean(a.valueChoiceTrials{mm,vv});
+       a.valChoiceSEMbyMouse(mm,vv) = sem(a.valueChoiceTrials{mm,vv});
+   end
 end
+
+%% OVERALL CHOICES BY AMOUNT
+
+for vv = 1:numel(a.values)
+   v = a.relValues(vv);
+    a.valChoices{vv,1} = vertcat(a.valueChoiceTrials{:,vv});
+    a.choiceByAmtMean(vv,1) = nanmean(a.valChoices{vv,1});
+    a.choiceByAmtSEM(vv,1) = sem(a.valChoices{vv,1});
+end
+
+%% HARDCODED OVERALL BY AMOUNT BY PROB
+
+for vv = 1:numel(a.values)
+   v = a.relValues(vv);
+    a.valChoicesProb{vv,1} = vertcat(a.valueChoiceTrials{1:2,vv});
+    a.valChoicesProb{vv,2} = vertcat(a.valueChoiceTrials{3:4,vv});
+    a.choiceByAmtProbMean(vv,1) = nanmean(a.valChoicesProb{vv,1});
+    a.choiceByAmtProbMean(vv,2) = nanmean(a.valChoicesProb{vv,2});
+    a.choiceByAmtProbSEM(vv,1) = sem(a.valChoicesProb{vv,1});
+    a.choiceByAmtProbSEM(vv,2) = sem(a.valChoicesProb{vv,2});
+end
+
+
+%%
+%  mean/SEM only the last 100 trials of that value!! no, ALL? What about
+% repeated values?
+% for mm = 1:numel(a.valueMice)
+%     m = a.valueMice(mm);
+%     mouseValFiles = a.valueFile{m,1};
+%     mouseValDays = a.valueDays{m,1};
+% %     mouseFileDays = a.fileDay(a.fileMouse == m);
+%     for vv = 1:numel(a.values)
+%        v = a.values(vv);
+%        a.valFiles{mm,vv} = a.valueFileCat(a.valChange(:,1) == v & a.valChangeMouse(:,1) == m);
+%        
+%        currValFiles = find(ismember(mouseValFiles,a.valFiles{mm,vv}));
+%        currValDays = mouseValDays(currValFiles);
+%        currValDiff = [1 diff(currValDays)];
+%        valSplit = find(currValDiff > 1);
+%        if ~isempty(valSplit)
+%            firstValDay = currValDays(valSplit-1);
+%            secondValDay = currValDays(end);
+%            valDays = [firstValDay, secondValDay];
+%        elseif ~isempty(currValDays)
+%            valDays = currValDays(end);
+%        else
+%            valDays = [];
+%        end
+%        % want to find last day in first string and last day in second
+%        % string
+%        
+%        % get actual days/file numbers for valDays (by mouse) to get choices
+%        
+%        a.valChoiceFiles{mm,vv} = find(ismember(a.fileDay,valDays)&a.fileMouse==m);
+%        a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valChoiceFiles{mm,vv},2)==1);
+% %        a.valChoices{mm,vv} = a.choice_all(sum(a.file == a.valFiles{mm,vv},2)==1); % takes all choices from all files with those values
+%        
+%        currentValChoices = a.valChoices{mm,vv};
+%        if numel(currentValChoices) >= 100
+% %            a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices(end-100:end));
+% %            a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices(end-100:end));
+% %            a.choiceByAmtByMouse{mm,vv} = currentValChoices(end-99:end);
+%            a.valChoiceMeanbyMouse(mm,vv) = mean(currentValChoices);
+%            a.valChoiceSEMbyMouse(mm,vv) = sem(currentValChoices);
+%            a.choiceByAmtByMouse{mm,vv} = currentValChoices;           
+%        else
+%            a.valChoiceMeanbyMouse(mm,vv) = NaN;
+%            a.valChoiceSEMbyMouse(mm,vv) = NaN;
+%            a.choiceByAmtByMouse{mm,vv} = NaN;
+%        end
+%     end
+% end
+% 
+% for vv = 1:numel(a.values)
+%    v = a.values(vv);
+%    a.choiceByAmt{v,1} = cell2mat(a.choiceByAmtbyFile(a.valChange(:,1)==v,1));
+%    currentChoiceByAmt = a.choiceByAmt{v,1};
+% %    a.choiceByAmtMean(v,1) = mean(a.choiceByAmt{v,1});
+% %    a.choiceByAmtSEM(v,1) = sem(a.choiceByAmt{v,1});
+% end
+% 
+% for vv = 1:numel(a.values)
+%     v = a.values(vv);
+%     a.choiceByAmtMean(v,1) = nanmean(cell2mat(a.choiceByAmtByMouse(:,v)));
+%     a.choiceByAmtSEM(v,1) = sem(cell2mat(a.choiceByAmtByMouse(:,v)));
+% end
 
 %% TRIAL TYPE COUNTS BY MOUSE BY DAY - UNUSED?
 
@@ -838,6 +928,7 @@ a.rxnSpeed = 1./a.rxn;
 
 a.goodRxn = a.rxn<8000 & a.rxn>100;
 
+%%
 % a.initInfoLicks = mean(a.earlyLicks(a.initinfoside_info == 1));
 % a.initNoInfoLicks = mean(a.earlyLicks(a.initinfoside_info == -1));
 % a.earlyLickIdx = (a.initInfoLicks - a.initNoInfoLicks)/(a.initInfoLicks + a.initNoInfoLicks);
@@ -871,6 +962,7 @@ a.goodRxn = a.rxn<8000 & a.rxn>100;
 %    a.rxnSpeedIdx(m,2) = (a.postRevRxnSpeed(m,1)-a.postRevRxnSpeed(m,2))/(a.postRevRxnSpeed(m,1)+a.postRevRxnSpeed(m,2)); 
 % end
 
+%%
 % RELATIVE TO CURRENT INFO SIDE
 for m=1:a.mouseCt
    ok1 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.preReverse == 1;
@@ -917,6 +1009,7 @@ end
 
 % ttest2(mean licks to initial-info side, mean licks to initial-noinfo side)
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% DAY SUMMARY
@@ -947,23 +1040,35 @@ for m = 1:a.mouseCt
         a.daySummary.infoSmall{m,d} = sum(a.infoSmall(ok));
         a.daySummary.randBig{m,d} = sum(a.randBig(ok));
         a.daySummary.randSmall{m,d} = sum(a.randSmall(ok));
-        lastFileIdx = find(ok,1,'last');
-        a.daySummary.infoBigAmt{m,d} = a.parameters{a.file(lastFileIdx),22};
-        a.daySummary.randBigAmt{m,d} = a.parameters{a.file(lastFileIdx),24};
-        a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),26};
-        a.daySummary.randBigProb{m,d} = a.parameters{a.file(lastFileIdx),27};
-        a.daySummary.rewardDelay{m,d} = a.parameters{a.file(lastFileIdx),21};
+        if sum(ok)>0
+            lastFileIdx = find(ok,1,'last');
+            a.daySummary.infoBigAmt{m,d} = a.parameters{a.file(lastFileIdx),22};
+            a.daySummary.randBigAmt{m,d} = a.parameters{a.file(lastFileIdx),24};
+            a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),26};
+            a.daySummary.randBigProb{m,d} = a.parameters{a.file(lastFileIdx),27};
+            a.daySummary.rewardDelay{m,d} = a.parameters{a.file(lastFileIdx),21};             
+        else
+            lastFileIdx = find(okAll,1,'last');
+            a.daySummary.infoBigAmt{m,d} = a.parameters{a.fileAll(lastFileIdx),22};
+            a.daySummary.randBigAmt{m,d} = a.parameters{a.fileAll(lastFileIdx),24};
+            a.daySummary.infoBigProb{m,d} = a.parameters{a.fileAll(lastFileIdx),26};
+            a.daySummary.randBigProb{m,d} = a.parameters{a.fileAll(lastFileIdx),27};
+            a.daySummary.rewardDelay{m,d} = a.parameters{a.fileAll(lastFileIdx),21};             
+        end         
         a.daySummary.totalRewards{m,d} = sum(a.rewardCorr(ok));
         a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
-        a.daySummary.percentInfo{m,d} = mean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1 & a.fileTrialTypes == 5));
-        a.daySummary.rxnInfoForced{m,d} = mean(a.rxn(a.infoForcedCorr & ok));
-        a.daySummary.rxnInfoChoice{m,d} = mean(a.rxn(a.infoChoiceCorr & ok));
-        a.daySummary.rxnRandForced{m,d} = mean(a.rxn(a.randForcedCorr & ok));
-        a.daySummary.rxnRandChoice{m,d} = mean(a.rxn(a.randChoiceCorr & ok));
+        a.daySummary.percentInfo{m,d} = nanmean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1 & a.fileTrialTypes == 5));
+        a.daySummary.percentIIS{m,d} = nanmean(a.choice_all(ok & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5));
+        a.daySummary.rxnInfoForced{m,d} = nanmean(a.rxn(a.infoForcedCorr & ok));
+        a.daySummary.rxnInfoChoice{m,d} = nanmean(a.rxn(a.infoChoiceCorr & ok));
+        a.daySummary.rxnRandForced{m,d} = nanmean(a.rxn(a.randForcedCorr & ok));
+        a.daySummary.rxnRandChoice{m,d} = nanmean(a.rxn(a.randChoiceCorr & ok));
+        a.daySummary.rxnSpeedIdx{m,d} = (nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) - nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)))/(nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) + nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)));
         a.daySummary.infoBigLicks{m,d} = a.AlicksBetween(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicks{m,d} = a.BlicksBetween(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicks{m,d} = a.ClicksBetween(m,d)/sum(a.odorCtrials & ok);
         a.daySummary.randDLicks{m,d} = a.DlicksBetween(m,d)/sum(a.odorDtrials & ok);
+        a.daySummary.earlyLickIdx{m,d} = (nanmean(a.earlyLicks(ok==1 & a.forcedCorrTrials == 1 & a.choice_all == 1)) - nanmean(a.earlyLicks(ok==1 & a.forcedCorrTrials == 1 & a.choice_all == 0)))/(nanmean(a.earlyLicks(ok==1 & a.forcedCorrTrials == 1 & a.choice_all == 1)) + nanmean(a.earlyLicks(ok==1 & a.forcedCorrTrials == 1 & a.choice_all == 0)));
         a.daySummary.infoBigLicksEarly{m,d} = a.AlicksEarly(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicksEarly{m,d} = a.BlicksEarly(m,d)/sum(a.odorBtrials & ok);
         a.daySummary.randCLicksEarly{m,d} = a.ClicksEarly(m,d)/sum(a.odorCtrials & ok);
@@ -1025,6 +1130,131 @@ for mm = 1:sum(a.FSMmice)
         a.randIncorr{m,d} = sum(ismember(outcomes,a.randIncorrCodes))/(sum(ismember(outcomes,a.randCorrCodes))+sum(ismember(outcomes,a.randIncorrCodes)));
         a.choiceIncorr{m,d} = sum(ismember(outcomes,a.choiceIncorrCodes))/(sum(ismember(outcomes,a.choiceCorrCodes))+sum(ismember(outcomes,a.choiceIncorrCodes)));
     end
+end
+
+%%
+for m = 1:a.mouseCt
+    infoBigProb = [];
+    randBigProb = [];
+    for d = 1:a.mouseDayCt(m)
+        infoBigProb(d) = a.daySummary.infoBigProb{m,d};
+        randBigProb(d) = a.daySummary.randBigProb{m,d};
+    end
+    a.infoBigProbs{m,1} = infoBigProb;
+    a.randBigProbs{m,1} = randBigProb;
+end
+
+%% DAYS AROUND REVERSES
+
+a.reversalDays = NaN(numel(a.reverseMice),3);
+
+for m = 1:numel(a.reverseMice)
+    mm=a.reverseMice(m);
+    a.reversalDays(m,1) = a.reverseDay{mm,1}-1; % day prior to 1st reversal
+    if ~isempty(a.reverseDay{mm,2})
+        a.reversalDays(m,2) = a.reverseDay{mm,2}-1; % day prior to second reversal
+        
+        % last day of second reversal (either r+3/last day or last day before get
+        % ready for values)
+        if ~ismember(mm,a.valueMice)
+            if a.reverseDay{mm,2}+3 >= a.mouseDayCt(m)
+                a.reversalDays(m,3) = a.mouseDayCt(m);
+            else
+                a.reversalDays(m,3) = a.reverseDay{mm,2}+3;
+            end
+        else
+            mmm = find(a.valueMice == mm);
+            mouseValueDays = a.mouseValueDays{mmm,1};
+            mouseProbDays = a.infoBigProbs{mm,1};
+            mouseValues = mouseProbDays(mouseValueDays);
+            if sum(mouseValues > 25) > 0
+                a.reversalDays(m,3) = find(mouseProbDays==25,1,'last');
+            else
+                a.reversalDays(m,3) = mouseValueDays(1);
+            end
+        end
+    end
+end
+
+%% CHOICE, RXN SPEED, EARLY LICKS, AND REWARD RATE AROUND REVERSALS
+
+a.reversalPrefs = NaN(numel(a.reverseMice),3);
+a.reversalRxn = NaN(numel(a.reverseMice),3);
+a.reversalLicks = NaN(numel(a.reverseMice),3);
+a.reversalMultiPrefs = NaN(numel(a.reverseMice),8);
+for m = 1:numel(a.reverseMice)
+    mm = a.reverseMice(m);
+    for n = 1:3
+        if ~isnan(a.reversalDays(m,n))
+            a.reversalPrefs(m,n) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)};
+            if n == 1
+                for k = 1:4
+                    if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
+                    a.reversalMultiPrefs(m,k) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
+                    end
+                end
+            elseif n==2
+                for k = 1:4
+                    if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
+                    a.reversalMultiPrefs(m,k+4) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
+                    end
+                end
+            end
+            
+%             if isnan(a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)})
+%                 a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)-1};
+%             else
+                a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{mm,a.reversalDays(m,n)};
+%             end
+%             if isnan(a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)})
+%                 a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)-1};
+%             else
+                a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{mm,a.reversalDays(m,n)};
+                a.reversalInfoBigEarlyLicks(m,n) = a.daySummary.infoBigLicksEarly{mm,a.reversalDays(m,n)};
+                a.reversalInfoSmallEarlyLicks(m,n) = a.daySummary.infoSmallLicksEarly{mm,a.reversalDays(m,n)};
+                a.reversalRandCEarlyLicks(m,n) = a.daySummary.randCLicksEarly{mm,a.reversalDays(m,n)};
+                a.reversalRandDEarlyLicks(m,n) = a.daySummary.randDLicksEarly{mm,a.reversalDays(m,n)};
+                a.reversalInfoBigLicks(m,n) = a.daySummary.infoBigLicks{mm,a.reversalDays(m,n)};
+                a.reversalInfoSmallLicks(m,n) = a.daySummary.infoSmallLicks{mm,a.reversalDays(m,n)};
+                a.reversalRandCLicks(m,n) = a.daySummary.randCLicks{mm,a.reversalDays(m,n)};
+                a.reversalRandDLicks(m,n) = a.daySummary.randDLicks{mm,a.reversalDays(m,n)};
+%             end
+%             a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)})/(a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}+a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)});
+              if n==2
+                a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateRandForced{mm,a.reversalDays(m,n)}-a.daySummary.rewardRateInfoForced{mm,a.reversalDays(m,n)});
+              else
+                a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{mm,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{mm,a.reversalDays(m,n)});   
+              end
+        end
+    end
+end
+
+%%
+a.meanReversalMultiPrefs = nanmean(a.reversalMultiPrefs);
+a.SEMReversalMultiPrefs = sem(a.reversalMultiPrefs);
+
+a.reversalPrefs_stats = a.reversalPrefs*100;
+a.reversal1P = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,2));
+a.reversal2P = signrank(a.reversalPrefs_stats(:,2),a.reversalPrefs_stats(:,3));
+a.reversalP = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,3));
+
+a.reversalRxnP(1,1) = signrank(a.reversalRxn(:,1),a.reversalRxn(:,2));
+a.reversalRxnP(1,2) = signrank(a.reversalRxn(:,2),a.reversalRxn(:,3));
+a.reversalRxnP(1,3) = signrank(a.reversalRxn(:,1),a.reversalRxn(:,3));
+
+a.reversalLicksP(1,1) = signrank(a.reversalLicks(:,1),a.reversalLicks(:,2));
+a.reversalLicksP(1,2) = signrank(a.reversalLicks(:,2),a.reversalLicks(:,3));
+a.reversalLicksP(1,3) = signrank(a.reversalLicks(:,1),a.reversalLicks(:,3));
+
+a.reversalRewardRateP(1,1) = signrank(a.reversalRewardRateIdx(:,1),a.reversalRewardRateIdx(:,2));
+a.reversalRewardRateP(1,2) = signrank(a.reversalRewardRateIdx(:,2),a.reversalRewardRateIdx(:,3));
+a.reversalRewardRateP(1,3) = signrank(a.reversalRewardRateIdx(:,1),a.reversalRewardRateIdx(:,3));
+
+for p =1:3
+    a.reversalPVals(1,p) = signrank(a.reversalPrefs_stats(:,p)-50);
+    a.reversalRxnPVals(1,p) = signrank(a.reversalRxn(:,p));
+    a.reversalLicksPVals(1,p) = signrank(a.reversalLicks(:,p));
+    a.reversalRewardRatePVals(1,p) = signrank(a.reversalRewardRateIdx(:,p));
 end
 
 %%
