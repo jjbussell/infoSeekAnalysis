@@ -351,7 +351,10 @@ end
 
     
 for m = 1:a.mouseCt
-    ok = a.mice(:,m) == 1;    
+    ok = a.mice(:,m) == 1;
+    mouseReverse = [];
+    mousePrereverse = [];
+    mouseTypes = [];
     mouseReverse = a.reverse(ok);
     mousePrereverse = a.preReverse(ok);
     mouseTypes = a.choiceTypeCorr(ok);
@@ -1054,12 +1057,12 @@ for m = 1:a.mouseCt
         end         
         a.daySummary.totalRewards{m,d} = sum(a.rewardCorr(ok));
         a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
-        a.daySummary.percentInfo{m,d} = mean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1 & a.fileTrialTypes == 5));
-        a.daySummary.percentIIS{m,d} = mean(a.choice_all(ok & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5));
-        a.daySummary.rxnInfoForced{m,d} = mean(a.rxn(a.infoForcedCorr & ok));
-        a.daySummary.rxnInfoChoice{m,d} = mean(a.rxn(a.infoChoiceCorr & ok));
-        a.daySummary.rxnRandForced{m,d} = mean(a.rxn(a.randForcedCorr & ok));
-        a.daySummary.rxnRandChoice{m,d} = mean(a.rxn(a.randChoiceCorr & ok));
+        a.daySummary.percentInfo{m,d} = nanmean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1 & a.fileTrialTypes == 5));
+        a.daySummary.percentIIS{m,d} = nanmean(a.choice_all(ok & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5));
+        a.daySummary.rxnInfoForced{m,d} = nanmean(a.rxn(a.infoForcedCorr & ok));
+        a.daySummary.rxnInfoChoice{m,d} = nanmean(a.rxn(a.infoChoiceCorr & ok));
+        a.daySummary.rxnRandForced{m,d} = nanmean(a.rxn(a.randForcedCorr & ok));
+        a.daySummary.rxnRandChoice{m,d} = nanmean(a.rxn(a.randChoiceCorr & ok));
         a.daySummary.rxnSpeedIdx{m,d} = (nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) - nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)))/(nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) + nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)));
         a.daySummary.infoBigLicks{m,d} = a.AlicksBetween(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicks{m,d} = a.BlicksBetween(m,d)/sum(a.odorBtrials & ok);
@@ -1146,22 +1149,23 @@ end
 a.reversalDays = NaN(numel(a.reverseMice),3);
 
 for m = 1:numel(a.reverseMice)
-    a.reversalDays(m,1) = a.reverseDay{m,1}-1; % day prior to 1st reversal
-    if ~isempty(a.reverseDay{m,2})
-        a.reversalDays(m,2) = a.reverseDay{m,2}-1; % day prior to second reversal
+    mm=a.reverseMice(m);
+    a.reversalDays(m,1) = a.reverseDay{mm,1}-1; % day prior to 1st reversal
+    if ~isempty(a.reverseDay{mm,2})
+        a.reversalDays(m,2) = a.reverseDay{mm,2}-1; % day prior to second reversal
         
         % last day of second reversal (either r+3/last day or last day before get
         % ready for values)
-        if ~ismember(m,a.valueMice)
-            if a.reverseDay{m,2}+3 >= a.mouseDayCt(m)
+        if ~ismember(mm,a.valueMice)
+            if a.reverseDay{mm,2}+3 >= a.mouseDayCt(m)
                 a.reversalDays(m,3) = a.mouseDayCt(m);
             else
-                a.reversalDays(m,3) = a.reverseDay{m,2}+3;
+                a.reversalDays(m,3) = a.reverseDay{mm,2}+3;
             end
         else
-            mm = find(a.valueMice == m);
-            mouseValueDays = a.mouseValueDays{mm,1};
-            mouseProbDays = a.infoBigProbs{m,1};
+            mmm = find(a.valueMice == mm);
+            mouseValueDays = a.mouseValueDays{mmm,1};
+            mouseProbDays = a.infoBigProbs{mm,1};
             mouseValues = mouseProbDays(mouseValueDays);
             if sum(mouseValues > 25) > 0
                 a.reversalDays(m,3) = find(mouseProbDays==25,1,'last');
@@ -1179,6 +1183,7 @@ a.reversalRxn = NaN(numel(a.reverseMice),3);
 a.reversalLicks = NaN(numel(a.reverseMice),3);
 a.reversalMultiPrefs = NaN(numel(a.reverseMice),8);
 for m = 1:numel(a.reverseMice)
+%     m = a.reverseMice(mm);
     for n = 1:3
         if ~isnan(a.reversalDays(m,n))
             a.reversalPrefs(m,n) = a.daySummary.percentIIS{m,a.reversalDays(m,n)};
