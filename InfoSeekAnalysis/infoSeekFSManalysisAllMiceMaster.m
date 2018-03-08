@@ -1040,12 +1040,21 @@ for m = 1:a.mouseCt
         a.daySummary.infoSmall{m,d} = sum(a.infoSmall(ok));
         a.daySummary.randBig{m,d} = sum(a.randBig(ok));
         a.daySummary.randSmall{m,d} = sum(a.randSmall(ok));
-        lastFileIdx = find(okAll,1,'last');
-        a.daySummary.infoBigAmt{m,d} = a.parameters{a.fileAll(lastFileIdx),22};
-        a.daySummary.randBigAmt{m,d} = a.parameters{a.fileAll(lastFileIdx),24};
-        a.daySummary.infoBigProb{m,d} = a.parameters{a.fileAll(lastFileIdx),26};
-        a.daySummary.randBigProb{m,d} = a.parameters{a.fileAll(lastFileIdx),27};
-        a.daySummary.rewardDelay{m,d} = a.parameters{a.fileAll(lastFileIdx),21};
+        if sum(ok)>0
+            lastFileIdx = find(ok,1,'last');
+            a.daySummary.infoBigAmt{m,d} = a.parameters{a.file(lastFileIdx),22};
+            a.daySummary.randBigAmt{m,d} = a.parameters{a.file(lastFileIdx),24};
+            a.daySummary.infoBigProb{m,d} = a.parameters{a.file(lastFileIdx),26};
+            a.daySummary.randBigProb{m,d} = a.parameters{a.file(lastFileIdx),27};
+            a.daySummary.rewardDelay{m,d} = a.parameters{a.file(lastFileIdx),21};             
+        else
+            lastFileIdx = find(okAll,1,'last');
+            a.daySummary.infoBigAmt{m,d} = a.parameters{a.fileAll(lastFileIdx),22};
+            a.daySummary.randBigAmt{m,d} = a.parameters{a.fileAll(lastFileIdx),24};
+            a.daySummary.infoBigProb{m,d} = a.parameters{a.fileAll(lastFileIdx),26};
+            a.daySummary.randBigProb{m,d} = a.parameters{a.fileAll(lastFileIdx),27};
+            a.daySummary.rewardDelay{m,d} = a.parameters{a.fileAll(lastFileIdx),21};             
+        end         
         a.daySummary.totalRewards{m,d} = sum(a.rewardCorr(ok));
         a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
         a.daySummary.percentInfo{m,d} = nanmean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1 & a.fileTrialTypes == 5));
