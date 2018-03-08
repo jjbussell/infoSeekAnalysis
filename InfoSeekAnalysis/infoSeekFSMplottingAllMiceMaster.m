@@ -1516,7 +1516,7 @@ end
 %     close(fig);
 
 
-    %% EARLY LICKS
+    %% EARLY LICKS REGRESSION
 
     bothSig = a.preRevEarlyLicks(:,3)<0.05 & a.postRevEarlyLicks(:,3)<0.05;
 
@@ -1645,7 +1645,7 @@ end
 % %     close(fig);
 
 
-    %% REACTION SPEED
+    %% REACTION SPEED REGRESSION
 
     bothSig = a.preRevRxnSpeed(:,3)<0.05 & a.postRevRxnSpeed(:,3)<0.05;
 
@@ -1704,8 +1704,6 @@ end
 
 %% PLOT MEAN CHOICES AROUND REVERSALS
 
-
-
     fig = figure();
     
     fig = gcf;
@@ -1760,9 +1758,9 @@ end
        errorbar(n,nanmean(a.reversalPrefs(:,n)),sem(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'CapSize',100);
     end
     for m = 1:numel(a.reverseMice)-1
-        if ~isnan(a.reversalPrefs(m,3))
+%         if ~isnan(a.reversalPrefs(m,3))
             plot(a.reversalPrefs(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
-        end
+%         end
     end
     reverseLabels = {'Pre-reversal','Reversal','Post-reversal'};
     set(gca,'XTickLabel',reverseLabels);

@@ -744,7 +744,7 @@ void readTTL(){
 
 /////////////////  BEAM BREAKS  /////////////////////////
 int beamBreak(int sensorPin) {
-  if (analogRead(sensorPin) < 250) {
+  if (analogRead(sensorPin) < 350) {
     return 1;
   }
 
