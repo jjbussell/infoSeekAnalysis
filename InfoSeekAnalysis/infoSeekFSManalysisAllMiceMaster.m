@@ -1174,20 +1174,20 @@ a.reversalRxn = NaN(numel(a.reverseMice),3);
 a.reversalLicks = NaN(numel(a.reverseMice),3);
 a.reversalMultiPrefs = NaN(numel(a.reverseMice),8);
 for m = 1:numel(a.reverseMice)
-%     m = a.reverseMice(mm);
+    mm = a.reverseMice(m);
     for n = 1:3
         if ~isnan(a.reversalDays(m,n))
-            a.reversalPrefs(m,n) = a.daySummary.percentIIS{m,a.reversalDays(m,n)};
+            a.reversalPrefs(m,n) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)};
             if n == 1
                 for k = 1:4
-                    if ~isempty(a.daySummary.percentIIS{m,a.reversalDays(m,n)+k-1})
-                    a.reversalMultiPrefs(m,k) = a.daySummary.percentIIS{m,a.reversalDays(m,n)+k-1};
+                    if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
+                    a.reversalMultiPrefs(m,k) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
                     end
                 end
             elseif n==2
                 for k = 1:4
-                    if ~isempty(a.daySummary.percentIIS{m,a.reversalDays(m,n)+k-1})
-                    a.reversalMultiPrefs(m,k+4) = a.daySummary.percentIIS{m,a.reversalDays(m,n)+k-1};
+                    if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
+                    a.reversalMultiPrefs(m,k+4) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
                     end
                 end
             end
@@ -1195,26 +1195,26 @@ for m = 1:numel(a.reverseMice)
 %             if isnan(a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)})
 %                 a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)-1};
 %             else
-                a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)};
+                a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{mm,a.reversalDays(m,n)};
 %             end
 %             if isnan(a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)})
 %                 a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)-1};
 %             else
-                a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)};
-                a.reversalInfoBigEarlyLicks(m,n) = a.daySummary.infoBigLicksEarly{m,a.reversalDays(m,n)};
-                a.reversalInfoSmallEarlyLicks(m,n) = a.daySummary.infoSmallLicksEarly{m,a.reversalDays(m,n)};
-                a.reversalRandCEarlyLicks(m,n) = a.daySummary.randCLicksEarly{m,a.reversalDays(m,n)};
-                a.reversalRandDEarlyLicks(m,n) = a.daySummary.randDLicksEarly{m,a.reversalDays(m,n)};
-                a.reversalInfoBigLicks(m,n) = a.daySummary.infoBigLicks{m,a.reversalDays(m,n)};
-                a.reversalInfoSmallLicks(m,n) = a.daySummary.infoSmallLicks{m,a.reversalDays(m,n)};
-                a.reversalRandCLicks(m,n) = a.daySummary.randCLicks{m,a.reversalDays(m,n)};
-                a.reversalRandDLicks(m,n) = a.daySummary.randDLicks{m,a.reversalDays(m,n)};
+                a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{mm,a.reversalDays(m,n)};
+                a.reversalInfoBigEarlyLicks(m,n) = a.daySummary.infoBigLicksEarly{mm,a.reversalDays(m,n)};
+                a.reversalInfoSmallEarlyLicks(m,n) = a.daySummary.infoSmallLicksEarly{mm,a.reversalDays(m,n)};
+                a.reversalRandCEarlyLicks(m,n) = a.daySummary.randCLicksEarly{mm,a.reversalDays(m,n)};
+                a.reversalRandDEarlyLicks(m,n) = a.daySummary.randDLicksEarly{mm,a.reversalDays(m,n)};
+                a.reversalInfoBigLicks(m,n) = a.daySummary.infoBigLicks{mm,a.reversalDays(m,n)};
+                a.reversalInfoSmallLicks(m,n) = a.daySummary.infoSmallLicks{mm,a.reversalDays(m,n)};
+                a.reversalRandCLicks(m,n) = a.daySummary.randCLicks{mm,a.reversalDays(m,n)};
+                a.reversalRandDLicks(m,n) = a.daySummary.randDLicks{mm,a.reversalDays(m,n)};
 %             end
 %             a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)})/(a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}+a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)});
               if n==2
-                a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)});
+                a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateRandForced{mm,a.reversalDays(m,n)}-a.daySummary.rewardRateInfoForced{mm,a.reversalDays(m,n)});
               else
-                a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)});   
+                a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{mm,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{mm,a.reversalDays(m,n)});   
               end
         end
     end

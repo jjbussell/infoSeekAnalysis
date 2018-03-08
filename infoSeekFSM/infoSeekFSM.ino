@@ -301,6 +301,7 @@ void loop() {
       REL_THRESH        =        Serial.parseInt();
       touch_right       =        Serial.parseInt();
       touch_left        =        Serial.parseInt();
+      optoFlag          =        Serial.parseInt();
 
       unsigned long entryThreshold = 20;
       int lickCheck = 1;
