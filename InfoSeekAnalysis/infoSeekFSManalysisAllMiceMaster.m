@@ -9,14 +9,6 @@
 % LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!! AND LICKING AFTER TRIAL
 % "ENDS"
 
-% Ethan's early lick index 
-% Ethan's logit--choice, infoside, prereverse, trial type
-% table
-
-% add all mice aligned to reverse day & MEAN + error
-% add all mice aligned to reverse day, trial-by-trial/sliding window
-% all mice pre-reverse aligned to start & MEAN + error
-% all mice pre-reverse aligned to start, trial-by-trial/sliding window
 % graph of all entries for each trial
 
 
@@ -389,7 +381,7 @@ a.trialsReverseWithChoices = a.lastReverse - a.firstReverseChoice;
 %% INFOSIDE
 
 for i = 1:size(a.file,1)
-   a.infoSide(i,1) = a.files(a.file(i)).infoSide;  
+   a.infoSide(i,1) = a.files(a.file(i)).infoSide;  ist(
 end
 
 a.initinfoside_info = -ones(a.corrTrialCt,1); % initinfoside_info all trials. 1 if initinfoside, -1 if reversed
@@ -398,6 +390,18 @@ a.initinfoside_side = ones(a.corrTrialCt,1); % initinfoside_side all trials
 for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
     a.initinfoside_info(a.infoSide == a.initinfoside(m) & ok == 1) = 1;
+end
+
+
+%% OPTO
+
+% files with laser on == 1
+a.optoFlag = cell2mat(a.parameters(:,5)) == 1;
+a.optoMice = unique(a.fileMouse(a.optoFlag));
+a.optoMiceList = a.mouseList(a.optoMice);
+
+for m = 1:lemgth(a.optoMice)
+%    a.laserStart = find( 
 end
 
 
@@ -431,7 +435,7 @@ for m = 1:a.mouseCt
    a.choiceIISByMouse{m} = a.choice_all(ok);   
 end
 
-%% CURRENT AND CHOICE AND REVERSED AND FSM MICE
+%% CURRENT AND CHOICE AND REVERSED AND FSM AND OPTO MICE
 
 % create list of mice with choices to cycle through and sort names
 
