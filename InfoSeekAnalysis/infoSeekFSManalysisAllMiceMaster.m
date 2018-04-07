@@ -381,7 +381,7 @@ a.trialsReverseWithChoices = a.lastReverse - a.firstReverseChoice;
 %% INFOSIDE
 
 for i = 1:size(a.file,1)
-   a.infoSide(i,1) = a.files(a.file(i)).infoSide;  ist(
+   a.infoSide(i,1) = a.files(a.file(i)).infoSide;
 end
 
 a.initinfoside_info = -ones(a.corrTrialCt,1); % initinfoside_info all trials. 1 if initinfoside, -1 if reversed
@@ -395,20 +395,20 @@ end
 
 %% OPTO
 
-% files with laser on == 1
-a.optoFlag = cell2mat(a.parameters(:,5)) == 1;
-a.optoMice = unique(a.fileMouse(a.optoFlag));
-a.optoMiceList = a.mouseList(a.optoMice);
-
-for m = 1:length(a.optoMice)
-    mm = a.optoMice(m);
-   a.laserStart(m,1) = find(a.fileMouse' == mm & a.optoFlag == 1,1);
-   laserOnFiles = find(a.fileMouse' == mm & a.optoFlag == 1);
-   laserOffFiles = find(a.fileMouse' == mm & a.optoFlag == 0);
-   laserOffFiles = laserOffFiles(laserOffFiles  >= a.laserStart(mm,1));
-   a.laserDays{m,1} = unique(a.fileDay(laserOnFiles));
-   a.laserDays{m,2} = unique(a.fileDay(laserOnFiles));
-end
+% % files with laser on == 1
+% a.optoFlag = cell2mat(a.parameters(:,5)) == 1;
+% a.optoMice = unique(a.fileMouse(a.optoFlag));
+% a.optoMiceList = a.mouseList(a.optoMice);
+% 
+% for m = 1:length(a.optoMice)
+%     mm = a.optoMice(m);
+%    a.laserStart(m,1) = find(a.fileMouse' == mm & a.optoFlag == 1,1);
+%    laserOnFiles = find(a.fileMouse' == mm & a.optoFlag == 1);
+%    laserOffFiles = find(a.fileMouse' == mm & a.optoFlag == 0);
+%    laserOffFiles = laserOffFiles(laserOffFiles  >= a.laserStart(mm,1));
+%    a.laserDays{m,1} = unique(a.fileDay(laserOnFiles));
+%    a.laserDays{m,2} = unique(a.fileDay(laserOnFiles));
+% end
 
 % a.daySummary.percentInfo(mm,a.laserDays{m,1})
 
