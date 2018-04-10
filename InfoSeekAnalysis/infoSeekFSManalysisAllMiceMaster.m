@@ -406,11 +406,20 @@ for m = 1:length(a.optoMice)
    laserOnFiles = find(a.fileMouse' == mm & a.optoFlag == 1);
    laserOffFiles = find(a.fileMouse' == mm & a.optoFlag == 0);
    laserOffFiles = laserOffFiles(laserOffFiles  >= a.laserStart(m,1));
+   if isempty(laserOffFiles)
+       mouseFiles = find(a.fileMouse' == mm);
+       laserOffFiles = mouseFiles(mouseFiles < a.laserStart(m,1));
+   end
    a.laserDays{m,1} = unique(a.fileDay(laserOnFiles));
    a.laserDays{m,2} = unique(a.fileDay(laserOffFiles));
+   
+   % choice on laser on vs off days (but reversal and values!! and
+   % training) need to calc time course of training!!
+    a.laserChoice{m,1} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,1})));
+    a.laserChoice{m,2} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,2})));
 end
 
-a.daySummary.percentInfo(mm,a.laserDays{m,1})
+
 
 
 %% CHOICES
