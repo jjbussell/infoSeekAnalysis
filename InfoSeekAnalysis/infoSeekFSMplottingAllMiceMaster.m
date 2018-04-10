@@ -123,13 +123,11 @@ for mm = 1:numel(a.currentMiceNums)
         ax.YTick = [0 0.25 0.50 0.75 1];
         ax.YLim = [-0.1 1.1];
         plot(0,0,'Marker','none');
-        % ADD IF OPTO MOUSE HERE!!!
+        plot(1:a.mouseDayCt(m),[cell2mat(a.daySummary.percentInfo(m,:))],'Color',[.5 .5 .5],'LineWidth',2,'Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);
         if ismember(m,a.optoMice)
-            mm = a.optoMice(m);
-            plot(a.laserDays{mm,1},[cell2mat(a.daySummary.percentInfo(m,a.laserDays{mm,1}))],'Color',[0 0 0],'LineWidth',2,'Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);
-        else
-            plot(1:a.mouseDayCt(m),[cell2mat(a.daySummary.percentInfo(m,:))],'Color',[.5 .5 .5],'LineWidth',2,'Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);
-        end
+            om = find(a.optoMice == m);
+            plot(a.laserDays{om,1},[cell2mat(a.daySummary.percentInfo(m,a.laserDays{om,1}))],'Color',[0 1 1],'LineStyle','none','Marker','o','MarkerFaceColor',[0 1 1],'MarkerSize',3);
+        end        
         plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.8 0.8 0.8],'LineWidth',1);
         for r = 1:numel(cell2mat(a.reverseDay(m,:)))
             plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
