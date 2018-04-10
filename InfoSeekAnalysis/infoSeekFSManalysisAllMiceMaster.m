@@ -405,9 +405,9 @@ for m = 1:length(a.optoMice)
    a.laserStart(m,1) = find(a.fileMouse' == mm & a.optoFlag == 1,1);
    laserOnFiles = find(a.fileMouse' == mm & a.optoFlag == 1);
    laserOffFiles = find(a.fileMouse' == mm & a.optoFlag == 0);
-   laserOffFiles = laserOffFiles(laserOffFiles  >= a.laserStart(mm,1));
+   laserOffFiles = laserOffFiles(laserOffFiles  >= a.laserStart(m,1));
    a.laserDays{m,1} = unique(a.fileDay(laserOnFiles));
-   a.laserDays{m,2} = unique(a.fileDay(laserOnFiles));
+   a.laserDays{m,2} = unique(a.fileDay(laserOffFiles));
 end
 
 a.daySummary.percentInfo(mm,a.laserDays{m,1})
