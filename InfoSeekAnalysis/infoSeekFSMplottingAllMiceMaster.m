@@ -162,6 +162,7 @@ for mm = 1:numel(a.currentMiceNums)
     ax = nsubplot(4,2,2,1);
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
+    ax.YLim = [0 2000];
     plot(cell2mat(a.daySummary.rxnInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
     plot(cell2mat(a.daySummary.rxnInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerEdgeColor',purple,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
     plot(cell2mat(a.daySummary.rxnRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
