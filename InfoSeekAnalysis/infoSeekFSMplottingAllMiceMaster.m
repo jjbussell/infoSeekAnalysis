@@ -279,11 +279,15 @@ for mm = 1:numel(a.currentMiceNums)
     plot(cell2mat(a.infoIncorr(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
     plot(cell2mat(a.randIncorr(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
     plot(cell2mat(a.choiceIncorr(m,:)),'Color',[.8 .8 .8],'LineWidth',2,'Marker','o','MarkerFaceColor',[.8 .8 .8],'MarkerSize',3);
+    if ismember(m,a.optoMice)
+        om = find(a.optoMice == m);
+        plot(a.laserDays{om,1},ones(1,length(a.laserDays{om,1})),'Color',[0 1 1],'LineStyle','none','Marker','o','MarkerFaceColor',[0 1 1],'MarkerSize',5);
+    end 
     for r = 1:numel(cell2mat(a.reverseDay(m,:)))
         plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
     end
     for d = 1:a.mouseDayCt(m)
-        text(d+0.1,1,num2str(a.daySummary.totalTrials{m,d}),'Fontsize',5);
+        text(d+0.1,1.1,num2str(a.daySummary.totalTrials{m,d}),'Fontsize',5);
     end 
     ylabel('Error rate');
 %     xlabel('Day');
