@@ -267,7 +267,7 @@ end
 a.rewardFlag = zeros(numel(a.rewardCorr),1);
 a.rewardFlag(a.rewardCorr>0) = 1;
 
-%% REVERSAL & CHOICES & VALUE
+%% REVERSAL & CHOICES
 
 % FINDS REVERSE DAY (a.reverseDay(m,1) AND TRIALS (a.preReverse)
 
@@ -322,17 +322,9 @@ for m = 1:a.mouseCt
             end
         else a.reverseDay{m,1} = 0;
         end
-    end
-    
-%     mouseValueFile = find(diff([cell2mat(a.parameters(a.fileMouse==m & a.trialTypes == 5,22)),cell2mat(a.parameters(a.fileMouse==m & a.trialTypes == 5,24))],1,2)~=0,1,'first');
-%     a.valueFile{m,1} = mouseFilesIdx(mouseValueFile:end);
-%     a.valueDays{m,1} = mouseFileDays(mouseValueFile:end);    
-%     if ~isempty(mouseValueFile)
-%         a.valueMice(m,1) = 1;
-%     end;    
+    end   
 end
 
-% a.valueMice = find(a.valueMice);
     
 a.preReverse = ones(size(a.file,1),1);
 a.reverse = zeros(size(a.file,1),1);
@@ -392,36 +384,6 @@ for m = 1:a.mouseCt
     a.initinfoside_info(a.infoSide == a.initinfoside(m) & ok == 1) = 1;
 end
 
-
-%% OPTO
-
-% files with laser on == 1
-a.optoFlag = cell2mat(a.parameters(:,5)) == 1;
-a.optoMice = unique(a.fileMouse(a.optoFlag));
-a.optoMiceList = a.mouseList(a.optoMice);
-
-for m = 1:length(a.optoMice)
-    mm = a.optoMice(m);
-   a.laserStart(m,1) = find(a.fileMouse' == mm & a.optoFlag == 1,1);
-   laserOnFiles = find(a.fileMouse' == mm & a.optoFlag == 1);
-   laserOffFiles = find(a.fileMouse' == mm & a.optoFlag == 0);
-   laserOffFiles = laserOffFiles(laserOffFiles  >= a.laserStart(m,1));
-   if isempty(laserOffFiles)
-       mouseFiles = find(a.fileMouse' == mm);
-       laserOffFiles = mouseFiles(mouseFiles < a.laserStart(m,1));
-   end
-   a.laserDays{m,1} = unique(a.fileDay(laserOnFiles));
-   a.laserDays{m,2} = unique(a.fileDay(laserOffFiles));
-   
-   % choice on laser on vs off days (but reversal and values!! and
-   % training) need to calc time course of training!!
-    a.laserChoice{m,1} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,1})));
-    a.laserChoice{m,2} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,2})));
-end
-
-
-
-
 %% CHOICES
 
 % MAKE THESE INCLUDE REVERSE, THEN CAN DO AVERAGES AND LIMIT TO LAST X
@@ -452,7 +414,7 @@ for m = 1:a.mouseCt
    a.choiceIISByMouse{m} = a.choice_all(ok);   
 end
 
-%% CURRENT AND CHOICE AND REVERSED AND FSM AND OPTO MICE
+%% CURRENT AND CHOICE AND REVERSED AND FSM MICE
 
 % create list of mice with choices to cycle through and sort names
 
@@ -698,54 +660,49 @@ if ~isempty(a.choiceMice)
 %     a.icp_all = a.meanChoice(1:end-1,1)*100;
     
     a.overallP = signrank(a.icp_all-50);
-    
-    
+        
 end
 
 %% DIFFERENT SIDE VALUES
-% 
-% a.valueFileCat = cat(2,a.valueFile{:});
-% for ff = 1:numel(a.valueFileCat)
-%     f = a.valueFileCat(ff);
-%     a.valChange(ff,1) = a.parameters{f,22};
-%     a.valChange(ff,2) = a.parameters{f,24};
-%     a.valChange(ff,3) = a.valChange(ff,1) / a.valChange(ff,2);
-%     a.valChangeMouse(ff,1) = a.fileMouse(f);
-%     a.choiceByAmtbyFile{ff,1} = a.choice_all(a.file == f);
-% end
-% 
-% if isfield(a,'valChange')
-%     a.values = unique(a.valChange(:,1));
-%     a.relValues = unique(a.valChange(:,1)/4);
-% else
-%     a.values = [];
-%     a.relValues = [];
-% end
 
-%% FIND LAST DAY AT EACH VALUE FOR EACH MOUSE
+% things to fix!
+% a.values
+% a.relValues
+% a.mouseValueFinalDays
+% a.mouseValueDays
+% mouseProbDays
+
+% HARDCODED-->CHANGE!!!!!!!!!!!!!!!
+% HARD CODED TO CHANGE
+a.valueMiceInfo = [6 7 8 9]; % info side values changed
+a.valueMiceNoInfo = [16 18 20 21]; % no info side values changed
+a.valueMice = [a.valueMiceInfo a.valueMiceNoInfo];
+a.valueMiceList = a.mouseList(a.valueMice);
+
+
+% FIND LAST DAY AT EACH VALUE FOR EACH MOUSE
 for f = 1:a.numFiles
     a.fileValue(f,1) = a.parameters{f,22};
     a.fileValue(f,2) = a.parameters{f,24};
     a.fileValue(f,3) = a.fileValue(f,1) / a.fileValue(f,2);
 end
 
-a.values = unique(a.fileValue(:,1));
+a.values = unique(a.fileValue(:,1:2));
 a.relValues = unique(a.fileValue(:,3));
-
-% HARDCODED-->CHANGE!!!!!!!!!!!!!!!
-% HARD CODED TO CHANGE
-a.valueMice = [6 7 8 9];
-a.valueMiceList = a.mouseList(a.valueMice);
 
 for mm = 1:numel(a.valueMice)
    m = a.valueMice(mm);
    a.valueMouseFiles{mm,1} = find(a.fileMouse == m);
-   a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,1);
+   if ismember(m,a.valueMiceInfo)
+    a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,1);
+   else
+    a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,2);       
+   end
 end
 
 % file within mouse's files after which value tests start
 % HARDCODED-->CHANGE!!!!!!!!!!!!!!!
- a.valueStarts = [35 40 48 50];
+ a.valueStarts = [35 40 48 50 57 59 77 54];
      
 for mm = 1:numel(a.valueMice)
    m = a.valueMice(mm); 
@@ -760,7 +717,7 @@ for mm = 1:numel(a.valueMice)
    mouseValueChangeDays = a.mouseValueChangeDays{mm,1};
    a.mouseValueChangeValues{mm,1} = a.fileValue(a.mouseValueChangeFiles{mm,1},3);
    mouseValueChangeValues = a.mouseValueChangeValues{mm,1};
-   for vv = 1:numel(a.values)
+   for vv = 1:numel(a.relValues)
        v = a.relValues(vv);
        a.mouseValueFinalDays{mm,vv} = mouseValueChangeDays(mouseValueChangeValues == v);
    end
@@ -773,7 +730,7 @@ end
 
 for mm = 1:numel(a.valueMice)
    m = a.valueMice(mm);
-   for vv = 1:numel(a.values)
+   for vv = 1:numel(a.relValues)
        v = a.relValues(vv);
        days = a.mouseValueFinalDays{mm,vv};
        a.valueChoiceTrials{mm,vv} = a.choice_all(ismember(a.mouseDay,days) & a.mice(:,m) == 1 & a.choiceCorrTrials == 1);
@@ -1186,7 +1143,11 @@ for m = 1:numel(a.reverseMice)
         else
             mmm = find(a.valueMice == mm);
             mouseValueDays = a.mouseValueDays{mmm,1};
-            mouseProbDays = a.infoBigProbs{mm,1};
+            if ismember(mmm,a.valueMiceInfo)
+                mouseProbDays = a.infoBigProbs{mm,1};
+            else
+                mouseProbDays = a.randBigProbs{mm,1};
+            end
             mouseValues = mouseProbDays(mouseValueDays);
             if sum(mouseValues > 25) > 0
                 a.reversalDays(m,3) = find(mouseProbDays==25,1,'last');
@@ -1276,6 +1237,33 @@ for p =1:3
     a.reversalRxnPVals(1,p) = signrank(a.reversalRxn(:,p));
     a.reversalLicksPVals(1,p) = signrank(a.reversalLicks(:,p));
     a.reversalRewardRatePVals(1,p) = signrank(a.reversalRewardRateIdx(:,p));
+end
+
+
+%% OPTO
+
+% files with laser on == 1
+a.optoFlag = cell2mat(a.parameters(:,5)) == 1;
+a.optoMice = unique(a.fileMouse(a.optoFlag));
+a.optoMiceList = a.mouseList(a.optoMice);
+
+for m = 1:length(a.optoMice)
+    mm = a.optoMice(m);
+   a.laserStart(m,1) = find(a.fileMouse' == mm & a.optoFlag == 1,1);
+   laserOnFiles = find(a.fileMouse' == mm & a.optoFlag == 1);
+   laserOffFiles = find(a.fileMouse' == mm & a.optoFlag == 0);
+   laserOffFiles = laserOffFiles(laserOffFiles  >= a.laserStart(m,1));
+   if isempty(laserOffFiles)
+       mouseFiles = find(a.fileMouse' == mm);
+       laserOffFiles = mouseFiles(mouseFiles < a.laserStart(m,1));
+   end
+   a.laserDays{m,1} = unique(a.fileDay(laserOnFiles));
+   a.laserDays{m,2} = unique(a.fileDay(laserOffFiles));
+   
+   % choice on laser on vs off days (but reversal and values!! and
+   % training) need to calc time course of training!!
+    a.laserChoice{m,1} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,1})));
+    a.laserChoice{m,2} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,2})));
 end
 
 %%
