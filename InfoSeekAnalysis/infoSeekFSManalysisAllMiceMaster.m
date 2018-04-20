@@ -845,6 +845,8 @@ for f = 1:a.numFiles
     a.odorD(f,1) = cell2mat(a.parameters(f,15));   
 end
 
+% a.odor2corr = a.odor2(a.correct);
+
 for t = 1:a.corrTrialCt
     trialFile = a.file(t);
     a.odorAtrials(t,1) = a.odor2(t) == a.odorA(trialFile);
@@ -855,6 +857,7 @@ end
 
 for m = 1:a.mouseCt
     for d = 1:a.mouseDayCt(m)
+        ok = [];
         ok = a.mouseDay == d & a.mice(:,m) == 1;
         a.Alicks(m,d) = sum(a.anticipatoryLicks(a.odorAtrials & ok)); % anticipateLickCt
         a.Blicks(m,d) = sum(a.anticipatoryLicks(a.odorBtrials & ok));
