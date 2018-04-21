@@ -1242,39 +1242,39 @@ end
 %% overall value plot
 % 1 fig, plot val vs pref (mean + error + baseline)
 
-fig = figure();
-fig = gcf;
-fig.PaperUnits = 'inches';
-fig.PaperPosition = [0.5 0.5 10 7];
-set(fig,'renderer','painters');
-set(fig,'PaperOrientation','landscape');
-ax = nsubplot(1,1,1,1);
-hold on;
-% ax.FontSize = 8;
-% ax.XLim = [0 2.5];
-ax.XTick = [0 a.relValues' 2];
-xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
-ax.YTick = [0 0.25 0.50 0.75 1];
-ax.YLim = [0 1];
-ylabel({'Info choice probability', 'across mice'});
-xlabel('Info side relative water amount');
-% p = patch([[a.relValues'] fliplr([a.relValues'])], [[a.choiceByAmtMean-a.choiceByAmtSEM]',[fliplr([a.choiceByAmtMean+a.choiceByAmtSEM]')]],[0.8 0.8 0.8]);
-% p.EdgeColor = 'none';
-% plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
-% bar(a.relValues,a.choiceByAmtMean,'FaceColor','k');
-plot(a.relValues,a.choiceByAmtProbMean(:,1),'Color','m','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.choiceByAmtProbMean(:,2),'Color','g','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.choiceByAmtMean+a.choiceByAmtSEM,'Color','k','LineWidth',1,'Marker','none');
-plot(a.relValues,a.choiceByAmtMean-a.choiceByAmtSEM,'Color','k','LineWidth',1,'Marker','none');
-% bar(2,a.overallPref,0.2,'FaceColor','r','EdgeColor','none');
-% errorbar(2,a.overallPref,a.overallPref - a.overallCI(1),a.overallCI(2) - a.overallPref,'CapSize',20,'LineStyle','none','LineWidth',2,'Color','k');
-
-% errorbar(a.relValues,a.choiceByAmtMean,a.choiceByAmtSEM,'Color','k','LineStyle','none','CapSize',10,'LineWidth',2);
-plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
-hold off;
-
-saveas(fig,fullfile(pathname,'OverallValue'),'pdf');
+% fig = figure();
+% fig = gcf;
+% fig.PaperUnits = 'inches';
+% fig.PaperPosition = [0.5 0.5 10 7];
+% set(fig,'renderer','painters');
+% set(fig,'PaperOrientation','landscape');
+% ax = nsubplot(1,1,1,1);
+% hold on;
+% % ax.FontSize = 8;
+% % ax.XLim = [0 2.5];
+% ax.XTick = [0 a.relValues'];
+% xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
+% ax.YTick = [0 0.25 0.50 0.75 1];
+% ax.YLim = [0 1];
+% ylabel({'Info choice probability', 'across mice'});
+% xlabel('Info side relative water amount');
+% % p = patch([[a.relValues'] fliplr([a.relValues'])], [[a.choiceByAmtMean-a.choiceByAmtSEM]',[fliplr([a.choiceByAmtMean+a.choiceByAmtSEM]')]],[0.8 0.8 0.8]);
+% % p.EdgeColor = 'none';
+% % plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
+% % bar(a.relValues,a.choiceByAmtMean,'FaceColor','k');
+% plot(a.relValues,a.choiceByAmtProbMean(:,1),'Color','m','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+% plot(a.relValues,a.choiceByAmtProbMean(:,2),'Color','g','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+% plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+% plot(a.relValues,a.choiceByAmtMean+a.choiceByAmtSEM,'Color','k','LineWidth',1,'Marker','none');
+% plot(a.relValues,a.choiceByAmtMean-a.choiceByAmtSEM,'Color','k','LineWidth',1,'Marker','none');
+% % bar(2,a.overallPref,0.2,'FaceColor','r','EdgeColor','none');
+% % errorbar(2,a.overallPref,a.overallPref - a.overallCI(1),a.overallCI(2) - a.overallPref,'CapSize',20,'LineStyle','none','LineWidth',2,'Color','k');
+% 
+% % errorbar(a.relValues,a.choiceByAmtMean,a.choiceByAmtSEM,'Color','k','LineStyle','none','CapSize',10,'LineWidth',2);
+% plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
+% hold off;
+% 
+% saveas(fig,fullfile(pathname,'OverallValue'),'pdf');
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
