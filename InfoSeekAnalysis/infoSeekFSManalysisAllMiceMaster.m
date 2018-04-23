@@ -749,8 +749,8 @@ end
 
 %% OVERALL CHOICES BY AMOUNT
 
-for vv = 1:numel(a.values)
-   v = a.relValues(vv);
+for vv = 1:numel(a.relValues)
+    v = a.relValues(vv);
     a.valChoices{vv,1} = vertcat(a.valueChoiceTrials{:,vv});
     % info vs no info changed
     a.valChoices{vv,2} = vertcat(a.valueChoiceTrials{a.valInfoMice,vv});
@@ -765,7 +765,7 @@ end
 
 %% HARDCODED OVERALL BY AMOUNT BY PROB
 
-for vv = 1:numel(a.values)
+for vv = 1:numel(a.relValues)
    v = a.relValues(vv);
     a.valChoicesProb{vv,1} = vertcat(a.valueChoiceTrials{1:2,vv});
     a.valChoicesProb{vv,2} = vertcat(a.valueChoiceTrials{3:4,vv});
