@@ -678,17 +678,22 @@ a.valueMiceInfo = [6 7 8 9]; % info side values changed
 a.valueMiceNoInfo = [16 18 20 21]; % no info side values changed
 a.valueMice = [a.valueMiceInfo a.valueMiceNoInfo];
 a.valueMiceList = a.mouseList(a.valueMice);
+a.valInfoMice = ismember(a.valueMice,a.valueMiceInfo);
+a.valNoInfoMice = ismember(a.valueMice,a.valueMiceNoInfo);
 
-
-% FIND LAST DAY AT EACH VALUE FOR EACH MOUSE
+% RELATIVE VALUES
 for f = 1:a.numFiles
     a.fileValue(f,1) = a.parameters{f,22};
     a.fileValue(f,2) = a.parameters{f,24};
-    a.fileValue(f,3) = a.fileValue(f,1) / a.fileValue(f,2);
+    a.fileValue(f,3) = a.fileValue(f,1) / a.fileValue(f,2); % info relative to rand
 end
 
 a.values = unique(a.fileValue(:,1:2));
+a.infoValues = unique(a.fileValue(:,1));
+a.randValues = unique(a.fileValue(:,2));
 a.relValues = unique(a.fileValue(:,3));
+a.rowValues = unique(a.fileValue(:,1:2),'rows');
+a.rowValues(:,3) = a.rowValues(:,1)./a.rowValues(:,2);
 
 for mm = 1:numel(a.valueMice)
    m = a.valueMice(mm);
@@ -696,14 +701,17 @@ for mm = 1:numel(a.valueMice)
    if ismember(m,a.valueMiceInfo)
     a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,1);
    else
-    a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,2);       
+    a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,2);    
    end
+   a.valueMouseRelValues{mm,1} = unique(a.fileValue(a.fileMouse==m,3));
 end
 
 % file within mouse's files after which value tests start
 % HARDCODED-->CHANGE!!!!!!!!!!!!!!!
  a.valueStarts = [35 40 48 50 57 59 77 54];
-     
+
+ 
+% FIND LAST DAY AT EACH VALUE FOR EACH MOUSE
 for mm = 1:numel(a.valueMice)
    m = a.valueMice(mm); 
    allMouseValueFiles = a.valueMouseFiles{mm,1};
@@ -726,7 +734,7 @@ end
 % Can pull daySummary.percentInfo for all value days (course of value
 % tradeoffs)
 
-%% CHOICES ON MOUSE VALUE FINAL DAYS (2 per value per mouse)
+%% CHOICES ON MOUSE VALUE FINAL DAYS (eventually trials of 2 days per value per mouse)
 
 for mm = 1:numel(a.valueMice)
    m = a.valueMice(mm);
@@ -744,8 +752,15 @@ end
 for vv = 1:numel(a.values)
    v = a.relValues(vv);
     a.valChoices{vv,1} = vertcat(a.valueChoiceTrials{:,vv});
+    % info vs no info changed
+    a.valChoices{vv,2} = vertcat(a.valueChoiceTrials{a.valInfoMice,vv});
+    a.valChoices{vv,3} = vertcat(a.valueChoiceTrials{a.valNoInfoMice,vv});
     a.choiceByAmtMean(vv,1) = nanmean(a.valChoices{vv,1});
+    a.choiceByAmtMean(vv,2) = nanmean(a.valChoices{vv,2});
+    a.choiceByAmtMean(vv,3) = nanmean(a.valChoices{vv,3});
     a.choiceByAmtSEM(vv,1) = sem(a.valChoices{vv,1});
+    a.choiceByAmtSEM(vv,2) = sem(a.valChoices{vv,2});
+    a.choiceByAmtSEM(vv,3) = sem(a.valChoices{vv,3});
 end
 
 %% HARDCODED OVERALL BY AMOUNT BY PROB
@@ -754,10 +769,13 @@ for vv = 1:numel(a.values)
    v = a.relValues(vv);
     a.valChoicesProb{vv,1} = vertcat(a.valueChoiceTrials{1:2,vv});
     a.valChoicesProb{vv,2} = vertcat(a.valueChoiceTrials{3:4,vv});
+    a.valChoicesProb{vv,3} = vertcat(a.valueChoiceTrials{5:8,vv});
     a.choiceByAmtProbMean(vv,1) = nanmean(a.valChoicesProb{vv,1});
     a.choiceByAmtProbMean(vv,2) = nanmean(a.valChoicesProb{vv,2});
+    a.choiceByAmtProbMean(vv,3) = nanmean(a.valChoicesProb{vv,3});
     a.choiceByAmtProbSEM(vv,1) = sem(a.valChoicesProb{vv,1});
     a.choiceByAmtProbSEM(vv,2) = sem(a.valChoicesProb{vv,2});
+    a.choiceByAmtProbSEM(vv,3) = sem(a.valChoicesProb{vv,3});
 end
 
 

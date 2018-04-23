@@ -1191,9 +1191,11 @@ for mm = 1:numel(a.tempValueMice)
     ax = nsubplot(2,1,1,1);
     title(a.mouseList(m));
     ax.FontSize = 8;
-%     ax.XLim = [0 2.5];
-    ax.XTick = [0 0.5 1 1.5 2];
-    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.XLim = [0 2];
+%     ax.XTickMode = 'manual';
+%     ax.XTick = [0 0.5 1 1.5 2];
+%     set(ax,'XTick',[0 0.5 1 1.5 2]);
+%     ax.YTick = [0 0.25 0.50 0.75 1];
     ax.YLim = [0 1];
     s=a.relValues';
 %     xticklabels([strtrim(cellstr(num2str(s'))') 'Overall']);
@@ -1206,7 +1208,7 @@ for mm = 1:numel(a.tempValueMice)
     plot(a.relValues(mouseVals),a.valChoiceMeanbyMouse(mm,mouseVals)-a.valChoiceSEMbyMouse(mm,mouseVals),'Color','r','LineWidth',1,'Marker','none','MarkerFaceColor','r','MarkerSize',3);
     %     bar(2,a.meanChoice(m,1),0.2,'FaceColor','r','EdgeColor','none');
 %     bar([a.relValues(mouseVals); 2],[a.valChoiceMeanbyMouse(mm,mouseVals) a.meanChoice(m,1)],0.2,'FaceColor','k');
-    xticklabels(['0' strtrim(cellstr(num2str(s'))')]);
+%     xticklabels(['0' strtrim(cellstr(num2str(s'))')]);
 
     ax = nsubplot(2,1,2,1);    
     ax.FontSize = 8;
@@ -1221,9 +1223,9 @@ for mm = 1:numel(a.tempValueMice)
     plot([-10000000 1000000],[1 1],'Color',grey,'yliminclude','off','xliminclude','off','LineWidth',0.5);
 %     bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.mouseValueDays{mm,1}))/4],'FaceColor','k','EdgeColor','none');
     if ismember(m,a.valueMiceInfo)
-        bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.mouseValueDays{mm,1}))/4],'FaceColor','k','EdgeColor','none');
+        bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.mouseValueDays{mm,1}))./4],'FaceColor','k','EdgeColor','none');
     else
-        bar([1 cell2mat(a.daySummary.randBigAmt(m,a.mouseValueDays{mm,1}))/4],'FaceColor','k','EdgeColor','none');
+        bar([1 4./cell2mat(a.daySummary.randBigAmt(m,a.mouseValueDays{mm,1}))],'FaceColor','k','EdgeColor','none');
     end
     
     
