@@ -1269,6 +1269,29 @@ for m = 1:length(a.optoMice)
     a.laserChoice{m,2} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,2})));
 end
 
+%% OUTCOME/COMPLETE/IN PORT
+
+for m = 1:a.mouseCt
+    ok = a.miceAll(:,m) == 1;
+    mouseOutcomes = a.finalOutcome(ok);
+    % info choice big
+    a.incomplete(m,1) =  sum(mouseOutcomes == 3)/sum(ismember(mouseOutcomes,[2 3]));
+    % info choice small
+    a.incomplete(m,2) =  sum(mouseOutcomes == 5)/sum(ismember(mouseOutcomes,[4 5]));
+    % rand choice big
+    a.incomplete(m,3) = sum(ismember(mouseOutcomes, [7]))/sum(ismember(mouseOutcomes, [6 7]));
+    % rand choice small
+    a.incomplete(m,4) =  sum(mouseOutcomes == 9)/sum(ismember(mouseOutcomes,[8 9]));    
+    % info big
+    a.incomplete(m,5) =  sum(mouseOutcomes == 12)/sum(ismember(mouseOutcomes,[11 12]));    
+    % info small
+    a.incomplete(m,6) =  sum(mouseOutcomes == 14)/sum(ismember(mouseOutcomes,[13 14]));
+    % rand big
+    a.incomplete(m,7) =  sum(mouseOutcomes == 18)/sum(ismember(mouseOutcomes,[17 18]));
+    % rand small
+    a.incomplete(m,8) =  sum(mouseOutcomes == 20)/sum(ismember(mouseOutcomes,[19 20]));
+end
+
 %%
 save('infoSeekFSMDataAnalyzed.mat','a');
 % save('JB195imagingDataAnalyzed.mat','a');

@@ -94,6 +94,9 @@ a.finalOutcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoBigNP',...
     'RandBig','RandBigNP','RandSmall','RandSmallNP',...
     'RandIncorrect'};
 
+% a.inPortLabels = {'ChoiceInfoBig','ChoiceInfoSmall','ChoiceRandBig',...
+%     'ChoiceRandSmall','InfoBig','InfoSmall','RandBig','RandSmall'};
+
 %%
 
  pathname=uigetdir('','Choose save directory');
@@ -995,6 +998,33 @@ end
 % 
 %     saveas(fig,fullfile(pathname,'ErrorMicePrefs'),'pdf');
 %     close(fig);
+
+
+%% NOT PRESENT IN PORT OVERALL
+
+for mm = 1:numel(a.currentMiceNums)
+    m=a.currentMiceNums(mm);
+% for m = 1:a.mouseCt
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    title(a.mouseList(m));
+    ax.FontSize = 8;
+    ylabel('% trials not present in reward port at outcome');
+    
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [-0.1 1.1];
+    
+    bar(a.incomplete(m,:),'FaceColor','k','EdgeColor','none');
+    set(gca,'XTickLabel',a.choiceLabels,'XTick',[1:8]);
+    
+    saveas(fig,fullfile(pathname,['notPresent' a.mouseList{m}]),'pdf');
+end
 
 
     %% OVERALL
