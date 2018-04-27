@@ -1308,6 +1308,17 @@ for m = 1:a.mouseCt
     a.incomplete(m,7) =  sum(mouseOutcomes == 18)/sum(ismember(mouseOutcomes,[17 18]));
     % rand small
     a.incomplete(m,8) =  sum(mouseOutcomes == 20)/sum(ismember(mouseOutcomes,[19 20]));
+    for d = 1:a.mouseDayCt(m)
+        mouseOutcomes = a.daySummary.finalOutcome{m,d};
+        a.dayIncomplete(m,d,1) = sum(mouseOutcomes == 3)/sum(ismember(mouseOutcomes,[2 3]));
+        a.dayIncomplete(m,d,2) = sum(mouseOutcomes == 5)/sum(ismember(mouseOutcomes,[4 5]));
+        a.dayIncomplete(m,d,3) = sum(mouseOutcomes == 7)/sum(ismember(mouseOutcomes, [6 7]));
+        a.dayIncomplete(m,d,4) = sum(mouseOutcomes == 9)/sum(ismember(mouseOutcomes,[8 9]));    
+        a.dayIncomplete(m,d,5) = sum(mouseOutcomes == 12)/sum(ismember(mouseOutcomes,[11 12]));    
+        a.dayIncomplete(m,d,6) = sum(mouseOutcomes == 14)/sum(ismember(mouseOutcomes,[13 14]));
+        a.dayIncomplete(m,d,7) = sum(mouseOutcomes == 18)/sum(ismember(mouseOutcomes,[17 18]));
+        a.dayIncomplete(m,d,8) = sum(mouseOutcomes == 20)/sum(ismember(mouseOutcomes,[19 20]));
+        ends
 end
 
 %%
