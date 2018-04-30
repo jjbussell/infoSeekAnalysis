@@ -1156,8 +1156,8 @@ for m = 1:numel(a.reverseMice)
         % last day of second reversal (either r+3/last day or last day before get
         % ready for values)
         if ~ismember(mm,a.valueMice)
-            if a.reverseDay{mm,2}+3 >= a.mouseDayCt(m)
-                a.reversalDays(m,3) = a.mouseDayCt(m);
+            if a.reverseDay{mm,2}+3 >= a.mouseDayCt(mm)
+                a.reversalDays(m,3) = a.mouseDayCt(mm);
             else
                 a.reversalDays(m,3) = a.reverseDay{mm,2}+3;
             end
