@@ -1318,7 +1318,7 @@ for m = 1:a.mouseCt
         a.dayIncomplete(m,d,6) = sum(mouseOutcomes == 14)/sum(ismember(mouseOutcomes,[13 14]));
         a.dayIncomplete(m,d,7) = sum(mouseOutcomes == 18)/sum(ismember(mouseOutcomes,[17 18]));
         a.dayIncomplete(m,d,8) = sum(mouseOutcomes == 20)/sum(ismember(mouseOutcomes,[19 20]));
-        ends
+    end
 end
 
 %%
