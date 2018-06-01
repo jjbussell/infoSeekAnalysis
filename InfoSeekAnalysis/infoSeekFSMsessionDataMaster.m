@@ -17,8 +17,8 @@ ports = [1,3]; % port sensor IDs
 % [datafilename,datapathname]=uigetfile('*.mat', 'Choose processed data file to load');
 % fname=fullfile(datapathname,datafilename);
 
-loadData = 1;
-% loadData = 0;
+% loadData = 1;
+loadData = 0;
 
 if loadData == 1
     fname = 'infoSeekFSMData.mat';
@@ -67,6 +67,10 @@ for f = 1:numFiles
     % as of 9/13/2017, added 2 new parameters for separate info/rand
     % reward amounts, so session parameters 2 bigger. also extra
     % parameter for FSM vs before?!?
+    
+    fileID=fopen(fname);
+    C = textscan(fileID,'%s', 'Delimiter', ',','MultipleDelimsAsOne',1);
+    fclose(fileID);
 
     if csvread(fname,31,0,[31,0,31,0]) == 0
         data = csvread(fname,31,0);
@@ -426,9 +430,9 @@ b.images(:,1) = ff;
 
     b.trialParams = data(data(:,3) == 17, :);
     
-%     if(size(b.trialParams,1) < trialCt)
-%         b.trialParams(end+1,:) = [totalTime, trialCt, 17, 0, 5];
-%     end
+    if(size(b.trialParams,1) < trialCt)
+        b.trialParams(end+1,:) = [totalTime, trialCt, 17, 0, 5];
+    end
     
     b.trialParams = [zeros(size(b.trialParams,1),1) b.trialParams];
     b.trialParams(:,1) = ff;
