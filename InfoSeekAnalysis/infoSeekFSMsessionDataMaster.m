@@ -40,6 +40,9 @@ f = 1;
 
 %% FOR EACH FILE
 for f = 1:numFiles
+    
+    clearvars -except a fname names pathname files numFiles f loadData ports;
+    
     filename = files(f).name;
     
     if loadData == 1
@@ -82,15 +85,25 @@ for f = 1:numFiles
 % test5(test6(1));
 % test5(test6(1))
 % % 62/2 % subtract 1 and divide by 2 since 2 columns, gives row to start data!
-
+    
     allData = C{1,1};
     firstZeros = find(strcmp(allData,'0'),20);
     firstZerosDiff = find(diff(firstZeros)==1,1);
     firstData = firstZeros(find(diff(firstZeros)==1,1));
-    dataStart = (firstData-1)/2;
+    paramsStop = floor((find(strcmp('Touch_Left',allData))+1)/2)-1;
+    paramRead = find(strcmp('Touch_Left',allData))+1;
+
+    dataStart = floor((firstData-paramRead)/5) + paramsStop + 1;
+
+%     dataStart = (firstData-1)/2;
     data = csvread(fname,dataStart,0);
-    paramsStop = (find(strcmp('Touch_Left',allData))+1)/2-1;
-    sessionParams(:,f) = csvread(fname,1,1,[1,1,paramsStop,1]);
+    
+    if paramsStop < 30
+        temp = csvread(fname,1,1,[1,1,paramsStop,1]); % report
+        sessionParams(:,f) = [temp(1:20); temp(19:20); temp(21:end)]; 
+    else
+        sessionParams(:,f) = csvread(fname,1,1,[1,1,paramsStop,1]);
+    end
 
 %     if csvread(fname,31,0,[31,0,31,0]) == 0
 %         data = csvread(fname,31,0);
