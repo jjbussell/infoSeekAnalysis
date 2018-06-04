@@ -99,8 +99,6 @@ for f = 1:numFiles
         sessionParams(:,f) = csvread(fname,1,1,[1,1,paramsStop,1]);
     end
 
-
-
     b = struct;
 
     infoSide = sessionParams(5,f);
@@ -148,30 +146,6 @@ for f = 1:numFiles
     files(f).interval = sessionParams(26,f);
     if isfield(files, 'folder')
         files = rmfield(files,'folder');
-    end
-
-
-%% TRIAL COUNTS
-
-    % need to figure out which to use. txn0_1 first, then printer(10, then
-    % txn1_2 (but also goCue, goParams)-->only count trials that get to
-    % goParams? need to use ITI to wait for start
-
-    trialCt = max(data(:,2));
-
-    trialStarts = data(data(:,3) == 10,:);
-    b.trialStart = data(data(:,3) == 10,:);
-   
-    if(size(b.trialStart,1)<trialCt)
-        trialCt = size(b.trialStart,1);
-    end
-    
-    b.trialNums(:,1) = 1:trialCt;
-
-    if loadData == 0
-        b.fileAll(1:trialCt,1) = f;
-    else
-        b.fileAll(1:trialCt,1) = f + a.numFiles;
     end
 
 %% IMAGING
@@ -230,7 +204,32 @@ for f = 1:numFiles
     b.txn10_16 = transitions(transitions(:,5) == 10 & transitions(:,6) == 16,[1 2 3 5 6]);
     b.txn16_15 = transitions(transitions(:,5) == 16 & transitions(:,6) == 15,[1 2 3 5 6]);        
 
+    
+%% TRIAL COUNTS
 
+    % need to figure out which to use. txn0_1 first, then printer(10, then
+    % txn1_2 (but also goCue, goParams)-->only count trials that get to
+    % goParams? need to use ITI to wait for start
+
+    trialCt = size(b.txn15_0,1) + 1;
+
+    trialStarts = data(data(:,3) == 10,:);
+    b.trialStart = data(data(:,3) == 10,:);
+    
+   
+    if(size(b.trialStart,1)<trialCt)
+%         trialCt = size(b.trialStart,1);
+        b.trialStart(trialCt,:) = [NaN trialCt 10 NaN NaN];
+    end
+    
+    b.trialNums(:,1) = 1:trialCt;
+
+    if loadData == 0
+        b.fileAll(1:trialCt,1) = f;
+    else
+        b.fileAll(1:trialCt,1) = f + a.numFiles;
+    end
+    
 %% ENTRIES AND EXITS
 
     entries = [];
