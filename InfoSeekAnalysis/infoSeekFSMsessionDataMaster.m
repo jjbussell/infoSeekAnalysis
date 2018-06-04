@@ -88,9 +88,6 @@ for f = 1:numFiles
     data = csvread(fname,dataStart,0);
 
     paramsStop = (find(strcmp('Touch_Left',allData))+1)/2-1;
-    sessionParams(:,f) = csvread(fname,1,1,[1,1,paramsStop,1]);
-    
-    clear C;
     
     if paramsStop < 30
         temp = csvread(fname,1,1,[1,1,paramsStop,1]); % report
@@ -98,6 +95,8 @@ for f = 1:numFiles
     else
         sessionParams(:,f) = csvread(fname,1,1,[1,1,paramsStop,1]);
     end
+    
+    clear C;
 
     b = struct;
 
