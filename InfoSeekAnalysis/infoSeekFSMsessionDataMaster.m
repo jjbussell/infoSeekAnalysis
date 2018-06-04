@@ -40,6 +40,9 @@ f = 1;
 
 %% FOR EACH FILE
 for f = 1:numFiles
+    
+    clearvars -except a fname names pathname files numFiles f loadData ports;
+    
     filename = files(f).name;
     
     if loadData == 1
