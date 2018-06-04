@@ -71,17 +71,6 @@ for f = 1:numFiles
     fileID=fopen(fname);
     C = textscan(fileID,'%s', 'Delimiter', ',','MultipleDelimsAsOne',1);
     fclose(fileID);
-    
-%     test=C{1,1}; % read file into cell of chars
-%     test2=test(63:end);
-%     test3=find(strcmp(test2,'0'));
-%     test4=diff(test3);
-% test5=find(strcmp(test(63:end),'0'),1);
-% test5=find(strcmp(test,'0'),20); % find the first 20 0's
-% test6=find(diff(test5)==1); % find the first 2 right after each other
-% test5(test6(1));
-% test5(test6(1))
-% % 62/2 % subtract 1 and divide by 2 since 2 columns, gives row to start data!
 
     allData = C{1,1};
     firstZeros = find(strcmp(allData,'0'),20);
@@ -91,15 +80,8 @@ for f = 1:numFiles
     data = csvread(fname,dataStart,0);
     paramsStop = (find(strcmp('Touch_Left',allData))+1)/2-1;
     sessionParams(:,f) = csvread(fname,1,1,[1,1,paramsStop,1]);
-
-%     if csvread(fname,31,0,[31,0,31,0]) == 0
-%         data = csvread(fname,31,0);
-%         sessionParams(:,f) = csvread(fname,1,1,[1,1,30,1]); % report        
-%     elseif csvread(fname,29,0,[29,0,29,0]) == 0
-%         data = csvread(fname,29,0);
-%         temp = csvread(fname,1,1,[1,1,28,1]); % report
-%         sessionParams(:,f) = [temp(1:20); temp(19:20); temp(21:end)];                                
-%     end
+    
+    clear C;
 
     b = struct;
 
@@ -153,8 +135,11 @@ for f = 1:numFiles
 
 %% TRIAL COUNTS
 
-    trialCt = max(data(:,2));
+    % need to figure out which to use. txn0_1 first, then printer(10, then
+    % txn1_2 (but also goCue, goParams)-->only count trials that get to
+    % goParams? need to use ITI to wait for start
 
+    trialCt = max(data(:,2));
 
     trialStarts = data(data(:,3) == 10,:);
     b.trialStart = data(data(:,3) == 10,:);
@@ -173,11 +158,11 @@ for f = 1:numFiles
 
 %% IMAGING
 
-% Pull imaging frame timestamps
-b.images = [];
-b.images = data(data(:,3) == 20, [1 2]);
-b.images = [zeros(size(b.images,1),1) b.images];
-b.images(:,1) = ff;    
+    % Pull imaging frame timestamps
+    b.images = [];
+    b.images = data(data(:,3) == 20, [1 2]);
+    b.images = [zeros(size(b.images,1),1) b.images];
+    b.images(:,1) = ff;    
 
 %% STATE TRANSITIONS (real time)
 
