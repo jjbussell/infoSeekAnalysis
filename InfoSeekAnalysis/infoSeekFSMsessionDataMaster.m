@@ -211,10 +211,21 @@ for f = 1:numFiles
     % goParams? need to use ITI to wait for start
 
     trialCt = size(b.txn15_0,1) + 1;
+    
+    trialStartCt = size(b.txn0_1,1);
+    
+    responseCt = size(b.txn8_9,1);
+    
+    if trialCt < trialStartCt
+        error('bad trial ct');
+    end
+    
+    if trialCt < responseCt
+        error('bad trial ct');
+    end    
 
     trialStarts = data(data(:,3) == 10,:);
-    b.trialStart = data(data(:,3) == 10,:);
-    
+    b.trialStart = data(data(:,3) == 10,:);    
    
     if(size(b.trialStart,1)<trialCt)
 %         trialCt = size(b.trialStart,1);
@@ -287,11 +298,19 @@ for f = 1:numFiles
     if size(b.goCue,1) < trialCt
         b.goCue = [b.goCue; [ff totalTime trialCt 0 0]];
     end
+    
     b.goParams = data(data(:,3) == 1, :);
+    [~, uniIdx] = unique(b.goParams(:,2));
+    b.goParams = b.goParams(uniIdx,:);
+    
+    
     b.goParams = [zeros(size(b.goParams,1),1) b.goParams];
     b.goParams(:,1) = ff;        
-    if size(b.goParams,1) < trialCt
+    if size(b.goParams,1) == trialCt-1
         b.goParams = [b.goParams; [ff totalTime trialCt 0 0 0]];
+    else if (size(b.goParams,1) ~= trialCt)
+            error('bad trial ct');
+        end
     end        
 
 %% CHOICE
@@ -451,10 +470,18 @@ for f = 1:numFiles
 
     b.trialParams = data(data(:,3) == 17, :);
     
-    if(size(b.trialParams,1) < trialCt)
-        b.trialParams(end+1,:) = [totalTime, trialCt, 17, 0, 5];
-    end
+    [~, uniIdx] = unique(b.trialParams(:,2));
     
+    b.trialParams = b.trialParams(uniIdx,:);
+    
+    if(size(b.trialParams,1) ~= b.corrTrialCt)
+        if (size(b.trialParams,1) == b.corrTrialCt-1)
+            b.trialParams(end+1,:) = [totalTime, b.corrTrialCt, 17, 0, 5];
+        else
+            error('bad trial Ct');
+        end
+    end
+  
     b.trialParams = [zeros(size(b.trialParams,1),1) b.trialParams];
     b.trialParams(:,1) = ff;
 
@@ -498,7 +525,7 @@ for f = 1:numFiles
         b.randSmallReward = (b.randSmallRewardTime * 4);
     end
 
-    b.rewardAmount = b.infoBigRewardCt * b.infoBigReward +...
+        b.rewardAmount = b.infoBigRewardCt * b.infoBigReward +...
         b.infoSmallRewardCt * b.infoSmallReward + b.randBigRewardCt...
         * b.randBigReward + b.randSmallRewardCt * b.randSmallReward; % report
 
@@ -693,8 +720,9 @@ for f = 1:numFiles
 
 %% FINAL OUTCOME (not present type) FOR ALL TRIALS
 
-    b.finalOutcome = NaN(numel(trialCt),1);
 
+    b.finalOutcome = NaN(trialCt,1);
+    
     for t = 1:size(b.trialStart,1)
         % choice 1 = info, 0 = rand, 3 = wrong, 2 = no choice
 

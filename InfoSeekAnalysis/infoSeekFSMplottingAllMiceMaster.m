@@ -103,9 +103,9 @@ a.finalOutcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoBigNP',...
 
 %% PLOT DAY SUMMARIES BY MOUSE FOR CURRENT MICE
 
-for mm = 1:numel(a.currentMiceNums)
-    m=a.currentMiceNums(mm);
-% for m = 1:a.mouseCt
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
+for m = 1:a.mouseCt
     figure();
     
     fig = gcf;
@@ -1002,9 +1002,9 @@ end
 
 %% NOT PRESENT IN PORT OVERALL
 
-for mm = 1:numel(a.currentMiceNums)
-    m=a.currentMiceNums(mm);
-% for m = 1:a.mouseCt
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
+for m = 1:a.mouseCt
     figure();
     fig = gcf;
     fig.PaperUnits = 'inches';
