@@ -190,6 +190,7 @@ int infoRewardProb;
 int randRewardProb;
 unsigned long gracePeriod; // additional time to enter reward port
 unsigned long interval; // ITI
+unsigned long optoFlag;
 
 int TOU_THRESH; // lick sensor touch threshold
 int REL_THRESH; // lick sensor release threshold
