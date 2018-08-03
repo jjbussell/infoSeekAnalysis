@@ -94,20 +94,23 @@ a.finalOutcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoBigNP',...
     'RandBig','RandBigNP','RandSmall','RandSmallNP',...
     'RandIncorrect'};
 
+% a.inPortLabels = {'ChoiceInfoBig','ChoiceInfoSmall','ChoiceRandBig',...
+%     'ChoiceRandSmall','InfoBig','InfoSmall','RandBig','RandSmall'};
+
 %%
 
  pathname=uigetdir('','Choose save directory');
 
 %% PLOT DAY SUMMARIES BY MOUSE FOR CURRENT MICE
 
-for mm = 1:numel(a.currentMiceNums)
-    m=a.currentMiceNums(mm);
-% for m = 1:a.mouseCt
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
+for m = 1:a.mouseCt
     figure();
     
     fig = gcf;
     fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0.5 0.5 10 7];
+    fig.PaperPosition = [0 0 11 8.5];
     set(fig,'renderer','painters');
     set(fig,'PaperOrientation','landscape');
     
@@ -116,16 +119,23 @@ for mm = 1:numel(a.currentMiceNums)
     ax.FontSize = 8;
 %     set(ax,'units','inches');
 %     ax.Position = [1 1 5 1];
+
+    % if there's choice
     if sum(isnan(cell2mat(a.daySummary.percentInfo(m,:)))) ~= a.mouseDayCt(m)
         ax.XTick = [0:5:a.mouseDayCt(m)];    
         ax.YTick = [0 0.25 0.50 0.75 1];
         ax.YLim = [-0.1 1.1];
         plot(0,0,'Marker','none');
-        plot(1:a.mouseDayCt(m),[cell2mat(a.daySummary.percentInfo(m,:))],'Color',[.5 .5 .5],'LineWidth',2,'Marker','o','MarkerFaceColor',[.5 .5 .5],'MarkerSize',3);
+        plot(1:a.mouseDayCt(m),[cell2mat(a.daySummary.percentInfo(m,:))],'Color',[.5 .5 .5],'LineWidth',2);
+        if ismember(m,a.optoMice)
+            om = find(a.optoMice == m);
+            plot(a.laserDays{om,1},[cell2mat(a.daySummary.percentInfo(m,a.laserDays{om,1}))],'Color',[0 1 1],'LineStyle','none','Marker','o','MarkerFaceColor',[0 1 1],'MarkerSize',3);
+        end        
         plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.8 0.8 0.8],'LineWidth',1);
         for r = 1:numel(cell2mat(a.reverseDay(m,:)))
             plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
         end
+
         for d = 1:a.mouseDayCt(m)
             text(d,1.05,num2str(a.daySummary.infoBigProb{m,d}),'Fontsize',5,'Color','r');
             text(d,-.05,num2str(a.daySummary.randBigProb{m,d}),'Fontsize',5,'Color','r');
@@ -140,7 +150,7 @@ for mm = 1:numel(a.currentMiceNums)
     else
         ax.XTick = [0:5:a.mouseDayCt(m)];
 %         ax.XLim = [1 a.mouseDayCt(m)]; 
-        plot(1:a.mouseDayCt(m),cell2mat(a.daySummary.infoBigProb(m,:)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
+        plot(1:a.mouseDayCt(m),cell2mat(a.daySummary.infoBigProb(m,:)),'Color','k','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerSize',2);
         for d = 1:a.mouseDayCt(m)
         text(d+0.1,a.daySummary.infoBigProb{m,d}+10,[num2str(a.daySummary.totalTrials{m,d}),' trials'],'Fontsize',5);
         end
@@ -151,19 +161,21 @@ for mm = 1:numel(a.currentMiceNums)
         hold off;
     end
     
+    
     ax = nsubplot(4,2,2,1);
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
-    plot(cell2mat(a.daySummary.rxnInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.rxnInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerEdgeColor',purple,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
-    plot(cell2mat(a.daySummary.rxnRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.rxnRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerEdgeColor',orange,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
+    ax.YLim = [0 2000];
+    plot(cell2mat(a.daySummary.rxnInfoForced(m,:)),'Color',purple,'LineWidth',1);
+    plot(cell2mat(a.daySummary.rxnInfoChoice(m,:)),'Color',purple,'LineWidth',1,'LineStyle',':');
+    plot(cell2mat(a.daySummary.rxnRandForced(m,:)),'Color',orange,'LineWidth',1);
+    plot(cell2mat(a.daySummary.rxnRandChoice(m,:)),'Color',orange,'LineWidth',1,'LineStyle',':');
     for r = 1:numel(cell2mat(a.reverseDay(m,:)))
-        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
+        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',1);
     end
     ylabel({'Reaction', 'Time (ms)'});
 %     xlabel('Day');    
-    leg = legend(ax,'Info-Forced','Info-Choice','No Info - Forced','No Info - Choice','Location','southoutside','Orientation','horizontal');
+    leg = legend(ax,['Info' newline '-Forced'],['Info' newline '-Choice'],['No Info' newline '-Forced'],['No Info' newline '-Choice'],'Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -172,14 +184,14 @@ for mm = 1:numel(a.currentMiceNums)
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
-    plot(cell2mat(a.daySummary.infoBigLicksEarly(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3);
-    plot(cell2mat(a.daySummary.infoSmallLicksEarly(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3);
-    plot(cell2mat(a.daySummary.randCLicksEarly(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.randDLicksEarly(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':');
-%     plot(cell2mat(a.daySummary.randBigLicksEarly(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
-%     plot(cell2mat(a.daySummary.randSmallLicksEarly(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
+    plot(cell2mat(a.daySummary.infoBigLicksEarly(m,:)),'Color','g','LineWidth',1);
+    plot(cell2mat(a.daySummary.infoSmallLicksEarly(m,:)),'Color','m','LineWidth',1);
+    plot(cell2mat(a.daySummary.randCLicksEarly(m,:)),'Color',cornflower,'LineWidth',1);
+    plot(cell2mat(a.daySummary.randDLicksEarly(m,:)),'Color',cornflower,'LineWidth',1,'LineStyle',':');
+%     plot(cell2mat(a.daySummary.randBigLicksEarly(m,:)),'Color','c','LineWidth',1);
+%     plot(cell2mat(a.daySummary.randSmallLicksEarly(m,:)),'Color','b','LineWidth',1);
     for r = 1:numel(cell2mat(a.reverseDay(m,:)))
-        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
+        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',1);
     end
     ylabel({'Early', 'lick rate'});
 %     xlabel('Day');
@@ -192,12 +204,12 @@ for mm = 1:numel(a.currentMiceNums)
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
-    plot(cell2mat(a.daySummary.infoBigLicks(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3);
-    plot(cell2mat(a.daySummary.infoSmallLicks(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3);
-    plot(cell2mat(a.daySummary.randCLicks(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.randDLicks(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':');
+    plot(cell2mat(a.daySummary.infoBigLicks(m,:)),'Color','g','LineWidth',1);
+    plot(cell2mat(a.daySummary.infoSmallLicks(m,:)),'Color','m','LineWidth',1);
+    plot(cell2mat(a.daySummary.randCLicks(m,:)),'Color',cornflower,'LineWidth',1);
+    plot(cell2mat(a.daySummary.randDLicks(m,:)),'Color',cornflower,'LineWidth',1,'LineStyle',':');
     for r = 1:numel(cell2mat(a.reverseDay(m,:)))
-        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
+        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',1);
     end     
     ylabel({'Anticipatory', 'lick rate'});
     xlabel('Day');
@@ -212,14 +224,14 @@ for mm = 1:numel(a.currentMiceNums)
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
-    plot(cell2mat(a.daySummary.infoBigLicksWater(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3);
-    plot(cell2mat(a.daySummary.infoSmallLicksWater(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3);
-    plot(cell2mat(a.daySummary.randBigLicksWater(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
-    plot(cell2mat(a.daySummary.randSmallLicksWater(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
-%     plot(cell2mat(a.daySummary.randCLicksWater(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
-%     plot(cell2mat(a.daySummary.randDLicksWater(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
+    plot(cell2mat(a.daySummary.infoBigLicksWater(m,:)),'Color','g','LineWidth',1);
+    plot(cell2mat(a.daySummary.infoSmallLicksWater(m,:)),'Color','m','LineWidth',1);
+    plot(cell2mat(a.daySummary.randBigLicksWater(m,:)),'Color','b','LineWidth',1);
+    plot(cell2mat(a.daySummary.randSmallLicksWater(m,:)),'Color','c','LineWidth',1);
+%     plot(cell2mat(a.daySummary.randCLicksWater(m,:)),'Color','c','LineWidth'1);
+%     plot(cell2mat(a.daySummary.randDLicksWater(m,:)),'Color','b','LineWidth',1);
     for r = 1:numel(cell2mat(a.reverseDay(m,:)))
-        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
+        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',1);
     end   
     ylabel({'Post-outcome', 'lick rate'});
 %     xlabel('Day');
@@ -232,18 +244,18 @@ for mm = 1:numel(a.currentMiceNums)
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
     ax.YLim = [0 inf];
-    plot(cell2mat(a.daySummary.ARewards(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3);
-    plot(cell2mat(a.daySummary.BRewards(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3);
-    plot(cell2mat(a.daySummary.CRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.DRewards(m,:)),'Color',cornflower,'LineWidth',2,'Marker','o','MarkerEdgeColor',cornflower,'MarkerSize',3,'LineStyle',':');
-    plot(cell2mat(a.daySummary.randBigRewards(m,:)),'Color','c','LineWidth',2,'Marker','o','MarkerFaceColor','c','MarkerSize',3);
-    plot(cell2mat(a.daySummary.randSmallRewards(m,:)),'Color','b','LineWidth',2,'Marker','o','MarkerFaceColor','b','MarkerSize',3);
+    plot(cell2mat(a.daySummary.ARewards(m,:)),'Color','g','LineWidth',1);
+    plot(cell2mat(a.daySummary.BRewards(m,:)),'Color','m','LineWidth',1);
+    plot(cell2mat(a.daySummary.CRewards(m,:)),'Color',cornflower,'LineWidth',1);
+    plot(cell2mat(a.daySummary.DRewards(m,:)),'Color',cornflower,'LineWidth',1,'LineStyle',':');
+    plot(cell2mat(a.daySummary.randBigRewards(m,:)),'Color','c','LineWidth',1);
+    plot(cell2mat(a.daySummary.randSmallRewards(m,:)),'Color','b','LineWidth',1);
     for r = 1:numel(cell2mat(a.reverseDay(m,:)))
-        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
+        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',1);
     end     
     ylabel({'Mean Reward', '(uL)'});
 %     xlabel('Day');
-    leg = legend(ax,'Info-Rew','Info-No Rew','No Info-C','No Info-D','No Info-Rew','No Info-No Rew','Location','southoutside','Orientation','horizontal');
+    leg = legend(ax,['Info' newline '-Rew'],['Info' newline '-No Rew'],['No Info' newline '-C'],['No Info' newline '-D'],['No Info' newline '-Rew'],['No Info' newline '-No Rew'],'Location','southoutside','Orientation','horizontal');
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -268,14 +280,18 @@ for mm = 1:numel(a.currentMiceNums)
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
 %     ax.YLim = [6000 20000];
-    plot(cell2mat(a.infoIncorr(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
-    plot(cell2mat(a.randIncorr(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
-    plot(cell2mat(a.choiceIncorr(m,:)),'Color',[.8 .8 .8],'LineWidth',2,'Marker','o','MarkerFaceColor',[.8 .8 .8],'MarkerSize',3);
+    plot(cell2mat(a.infoIncorr(m,:)),'Color',purple,'LineWidth',1);
+    plot(cell2mat(a.randIncorr(m,:)),'Color',orange,'LineWidth',1);
+    plot(cell2mat(a.choiceIncorr(m,:)),'Color',[0.5 0.5 0.5],'LineWidth',1);
+    if ismember(m,a.optoMice)
+        om = find(a.optoMice == m);
+        plot(a.laserDays{om,1},ones(1,length(a.laserDays{om,1})),'Color',[0 1 1],'LineStyle','none','Marker','o','MarkerFaceColor',[0 1 1],'MarkerSize',5);
+    end 
     for r = 1:numel(cell2mat(a.reverseDay(m,:)))
-        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
+        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',1);
     end
     for d = 1:a.mouseDayCt(m)
-        text(d+0.1,1,num2str(a.daySummary.totalTrials{m,d}),'Fontsize',5);
+        text(d+0.1,1.1,num2str(a.daySummary.totalTrials{m,d}),'Fontsize',5);
     end 
     ylabel('Error rate');
 %     xlabel('Day');
@@ -288,15 +304,15 @@ for mm = 1:numel(a.currentMiceNums)
     ax.FontSize = 8;
     ax.XTick = [0:5:max(cell2mat(a.daySummary.day(m,:)))];
 %     ax.YLim = [0 0.5];
-    plot(cell2mat(a.daySummary.rewardRateInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.rewardRateRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
-    plot(cell2mat(a.daySummary.rewardRateChoice(m,:)),'Color',grey,'LineWidth',2,'Marker','o','MarkerEdgeColor',grey,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
+    plot(cell2mat(a.daySummary.rewardRateInfoForced(m,:)),'Color',purple,'LineWidth',1);
+    plot(cell2mat(a.daySummary.rewardRateRandForced(m,:)),'Color',orange,'LineWidth',1);
+    plot(cell2mat(a.daySummary.rewardRateChoice(m,:)),'Color',[0.5 0.5 0.5],'LineWidth',1);
 %     plot(cell2mat(a.daySummary.rewardRateInfoForced(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerFaceColor',purple,'MarkerSize',3);
 %     plot(cell2mat(a.daySummary.rewardRateInfoChoice(m,:)),'Color',purple,'LineWidth',2,'Marker','o','MarkerEdgeColor',purple,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
 %     plot(cell2mat(a.daySummary.rewardRateRandForced(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerFaceColor',orange,'MarkerSize',3);
 %     plot(cell2mat(a.daySummary.rewardRateRandChoice(m,:)),'Color',orange,'LineWidth',2,'Marker','o','MarkerEdgeColor',orange,'MarkerFaceColor','w','MarkerSize',3,'LineStyle',':');
     for r = 1:numel(cell2mat(a.reverseDay(m,:)))
-        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
+        plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',1);
     end
 %     plot(cell2mat(a.daySummary.infoBigLicksWater(m,:)),'Color','g','LineWidth',2,'Marker','o','MarkerFaceColor','g','MarkerSize',3,'Visible','off');
 %     plot(cell2mat(a.daySummary.infoSmallLicksWater(m,:)),'Color','m','LineWidth',2,'Marker','o','MarkerFaceColor','m','MarkerSize',3,'Visible','off');
@@ -984,6 +1000,33 @@ end
 %     close(fig);
 
 
+%% NOT PRESENT IN PORT OVERALL
+
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
+for m = 1:a.mouseCt
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    title(a.mouseList(m));
+    ax.FontSize = 8;
+    ylabel('% trials not present in reward port at outcome');
+    
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [-0.1 1.1];
+    
+    bar(a.incomplete(m,:),'FaceColor','k','EdgeColor','none');
+    set(gca,'XTickLabel',a.choiceLabels,'XTick',[1:8]);
+    
+    saveas(fig,fullfile(pathname,['notPresent' a.mouseList{m}]),'pdf');
+end
+
+
     %% OVERALL
 % for m=1:a.mouseCt 
 %     [outcomeCounts(m,:),outcomeBins(m,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
@@ -1178,9 +1221,11 @@ for mm = 1:numel(a.tempValueMice)
     ax = nsubplot(2,1,1,1);
     title(a.mouseList(m));
     ax.FontSize = 8;
-%     ax.XLim = [0 2.5];
-    ax.XTick = [0 a.relValues'];
-    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.XLim = [0 2];
+%     ax.XTickMode = 'manual';
+%     ax.XTick = [0 0.5 1 1.5 2];
+%     set(ax,'XTick',[0 0.5 1 1.5 2]);
+%     ax.YTick = [0 0.25 0.50 0.75 1];
     ax.YLim = [0 1];
     s=a.relValues';
 %     xticklabels([strtrim(cellstr(num2str(s'))') 'Overall']);
@@ -1193,7 +1238,7 @@ for mm = 1:numel(a.tempValueMice)
     plot(a.relValues(mouseVals),a.valChoiceMeanbyMouse(mm,mouseVals)-a.valChoiceSEMbyMouse(mm,mouseVals),'Color','r','LineWidth',1,'Marker','none','MarkerFaceColor','r','MarkerSize',3);
     %     bar(2,a.meanChoice(m,1),0.2,'FaceColor','r','EdgeColor','none');
 %     bar([a.relValues(mouseVals); 2],[a.valChoiceMeanbyMouse(mm,mouseVals) a.meanChoice(m,1)],0.2,'FaceColor','k');
-    xticklabels(['0' strtrim(cellstr(num2str(s'))')]);
+%     xticklabels(['0' strtrim(cellstr(num2str(s'))')]);
 
     ax = nsubplot(2,1,2,1);    
     ax.FontSize = 8;
@@ -1203,10 +1248,16 @@ for mm = 1:numel(a.tempValueMice)
     ax = gca;
     ax.YColor = 'k';
     ylabel({'Info', 'relative value'});
-    ax.YTick = [0 a.relValues' 1.75 2];
+    ax.YTick = [0 0.5 1 1.5 2];
     ax.YLim = [0 2];
     plot([-10000000 1000000],[1 1],'Color',grey,'yliminclude','off','xliminclude','off','LineWidth',0.5);
-    bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.mouseValueDays{mm,1}))/4],'FaceColor','k','EdgeColor','none'); 
+%     bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.mouseValueDays{mm,1}))/4],'FaceColor','k','EdgeColor','none');
+    if ismember(m,a.valueMiceInfo)
+        bar([1 cell2mat(a.daySummary.infoBigAmt(m,a.mouseValueDays{mm,1}))./4],'FaceColor','k','EdgeColor','none');
+    else
+        bar([1 4./cell2mat(a.daySummary.randBigAmt(m,a.mouseValueDays{mm,1}))],'FaceColor','k','EdgeColor','none');
+    end
+    
     
     yyaxis right
     ax = gca;
@@ -1233,8 +1284,8 @@ ax = nsubplot(1,1,1,1);
 hold on;
 % ax.FontSize = 8;
 % ax.XLim = [0 2.5];
-ax.XTick = [0 a.relValues' 2];
-xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
+% ax.XTick = [0 a.relValues'];
+% xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
 ax.YTick = [0 0.25 0.50 0.75 1];
 ax.YLim = [0 1];
 ylabel({'Info choice probability', 'across mice'});
@@ -1243,11 +1294,50 @@ xlabel('Info side relative water amount');
 % p.EdgeColor = 'none';
 % plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
 % bar(a.relValues,a.choiceByAmtMean,'FaceColor','k');
-plot(a.relValues,a.choiceByAmtProbMean(:,1),'Color','m','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.choiceByAmtProbMean(:,2),'Color','g','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.choiceByAmtMean+a.choiceByAmtSEM,'Color','k','LineWidth',1,'Marker','none');
-plot(a.relValues,a.choiceByAmtMean-a.choiceByAmtSEM,'Color','k','LineWidth',1,'Marker','none');
+plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,1))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,1)),1),'Color','m','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,2))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,2)),2),'Color','g','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+% plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,3))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,3)),3),'Color','b','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+plot(a.relValues,a.choiceByAmtMean(:,1),'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+plot(a.relValues,a.choiceByAmtMean(:,1)+a.choiceByAmtSEM(:,1),'Color','k','LineWidth',1,'Marker','none');
+plot(a.relValues,a.choiceByAmtMean(:,1)-a.choiceByAmtSEM(:,1),'Color','k','LineWidth',1,'Marker','none');
+% bar(2,a.overallPref,0.2,'FaceColor','r','EdgeColor','none');
+% errorbar(2,a.overallPref,a.overallPref - a.overallCI(1),a.overallCI(2) - a.overallPref,'CapSize',20,'LineStyle','none','LineWidth',2,'Color','k');
+
+% errorbar(a.relValues,a.choiceByAmtMean,a.choiceByAmtSEM,'Color','k','LineStyle','none','CapSize',10,'LineWidth',2);
+plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
+hold off;
+
+saveas(fig,fullfile(pathname,'OverallValue'),'pdf');
+
+%% overall value plot
+% 1 fig, plot val vs pref (mean + error + baseline)
+
+fig = figure();
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0.5 0.5 10 7];
+set(fig,'renderer','painters');
+set(fig,'PaperOrientation','landscape');
+ax = nsubplot(1,1,1,1);
+hold on;
+% ax.FontSize = 8;
+% ax.XLim = [0 2.5];
+% ax.XTick = [0 a.relValues'];
+% xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
+ax.YTick = [0 0.25 0.50 0.75 1];
+ax.YLim = [0 1];
+ylabel({'Info choice probability', 'across mice'});
+xlabel('Info side relative water amount');
+% p = patch([[a.relValues'] fliplr([a.relValues'])], [[a.choiceByAmtMean-a.choiceByAmtSEM]',[fliplr([a.choiceByAmtMean+a.choiceByAmtSEM]')]],[0.8 0.8 0.8]);
+% p.EdgeColor = 'none';
+% plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
+% bar(a.relValues,a.choiceByAmtMean,'FaceColor','k');
+% plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,1))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,1)),1),'Color','m','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+% plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,2))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,2)),2),'Color','g','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+% plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,3))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,3)),3),'Color','b','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+plot(a.relValues,a.prefByAmt(:,1),'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+plot(a.relValues,a.prefByAmtCI(:,1),'Color','k','LineWidth',1,'Marker','none');
+plot(a.relValues,a.prefByAmtCI(:,2),'Color','k','LineWidth',1,'Marker','none');
 % bar(2,a.overallPref,0.2,'FaceColor','r','EdgeColor','none');
 % errorbar(2,a.overallPref,a.overallPref - a.overallCI(1),a.overallCI(2) - a.overallPref,'CapSize',20,'LineStyle','none','LineWidth',2,'Color','k');
 
@@ -1790,9 +1880,9 @@ end
     
     for n=1:3
        plot(n,nanmean(a.reversalRxn(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
-       errorbar(n,nanmean(a.reversalRxn(:,n)),sem(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'CapSize',100);
+       errorbar(n,nanmean(a.reversalRxn(:,n)),sem(a.reversalRxn(:,n)),'Color','k','LineWidth',2,'CapSize',100);
     end
-    for m = 1:numel(a.reverseMice)-1
+    for m = 1:numel(a.reverseMice)
         if ~isnan(a.reversalPrefs(m,3))
             plot(a.reversalRxn(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
         end
@@ -1803,6 +1893,35 @@ end
     
     saveas(fig,fullfile(pathname,'ReversalRxn'),'pdf');
 % end
+
+%% REACTION SPEED PLOT
+
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+%     ax.YTick = [0 500 1000 1500];
+    ax.YLim = [300 1300];
+    ax.XLim = [0.5 3.5];
+%     ax.XTick = [1 2 3];
+    
+%     bar(1,nanmean(a.reversalRxn(:,1)));
+    for m = 1:numel(a.reverseMice)
+        plot([1 3],[a.reversalRxnInfo(m,1) a.reversalRxnRand(m,1)],'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+    end
+    plot(1,nanmean(a.reversalRxnInfo(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(1,nanmean(a.reversalRxnInfo(:,1)),sem(a.reversalRxnInfo(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+    plot(3,nanmean(a.reversalRxnRand(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(3,nanmean(a.reversalRxnRand(:,1)),sem(a.reversalRxnInfo(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+
+
+
 
 %% PLOT EARLY LICK IDX AROUND REVERSALS
 
@@ -1938,6 +2057,43 @@ end
     
 % end
 
+%% REWARD RATE PLOT
+
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+%     ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [0 20];
+    ax.XLim = [0 4];
+    ax.XTick = [1 3];
+
+%     plot(1,nanmean(a.reversalRewardRateIdx(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+%     errorbar(1,nanmean(a.reversalRewardRateIdx(:,1)),sem(a.reversalRewardRateIdx(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+
+    plot(1,nanmean(a.reversalRewardRateInfo(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(1,nanmean(a.reversalRewardRateInfo(:,1)),sem(a.reversalRewardRateInfo(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+    plot(3,nanmean(a.reversalRewardRateRand(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(3,nanmean(a.reversalRewardRateRand(:,1)),sem(a.reversalRewardRateRand(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+
+
+for m = 1:numel(a.reverseMice)
+%         plot(a.reversalRewardRateIdx(m,1),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+%         plot(a.reversalPrefs(m,1),a.reversalRewardRateIdx(m,1),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        plot([1 3],[a.reversalRewardRateInfo(m,1),a.reversalRewardRateRand(m,1)],'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+%         plot(2,a.reversalRewardRateRand(m,1),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+    end
+%%
+
+plot(a.reversalRewardRateIdx(:,1),a.reversalMultiPrefs(:,1),'Color','k','LineStyle','none','Marker','o','MarkerFaceColor','k','MarkerSize',10);
+
+    
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

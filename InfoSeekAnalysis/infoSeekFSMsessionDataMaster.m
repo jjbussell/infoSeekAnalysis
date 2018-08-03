@@ -40,6 +40,9 @@ f = 1;
 
 %% FOR EACH FILE
 for f = 1:numFiles
+    
+    clearvars -except a fname names pathname files numFiles f loadData ports;
+    
     filename = files(f).name;
     
     if loadData == 1
@@ -67,15 +70,33 @@ for f = 1:numFiles
     % as of 9/13/2017, added 2 new parameters for separate info/rand
     % reward amounts, so session parameters 2 bigger. also extra
     % parameter for FSM vs before?!?
+    
+    fileID=fopen(fname);
+    C = textscan(fileID,'%s', 'Delimiter', ',','MultipleDelimsAsOne',1);
+    fclose(fileID);
+    
+    allData = C{1,1};
+    firstZeros = find(strcmp(allData,'0'),20);
+    firstZerosDiff = find(diff(firstZeros)==1,1);
+    firstData = firstZeros(find(diff(firstZeros)==1,1));
+    paramsStop = floor((find(strcmp('Touch_Left',allData))+1)/2)-1;
+    paramRead = find(strcmp('Touch_Left',allData))+1;
 
-    if csvread(fname,31,0,[31,0,31,0]) == 0
-        data = csvread(fname,31,0);
-        sessionParams(:,f) = csvread(fname,1,1,[1,1,30,1]); % report        
-    elseif csvread(fname,29,0,[29,0,29,0]) == 0
-        data = csvread(fname,29,0);
-        temp = csvread(fname,1,1,[1,1,28,1]); % report
-        sessionParams(:,f) = [temp(1:20); temp(19:20); temp(21:end)];                                
+    dataStart = floor((firstData-paramRead)/5) + paramsStop + 1;
+
+%     dataStart = (firstData-1)/2;
+    data = csvread(fname,dataStart,0);
+
+    paramsStop = (find(strcmp('Touch_Left',allData))+1)/2-1;
+    
+    if paramsStop < 30
+        temp = csvread(fname,1,1,[1,1,paramsStop,1]); % report
+        sessionParams(:,f) = [temp(1:20); temp(19:20); temp(21:end)]; 
+    else
+        sessionParams(:,f) = csvread(fname,1,1,[1,1,paramsStop,1]);
     end
+    
+    clear C;
 
     b = struct;
 
@@ -126,34 +147,13 @@ for f = 1:numFiles
         files = rmfield(files,'folder');
     end
 
-
-%% TRIAL COUNTS
-
-    trialCt = max(data(:,2));
-
-
-    trialStarts = data(data(:,3) == 10,:);
-    b.trialStart = data(data(:,3) == 10,:);
-   
-    if(size(b.trialStart,1)<trialCt)
-        trialCt = size(b.trialStart,1);
-    end
-    
-    b.trialNums(:,1) = 1:trialCt;
-
-    if loadData == 0
-        b.fileAll(1:trialCt,1) = f;
-    else
-        b.fileAll(1:trialCt,1) = f + a.numFiles;
-    end
-
 %% IMAGING
 
-% Pull imaging frame timestamps
-b.images = [];
-b.images = data(data(:,3) == 20, [1 2]);
-b.images = [zeros(size(b.images,1),1) b.images];
-b.images(:,1) = ff;    
+    % Pull imaging frame timestamps
+    b.images = [];
+    b.images = data(data(:,3) == 20, [1 2]);
+    b.images = [zeros(size(b.images,1),1) b.images];
+    b.images(:,1) = ff;    
 
 %% STATE TRANSITIONS (real time)
 
@@ -203,7 +203,43 @@ b.images(:,1) = ff;
     b.txn10_16 = transitions(transitions(:,5) == 10 & transitions(:,6) == 16,[1 2 3 5 6]);
     b.txn16_15 = transitions(transitions(:,5) == 16 & transitions(:,6) == 15,[1 2 3 5 6]);        
 
+    
+%% TRIAL COUNTS
 
+    % need to figure out which to use. txn0_1 first, then printer(10, then
+    % txn1_2 (but also goCue, goParams)-->only count trials that get to
+    % goParams? need to use ITI to wait for start
+
+    trialCt = size(b.txn15_0,1) + 1;
+    
+    trialStartCt = size(b.txn0_1,1);
+    
+    responseCt = size(b.txn8_9,1);
+    
+    if trialCt < trialStartCt
+        error('bad trial ct');
+    end
+    
+    if trialCt < responseCt
+        error('bad trial ct');
+    end    
+
+    trialStarts = data(data(:,3) == 10,:);
+    b.trialStart = data(data(:,3) == 10,:);    
+   
+    if(size(b.trialStart,1)<trialCt)
+%         trialCt = size(b.trialStart,1);
+        b.trialStart(trialCt,:) = [NaN trialCt 10 NaN NaN];
+    end
+    
+    b.trialNums(:,1) = 1:trialCt;
+
+    if loadData == 0
+        b.fileAll(1:trialCt,1) = f;
+    else
+        b.fileAll(1:trialCt,1) = f + a.numFiles;
+    end
+    
 %% ENTRIES AND EXITS
 
     entries = [];
@@ -262,11 +298,19 @@ b.images(:,1) = ff;
     if size(b.goCue,1) < trialCt
         b.goCue = [b.goCue; [ff totalTime trialCt 0 0]];
     end
+    
     b.goParams = data(data(:,3) == 1, :);
+    [~, uniIdx] = unique(b.goParams(:,2));
+    b.goParams = b.goParams(uniIdx,:);
+    
+    
     b.goParams = [zeros(size(b.goParams,1),1) b.goParams];
     b.goParams(:,1) = ff;        
-    if size(b.goParams,1) < trialCt
+    if size(b.goParams,1) == trialCt-1
         b.goParams = [b.goParams; [ff totalTime trialCt 0 0 0]];
+    else if (size(b.goParams,1) ~= trialCt)
+            error('bad trial ct');
+        end
     end        
 
 %% CHOICE
@@ -426,10 +470,18 @@ b.images(:,1) = ff;
 
     b.trialParams = data(data(:,3) == 17, :);
     
-    if(size(b.trialParams,1) < trialCt)
-        b.trialParams(end+1,:) = [totalTime, trialCt, 17, 0, 5];
-    end
+    [~, uniIdx] = unique(b.trialParams(:,2));
     
+    b.trialParams = b.trialParams(uniIdx,:);
+    
+    if(size(b.trialParams,1) ~= b.corrTrialCt)
+        if (size(b.trialParams,1) == b.corrTrialCt-1)
+            b.trialParams(end+1,:) = [totalTime, b.corrTrialCt, 17, 0, 5];
+        else
+            error('bad trial Ct');
+        end
+    end
+  
     b.trialParams = [zeros(size(b.trialParams,1),1) b.trialParams];
     b.trialParams(:,1) = ff;
 
@@ -473,7 +525,7 @@ b.images(:,1) = ff;
         b.randSmallReward = (b.randSmallRewardTime * 4);
     end
 
-    b.rewardAmount = b.infoBigRewardCt * b.infoBigReward +...
+        b.rewardAmount = b.infoBigRewardCt * b.infoBigReward +...
         b.infoSmallRewardCt * b.infoSmallReward + b.randBigRewardCt...
         * b.randBigReward + b.randSmallRewardCt * b.randSmallReward; % report
 
@@ -668,8 +720,9 @@ b.images(:,1) = ff;
 
 %% FINAL OUTCOME (not present type) FOR ALL TRIALS
 
-    b.finalOutcome = NaN(numel(trialCt),1);
 
+    b.finalOutcome = NaN(trialCt,1);
+    
     for t = 1:size(b.trialStart,1)
         % choice 1 = info, 0 = rand, 3 = wrong, 2 = no choice
 
