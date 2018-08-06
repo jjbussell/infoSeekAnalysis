@@ -354,7 +354,7 @@ void loop() {
 
       printer(0, 0, 0);
 
-      if (imageFlag == 1){
+      if (imageFlag > 0){
           digitalWrite(arduScope, LOW); //start imaging
           image = 1;
           lastImageChange = startTime;
@@ -463,7 +463,7 @@ void loop() {
 
 
         
-        if (image == 1){
+        if (image > 0){
           readTTL();
         }
 

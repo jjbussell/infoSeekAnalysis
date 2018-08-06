@@ -1,6 +1,27 @@
 #include "TrialParams.h"
 #include "Arduino.h"
 
+
+/*
+ * move reward or not into trial type!
+ * then, pickTrialParams just sets amount and odor (printout/repeat reward or not?)
+ * want blocks of 12 (not 20!) trials:
+ * 4 choice (2 big, 2 small), 4 info (2 big, 2 small), 4 rand (2 big, 2 small)-->6 types or 4 types
+ * 1 1 2 2 3 3 4 4 5 5 6 6
+ * 1 2 3 4 5 6 7 8 9 10 11 12
+ * no, just do blocks of either 6 or 4 so
+ * 1 2 3 4
+ * rand(1-4)
+ * 
+ * newBlock vs pickTrialParams-->new block needs to pick the trial types in the pseudorandom way
+ * 
+ * randomTrial()
+ * determineTrial()
+ * 
+ */
+
+
+
 // To determine the reward size and odor of the trial
 void pickTrialParams(int choice){
   int probBig;
