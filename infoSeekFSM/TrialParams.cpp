@@ -86,18 +86,6 @@ int determineReward(int rewardProb) {
 } 
 
 
-////////////////  RANDOMIZATION  /////////////////////////
-// To randomize a value to 0 or 1
-int randomize() {
-  int randVal = 0;
-  int randNum = random(10);
-  if (randNum > 4) {
-    randVal = 1;
-  }
-  return randVal;
-}
-
-
 ///// SET BLOCK OF TRIAL TYPES
 void newBlock(){
   for (int v = 0; v < 20; v++){
