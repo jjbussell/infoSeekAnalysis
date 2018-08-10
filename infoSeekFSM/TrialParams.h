@@ -27,7 +27,7 @@ extern int water;
 extern int infoWater;
 extern int randWater;
 
-int blockShuffle[blockSize];
+void blockSetup(void);
 
 void pickTrialParams(int);
 

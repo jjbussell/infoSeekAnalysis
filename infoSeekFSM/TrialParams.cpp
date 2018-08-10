@@ -1,23 +1,36 @@
 #include "TrialParams.h"
 #include "Arduino.h"
 
+/////// REMEMBER TO CHANGE BLOCK COUNT IN SWITCHING TO NEW BLOCK AT TRIAL START!!!
+////// ALSO REMEMBER TO COUNT UP CHOICE TRIALS!!!!
 
-void setTrialBlock(void){
+void blockSetup(void){
   float choicePercent;
   float infoPercent;
   float randPercent;
-  int infoBlockCount;
-  int randBlockCount;
+  float infoBlockCount;
+  float randBlockCount;
+  float choiceBlockCount;
   int blockTypeCounts[4];
   int blockTypes = [2,3,4,5];
+  float choiceInfoBigSize;
+  float choiceInfoSmallSize;
+  float choiceRandBigSize;
+  float choiceRandSmallSize;
   int choiceInfoBigCount;
   int choiceInfoSmallCount;
   int choiceRandBigCount;
   int choiceRandSmallCount;
+  float blockTypeSize[4];
+  int blockTypeCounts[4];
+  int blockShuffle[blockSize];
   int blockTypeCount;
   int blockType;
   int startType;
-  int typeStop;
+  int typeStop = choiceBlockSize;
+  int blockTypes[] = {2,3,4,5};
+  int n;
+  int temp;
 
   switch (trialTypes) {
     case 1: // choice
@@ -33,9 +46,90 @@ void setTrialBlock(void){
       choicePercent = 0; infoPercent = 0.5; randPercent = 0.5;
       break;
     case 5: // all three alternating
-}
+      choicePercent = 0.334; infoPercent = 0.334; randPercent = 0.334;
+      break;
+    case 6: // biased, hardcode which
+      choicePercent = 0; infoPercent = 0.85; randPercent = 0.15;
+      break;
+    case 7: // choice training info
+      choicePercent = 0.5; infoPercent = 0.5; randPercent = 0;
+      break;
+    case 8: // choice training rand
+      choicePercent = 0.5; infoPercent = 0; randPercent = 0.5;
+      break;
+  }
 
-  
+  randBlockCount = randPercent * (float)blockSize;
+  infoBlockCount = infoPercent * (float)blockSize;
+  choiceBlockCount = choicePercent * (float)blockSize;
+  choiceBlockSize = (int)choiceBlockCount;
+
+  choiceInfoBigSize = choiceBlockCount - (float)infoRewardProb/100*choiceBlockCount;
+  choiceInfoSmallSize = choiceBlockCount - choiceInfoBigSize;
+  choiceRandBigSize = choiceBlockCount - (float)randrewardProb/100*choiceBlockCount;
+  choiceRandSmallSize = choiceBlockCount - choiceRandBigSize;
+
+  choiceInfoBigCount = (int)choiceInfoBigSize;
+  choiceInfoSmallCount =(int)choiceInfoSmallSize;
+  choiceRandBigCount = (int)choiceRandBigSize;
+  choiceRandSmallCount = (int)choiceRandSmallSize;
+
+  for (int n=0;n<choiceBlockSize;n++){
+    if (n<choiceInfoBigCount){
+      choiceInfoBlock[n] = 1;
+    }
+    else {
+      choiceInfoBlock[n] = 0;
+    }
+    if (n<choiceRandBigCount){
+      choiceRandBlock[n] = 1;
+    }
+    else {
+      choiceRandBlock[n] = 0;
+    }
+  }
+
+  blockTypeSize[0] = infoBlockCount - (float)infoRewardProb/100*infoBlockCount; // info big
+  blockTypeSize[1] = infoBlockCount - blockTypeSize[0]; // info small
+  blockTypeSize[2] = randBlockCount-(float)randRewardProb/100*randBlockCount; // rand big
+  blockTypeSize[3] = randBlockCount-blockTypeSize[2]; // rand small  
+
+  for (int i = 0; i<4; i++){
+    blockTypeCounts[i]=(int)blockTypeSize[i];
+  }
+
+  /// MAKE FULL BLOCK TO SHUFFLE
+  for (int i=0; i<blockSize; i++){
+    blockShuffle[i]=0;
+  }
+
+  // Place choice trials
+  for (int i = 0; i<choiceBlockSize; i++){
+    blockShuffle[i] = 1;
+  }
+
+  // Place info and random trials
+  for (int i = 0; i<4; i++){
+    blockTypeCount = blockTypeCounts[i];
+    blockType = blockTypes[i];
+    startType = typeStop; 
+    for (int j = startType; j<blockTypeCount+startType; j++){
+      blockShuffle[j] = blockType;
+    }
+    typeStop = startType+blockTypeCount;
+  }
+
+  // SHUFFLE BLOCK  
+
+  for ( int p=0; p<blockSize; p++){
+    block[p] = blockShuffle[p];
+  }
+  for (int i=0; i<blockSize; i++){
+    n = random(0,blockSize);
+    temp = block[n];
+    block[n] = block[i];
+    block[i] = temp;
+  }    
 }
 
 
@@ -67,7 +161,7 @@ void setTrialBlock(void){
 
 
 
-// To SET THE NUMBER OF DROPS AND WATER VALVE AND RANDOM ODOR
+// To SET THE NUMBER OF DROPS AND WATER VALVE AND RANDOM ODOR AND REWARD IF CHOICE!
 void pickTrialParams(int choice){
 
   // REWARD SIZE IS ALREADY SET

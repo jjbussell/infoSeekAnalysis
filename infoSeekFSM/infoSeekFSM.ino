@@ -467,7 +467,7 @@ void loop() {
 
 
         
-        if (image > 0){
+        if (image = 0){
           readTTL();
         }
 
