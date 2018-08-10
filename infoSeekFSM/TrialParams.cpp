@@ -22,33 +22,30 @@
 
 
 
-// To determine the reward size and odor of the trial
+// To SET THE NUMBER OF DROPS AND WATER VALVE AND RANDOM ODOR
 void pickTrialParams(int choice){
-  int probBig;
+
+  // REWARD SIZE IS ALREADY SET
+  
   unsigned long bigRewardTime;
   unsigned long smallRewardTime;
   
   // vals based on choice
   if (choice == 1){
-    water = infoWater;
-    probBig = infoRewardProb;
+    water = infoWater; // which valve
     bigRewardTime = infoBigRewardTime;
     smallRewardTime = infoSmallRewardTime;
   }
   else if (choice == 0){
     water = randWater;
-    probBig = randRewardProb;
     bigRewardTime = randBigRewardTime;
     smallRewardTime = randSmallRewardTime;
   }
   else {
     water = infoWater;
-    probBig = 0;
     smallRewardTime = infoSmallRewardTime;
     bigRewardTime = infoBigRewardTime;
   }
-
-  reward = determineReward(probBig);
 
   if (reward == 1) {
     currentRewardTime = bigRewardTime;
@@ -58,7 +55,7 @@ void pickTrialParams(int choice){
   }
 
   int odorPick;
-  odorPick = determineReward(randRewardProb); // 1 = OdorC, 0 = OdorD
+  odorPick = randomize(randRewardProb); // 1 = OdorC, 0 = OdorD
   if ((choice == 1) && (reward == 1)) {
     odor = odorA;
   }
@@ -76,10 +73,10 @@ void pickTrialParams(int choice){
 
 // To randomly determine big or small reward (1, 0 respectively)
 // based on reward probability
-int determineReward(int rewardProb) {
+int randomize(int prob) {
   int randVal = 0;
   long randNum = random(100);
-  if (randNum < rewardProb) {
+  if (randNum < prob) {
     randVal = 1;
   }
   return randVal;
@@ -88,6 +85,122 @@ int determineReward(int rewardProb) {
 
 ///// SET BLOCK OF TRIAL TYPES
 void newBlock(){
+  // if trialTypes == 5, blocks of 6. if trialTypes == 4,7,8, blocks of 4. else, constant blocks of 6.
+  // NO, blocks of 24 either way. If trialTypes == 5, 8 of each type, 2 big, 6 small. If trialTypes == 4, 12 of each type, 3 big, 9 small
+  // trialTypes 5 array to shuffle
+
+  // shuffle pre-set arrays of 24? make one for all possible options (reward probs and trialTypes)? Just give up on unequal reward probs? In that case set reward separately??
+
+  // REWARD PROBS
+  if (infoRewardProb == randRewardProb){
+  
+    switch (trialTypes) {
+        case 1: // choice
+          if (infoRewardProb == 100){
+            for (int i=0; i < 24; i++){
+              blockShuffle[i] = 1;
+            }
+          }
+          else if (infoRewardProb == 50){
+            blockShuffle = [1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2];
+          }
+          else if (infoRewardProb == 25){
+          }
+          for (int i=0; i < 24; i++){
+            block[i] = 1;   
+          }
+
+          // first calc fraction info, random, choice
+          // then have count of each type for reward array size
+          // create final mini-arry for each choice type
+
+//////////////////////////////////////////////////////////////////////////////////
+          // these change based on trialtypes
+          float randPercent = 0.333
+          float infoPercent = 0.333
+          float choicePercent = 0.334
+
+          int blockCount = 24;
+
+          int randBlockCount = randPercent * blockCount;
+          infoBlockCount = infoPercent * blockCount;
+          choiceBlockCount = choicePercent * blockCount;
+
+          int blockTypeCounts[4];
+
+          blockTypeCounts[0] = infoBlockCount - infoRewardProb/100*infoBlockCount; // info big
+          blockTypeCounts[1] = infoBlockCount - blockInfoBigCount; // info small
+          blockTypeCounts[2] = randBlockCount-randRewardProb/100*randBlockCount; // rand big
+          blockTypeCounts[3] = randBlockCount-blockRandBigCount; // rand small
+
+          int blockTypes = [2 3 4 5];
+
+          choiceInfoBigCount = choiceBlockCount - infoRewardProb/100*choiceBlockCount;
+          choiceInfoSmallCount = choiceBlockCount - choiceInfoBigCount;
+          choiceRandBigCount = choiceBlockCount - randRewardProb/100*choiceBlockCount;
+          choiceRandSmallCount = choiceBlockCount-choiceRandBigCount;
+
+          int blockShuffle[blockCount];
+
+          for (i = 0; i<choiceBlockCount; i++){
+            blockShuffle[i] = 1;
+            typeStop = choiceBlockCount;
+          }
+
+          for (i = 0; i<4; i++){
+            blockTypeCount = blockTypeCounts[i];
+            blockType = blockTypes[i];
+            startType = typeStop+1;
+            for (j = startType; j<blockTypeCount; j++){
+              blockShuffle[j] = blockType;
+            }
+            typeStop = startType+blockTypeCount;
+          }
+
+
+          ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+          
+          for (int i = 0; i < blockBigCount; i++){
+            blockShuffle[i] = bigType;
+          }
+          for (int j = blockBigCount+1; j<24; j++){
+            blockShuffle[j] = smallType;
+          }
+          
+          break;
+        case 2: // forced info
+          for (int i=0; i < 24; i++){
+            block6[i] = 2;   
+          }
+          break;
+        case 3: // forced rand
+          for (int i=0; i < 24; i++){
+            block6[i] = 3;   
+          }
+          break;
+        case 4: // alternate forced info and forced rand
+          block4 = shuffleBlock();
+          break;
+        case 5: // all three trial types
+          //
+          block6 = shuffleBlock();
+          break;
+        case 7: // forced info or choice
+          block4 = shuffleBlock();
+          break;
+        case 8: // forced rand or choice
+          block4 = shuffleBlock();
+          break;
+    }
+  }
+ }
+
+
+///// SET BLOCK OF TRIAL TYPES
+void newBlock(){
+  // if trialTypes == 5, blocks of 6. if trialTypes == 4,7,8, blocks of 4. else, constant blocks of 6.
+  // put the trialTypes switch here!
   for (int v = 0; v < 20; v++){
     lastBlock[v] = block[v];
   }
