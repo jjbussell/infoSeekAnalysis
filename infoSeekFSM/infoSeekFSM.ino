@@ -93,9 +93,13 @@ STATE_TYPE next_state;
 //STATE_TYPE current_state;
 
 ///// PARAMS FOR TRIAL
-int block[20];
-int lastBlock[20];
+int blockSize = 24;
+int block[blockSize];
 int trialNum;
+int choiceTrialNum;
+int choiceBlockSize;
+int choiceInfoBlock[blockSize];
+int choiceRandBlock[blockSize];
 int newTrial;
 int trialCt;
 int trialType;

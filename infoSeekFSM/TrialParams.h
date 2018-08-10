@@ -6,6 +6,10 @@ extern int randRewardProb;
 extern int odor;
 extern unsigned long currentRewardTime;
 extern int block[];
+extern int blockSize;
+extern int choiceBlockSize;
+extern int choiceInfoBlock;
+extern int choiceRandBlock;
 extern int trialType;
 extern int trialTypes;
 extern int infoPort;
@@ -23,23 +27,14 @@ extern int water;
 extern int infoWater;
 extern int randWater;
 
-//int lastBlock[20];
-extern int lastBlock[];
+int blockShuffle[blockSize];
 
 void pickTrialParams(int);
 
-int determineReward(int);
-
 int randomize(void);
 
-void newBlock(void);
+void setTrialBlock(void);
 
-int randomTrial(int);
-
-int determineTrial (void);
-
-int determineForcedTrial (void);
-
-int determineBiasedTrial (void);
+void shuffleBlock(void);
 
 #endif

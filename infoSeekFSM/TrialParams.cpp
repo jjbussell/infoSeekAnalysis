@@ -2,6 +2,51 @@
 #include "Arduino.h"
 
 
+void setTrialBlock(void){
+  float choicePercent;
+  float infoPercent;
+  float randPercent;
+  int infoBlockCount;
+  int randBlockCount;
+  int blockTypeCounts[4];
+  int blockTypes = [2,3,4,5];
+  int choiceInfoBigCount;
+  int choiceInfoSmallCount;
+  int choiceRandBigCount;
+  int choiceRandSmallCount;
+  int blockTypeCount;
+  int blockType;
+  int startType;
+  int typeStop;
+
+  switch (trialTypes) {
+    case 1: // choice
+      choicePercent = 1; infoPercent = 0; randPercent = 0;
+      break;
+    case 2: // forced info
+      choicePercent = 0; infoPercent = 1; randPercent = 0;
+      break;
+    case 3: // forced rand
+      choicePercent = 0; infoPercent = 0; randPercent = 1;
+      break;
+    case 4: // forced info and forced rand alternating
+      choicePercent = 0; infoPercent = 0.5; randPercent = 0.5;
+      break;
+    case 5: // all three alternating
+}
+
+  
+}
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 /*
  * move reward or not into trial type!
  * then, pickTrialParams just sets amount and odor (printout/repeat reward or not?)
