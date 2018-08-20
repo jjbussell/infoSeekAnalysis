@@ -2,8 +2,6 @@
 
 % "checking"/out of trial flow side entries--> GET ENTRIES!!!
 
-% NEED TO SAVE ENTRIES TO a.
-
 % fix lick prob days for histogram
 
 % LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!! AND LICKING AFTER TRIAL
@@ -674,12 +672,13 @@ end
 
 % HARDCODED-->CHANGE!!!!!!!!!!!!!!!
 % HARD CODED TO CHANGE
-if size(a.mouseList,1)>5
-a.valueMiceInfo = [6 7 8 9]; % info side values changed
-a.valueMiceNoInfo = [16 18 20 21]; % no info side values changed
+a.doValue = 0;
+if a.doValue == 1
+    a.valueMiceInfo = [6 7 8 9]; % info side values changed
+%     a.valueMiceNoInfo = [16 18 20 21]; % no info side values changed
 else
-a.valueMiceInfo = [];
-a.valueMiceNoInfo = [];
+    a.valueMiceInfo = [];
+    a.valueMiceNoInfo = [];
 end
 a.valueMice = [a.valueMiceInfo a.valueMiceNoInfo];
 a.valueMiceList = a.mouseList(a.valueMice);
