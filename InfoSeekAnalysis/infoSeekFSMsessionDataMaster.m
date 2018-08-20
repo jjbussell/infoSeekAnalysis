@@ -1091,3 +1091,5 @@ end
 
 save('infoSeekFSMData.mat','a');
 % uisave({'a'},'infoSeekFSMData.mat');
+
+save(['infoSeekFSMData' datestr(now,'yyyymmdd')],'a');
