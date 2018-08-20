@@ -33,8 +33,4 @@ void pickTrialParams(int);
 
 int randomize(void);
 
-void setTrialBlock(void);
-
-void shuffleBlock(void);
-
 #endif
