@@ -1274,78 +1274,84 @@ end
 %% overall value plot
 % 1 fig, plot val vs pref (mean + error + baseline)
 
-fig = figure();
-fig = gcf;
-fig.PaperUnits = 'inches';
-fig.PaperPosition = [0.5 0.5 10 7];
-set(fig,'renderer','painters');
-set(fig,'PaperOrientation','landscape');
-ax = nsubplot(1,1,1,1);
-hold on;
-% ax.FontSize = 8;
-% ax.XLim = [0 2.5];
-% ax.XTick = [0 a.relValues'];
-% xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
-ax.YTick = [0 0.25 0.50 0.75 1];
-ax.YLim = [0 1];
-ylabel({'Info choice probability', 'across mice'});
-xlabel('Info side relative water amount');
-% p = patch([[a.relValues'] fliplr([a.relValues'])], [[a.choiceByAmtMean-a.choiceByAmtSEM]',[fliplr([a.choiceByAmtMean+a.choiceByAmtSEM]')]],[0.8 0.8 0.8]);
-% p.EdgeColor = 'none';
-% plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
-% bar(a.relValues,a.choiceByAmtMean,'FaceColor','k');
-plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,1))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,1)),1),'Color','m','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,2))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,2)),2),'Color','g','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-% plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,3))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,3)),3),'Color','b','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.choiceByAmtMean(:,1),'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.choiceByAmtMean(:,1)+a.choiceByAmtSEM(:,1),'Color','k','LineWidth',1,'Marker','none');
-plot(a.relValues,a.choiceByAmtMean(:,1)-a.choiceByAmtSEM(:,1),'Color','k','LineWidth',1,'Marker','none');
-% bar(2,a.overallPref,0.2,'FaceColor','r','EdgeColor','none');
-% errorbar(2,a.overallPref,a.overallPref - a.overallCI(1),a.overallCI(2) - a.overallPref,'CapSize',20,'LineStyle','none','LineWidth',2,'Color','k');
+if ~isempty(a.valueMice)
 
-% errorbar(a.relValues,a.choiceByAmtMean,a.choiceByAmtSEM,'Color','k','LineStyle','none','CapSize',10,'LineWidth',2);
-plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
-hold off;
+    fig = figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    ax = nsubplot(1,1,1,1);
+    hold on;
+    % ax.FontSize = 8;
+    % ax.XLim = [0 2.5];
+    % ax.XTick = [0 a.relValues'];
+    % xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [0 1];
+    ylabel({'Info choice probability', 'across mice'});
+    xlabel('Info side relative water amount');
+    % p = patch([[a.relValues'] fliplr([a.relValues'])], [[a.choiceByAmtMean-a.choiceByAmtSEM]',[fliplr([a.choiceByAmtMean+a.choiceByAmtSEM]')]],[0.8 0.8 0.8]);
+    % p.EdgeColor = 'none';
+    % plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
+    % bar(a.relValues,a.choiceByAmtMean,'FaceColor','k');
+    plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,1))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,1)),1),'Color','m','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+    plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,2))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,2)),2),'Color','g','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+    % plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,3))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,3)),3),'Color','b','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+    plot(a.relValues,a.choiceByAmtMean(:,1),'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+    plot(a.relValues,a.choiceByAmtMean(:,1)+a.choiceByAmtSEM(:,1),'Color','k','LineWidth',1,'Marker','none');
+    plot(a.relValues,a.choiceByAmtMean(:,1)-a.choiceByAmtSEM(:,1),'Color','k','LineWidth',1,'Marker','none');
+    % bar(2,a.overallPref,0.2,'FaceColor','r','EdgeColor','none');
+    % errorbar(2,a.overallPref,a.overallPref - a.overallCI(1),a.overallCI(2) - a.overallPref,'CapSize',20,'LineStyle','none','LineWidth',2,'Color','k');
 
-saveas(fig,fullfile(pathname,'OverallValue'),'pdf');
+    % errorbar(a.relValues,a.choiceByAmtMean,a.choiceByAmtSEM,'Color','k','LineStyle','none','CapSize',10,'LineWidth',2);
+    plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
+    hold off;
+
+    saveas(fig,fullfile(pathname,'OverallValue'),'pdf');
+end
 
 %% overall value plot
 % 1 fig, plot val vs pref (mean + error + baseline)
 
-fig = figure();
-fig = gcf;
-fig.PaperUnits = 'inches';
-fig.PaperPosition = [0.5 0.5 10 7];
-set(fig,'renderer','painters');
-set(fig,'PaperOrientation','landscape');
-ax = nsubplot(1,1,1,1);
-hold on;
-% ax.FontSize = 8;
-% ax.XLim = [0 2.5];
-% ax.XTick = [0 a.relValues'];
-% xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
-ax.YTick = [0 0.25 0.50 0.75 1];
-ax.YLim = [0 1];
-ylabel({'Info choice probability', 'across mice'});
-xlabel('Info side relative water amount');
-% p = patch([[a.relValues'] fliplr([a.relValues'])], [[a.choiceByAmtMean-a.choiceByAmtSEM]',[fliplr([a.choiceByAmtMean+a.choiceByAmtSEM]')]],[0.8 0.8 0.8]);
-% p.EdgeColor = 'none';
-% plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
-% bar(a.relValues,a.choiceByAmtMean,'FaceColor','k');
-% plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,1))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,1)),1),'Color','m','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-% plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,2))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,2)),2),'Color','g','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-% plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,3))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,3)),3),'Color','b','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.prefByAmt(:,1),'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
-plot(a.relValues,a.prefByAmtCI(:,1),'Color','k','LineWidth',1,'Marker','none');
-plot(a.relValues,a.prefByAmtCI(:,2),'Color','k','LineWidth',1,'Marker','none');
-% bar(2,a.overallPref,0.2,'FaceColor','r','EdgeColor','none');
-% errorbar(2,a.overallPref,a.overallPref - a.overallCI(1),a.overallCI(2) - a.overallPref,'CapSize',20,'LineStyle','none','LineWidth',2,'Color','k');
+if ~isempty(a.valueMice)
 
-% errorbar(a.relValues,a.choiceByAmtMean,a.choiceByAmtSEM,'Color','k','LineStyle','none','CapSize',10,'LineWidth',2);
-plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
-hold off;
+    fig = figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    ax = nsubplot(1,1,1,1);
+    hold on;
+    % ax.FontSize = 8;
+    % ax.XLim = [0 2.5];
+    % ax.XTick = [0 a.relValues'];
+    % xticklabels(['0' strtrim(cellstr(num2str(s'))') 'Original (1)']);
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [0 1];
+    ylabel({'Info choice probability', 'across mice'});
+    xlabel('Info side relative water amount');
+    % p = patch([[a.relValues'] fliplr([a.relValues'])], [[a.choiceByAmtMean-a.choiceByAmtSEM]',[fliplr([a.choiceByAmtMean+a.choiceByAmtSEM]')]],[0.8 0.8 0.8]);
+    % p.EdgeColor = 'none';
+    % plot(a.relValues,a.choiceByAmtMean,'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',3);
+    % bar(a.relValues,a.choiceByAmtMean,'FaceColor','k');
+    % plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,1))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,1)),1),'Color','m','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+    % plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,2))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,2)),2),'Color','g','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+    % plot(a.relValues(~isnan(a.choiceByAmtProbMean(:,3))),a.choiceByAmtProbMean(~isnan(a.choiceByAmtProbMean(:,3)),3),'Color','b','LineWidth',1,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+    plot(a.relValues,a.prefByAmt(:,1),'Color','k','LineWidth',3,'Marker','o','MarkerFaceColor','k','MarkerEdgeColor','k','MarkerSize',3);
+    plot(a.relValues,a.prefByAmtCI(:,1),'Color','k','LineWidth',1,'Marker','none');
+    plot(a.relValues,a.prefByAmtCI(:,2),'Color','k','LineWidth',1,'Marker','none');
+    % bar(2,a.overallPref,0.2,'FaceColor','r','EdgeColor','none');
+    % errorbar(2,a.overallPref,a.overallPref - a.overallCI(1),a.overallCI(2) - a.overallPref,'CapSize',20,'LineStyle','none','LineWidth',2,'Color','k');
 
-saveas(fig,fullfile(pathname,'OverallValue'),'pdf');
+    % errorbar(a.relValues,a.choiceByAmtMean,a.choiceByAmtSEM,'Color','k','LineStyle','none','CapSize',10,'LineWidth',2);
+    plot([-10000000 1000000],[0.5 0.5],'Color',grey,'yliminclude','off','xliminclude','off');
+    hold off;
+
+    saveas(fig,fullfile(pathname,'OverallValue'),'pdf');
+end
 
 %% 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1514,36 +1520,38 @@ end
 
     %% CHOICE PREF REL IIS PRE- VS POST-REVERSAL FOR TRIALS TO COUNT (prevspost.pdf)
 
-    fig = figure();
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0.5 0.5 10 7];
-    set(fig,'renderer','painters');
-    set(fig,'PaperOrientation','landscape');
+    if ~isempty(a.reverseMice)
+        fig = figure();
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [0.5 0.5 10 7];
+        set(fig,'renderer','painters');
+        set(fig,'PaperOrientation','landscape');
 
-    ax = nsubplot(1,1,1,1);
-    ax.FontSize = 8;
-    ax.XLim = [0 1];
-    ax.YLim = [0 1];
-    for l = 1:numel(a.reverseMice)
-        m = a.reverseMice(l);
-        plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
-        plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
-        dy = a.prefRevCI(m,2) - a.pref(m,2) + 0.02;
-        text(a.pref(m,1),a.pref(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
-    end
-    scatter(a.pref(:,1),a.pref(:,2),'filled')
-    plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-    text(numel(a.reverseMice)+2,a.overallPref,['p = ' num2str(a.overallP)])
-%     patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
-    ylabel({'% choice of initially informative side', 'POST-reversal'}); %{'Info choice', 'probability'}
-    xlabel({'% choice of initially informative side', 'PRE-reversal'});
-    title('Raw choice percentages, pre vs post-reversal');
-    hold off;
+        ax = nsubplot(1,1,1,1);
+        ax.FontSize = 8;
+        ax.XLim = [0 1];
+        ax.YLim = [0 1];
+        for l = 1:numel(a.reverseMice)
+            m = a.reverseMice(l);
+            plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+            plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+            dy = a.prefRevCI(m,2) - a.pref(m,2) + 0.02;
+            text(a.pref(m,1),a.pref(m,2) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
+        end
+        scatter(a.pref(:,1),a.pref(:,2),'filled')
+        plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+        plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+        text(numel(a.reverseMice)+2,a.overallPref,['p = ' num2str(a.overallP)])
+    %     patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
+        ylabel({'% choice of initially informative side', 'POST-reversal'}); %{'Info choice', 'probability'}
+        xlabel({'% choice of initially informative side', 'PRE-reversal'});
+        title('Raw choice percentages, pre vs post-reversal');
+        hold off;
 
-    saveas(fig,fullfile(pathname,'PrevsPostIIS'),'pdf');
-%     close(fig);
-
+        saveas(fig,fullfile(pathname,'PrevsPostIIS'),'pdf');
+    %     close(fig);
+end
+    
 %% 
 %     fig = figure();
 %     fig.PaperUnits = 'inches';
@@ -1577,6 +1585,7 @@ end
 
     %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
 
+if ~isempty(a.reverseMice)
     fig = figure();
     fig.PaperUnits = 'inches';
     fig.PaperPosition = [0.5 0.5 10 7];
@@ -1604,7 +1613,6 @@ end
 
     saveas(fig,fullfile(pathname,'Regression'),'pdf');
 %     close(fig);
-
 
     %% EARLY LICKS REGRESSION
 
@@ -2093,7 +2101,7 @@ for m = 1:numel(a.reverseMice)
 
 plot(a.reversalRewardRateIdx(:,1),a.reversalMultiPrefs(:,1),'Color','k','LineStyle','none','Marker','o','MarkerFaceColor','k','MarkerSize',10);
 
-    
+end    
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

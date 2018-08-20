@@ -674,9 +674,13 @@ end
 
 % HARDCODED-->CHANGE!!!!!!!!!!!!!!!
 % HARD CODED TO CHANGE
+if size(a.mouseList,1)>5
 a.valueMiceInfo = [6 7 8 9]; % info side values changed
-% a.valueMiceNoInfo = [16 18 20 21]; % no info side values changed
+a.valueMiceNoInfo = [16 18 20 21]; % no info side values changed
+else
+a.valueMiceInfo = [];
 a.valueMiceNoInfo = [];
+end
 a.valueMice = [a.valueMiceInfo a.valueMiceNoInfo];
 a.valueMiceList = a.mouseList(a.valueMice);
 a.valInfoMice = ismember(a.valueMice,a.valueMiceInfo);
@@ -696,94 +700,95 @@ a.relValues = unique(a.fileValue(:,3));
 a.rowValues = unique(a.fileValue(:,1:2),'rows');
 a.rowValues(:,3) = a.rowValues(:,1)./a.rowValues(:,2);
 
-for mm = 1:numel(a.valueMice)
-   m = a.valueMice(mm);
-   a.valueMouseFiles{mm,1} = find(a.fileMouse == m);
-   if ismember(m,a.valueMiceInfo)
-    a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,1);
-   else
-    a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,2);    
-   end
-   a.valueMouseRelValues{mm,1} = unique(a.fileValue(a.fileMouse==m,3));
-end
+if ~isempty(a.valueMice)
+    for mm = 1:numel(a.valueMice)
+       m = a.valueMice(mm);
+       a.valueMouseFiles{mm,1} = find(a.fileMouse == m);
+       if ismember(m,a.valueMiceInfo)
+        a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,1);
+       else
+        a.valueMouseValues{mm,1} = a.fileValue(a.fileMouse==m,2);    
+       end
+       a.valueMouseRelValues{mm,1} = unique(a.fileValue(a.fileMouse==m,3));
+    end
 
-% file within mouse's files after which value tests start
-% HARDCODED-->CHANGE!!!!!!!!!!!!!!!
- a.valueStarts = [35 40 48 50 57 59 77 54];
+    % file within mouse's files after which value tests start
+    % HARDCODED-->CHANGE!!!!!!!!!!!!!!!
+     a.valueStarts = [35 40 48 50 57 59 77 54];
 
- 
-% FIND LAST DAY AT EACH VALUE FOR EACH MOUSE
-for mm = 1:numel(a.valueMice)
-   m = a.valueMice(mm); 
-   allMouseValueFiles = a.valueMouseFiles{mm,1};
-   mouseValueFiles = allMouseValueFiles(a.valueStarts(mm):end);
-   allMouseValues = a.valueMouseValues{mm,1};
-   mouseValues = allMouseValues(a.valueStarts(mm):end);
-   a.mouseValueDays{mm,1} = a.fileDay(mouseValueFiles);
-   a.mouseValueChangeFiles{mm,1}=mouseValueFiles(find(diff(mouseValues)~=0));
-   % NOTE: choosing entire day from file before value changed
-   a.mouseValueChangeDays{mm,1} = a.fileDay(a.mouseValueChangeFiles{mm,1});
-   mouseValueChangeDays = a.mouseValueChangeDays{mm,1};
-   a.mouseValueChangeValues{mm,1} = a.fileValue(a.mouseValueChangeFiles{mm,1},3);
-   mouseValueChangeValues = a.mouseValueChangeValues{mm,1};
-   for vv = 1:numel(a.relValues)
+
+    % FIND LAST DAY AT EACH VALUE FOR EACH MOUSE
+    for mm = 1:numel(a.valueMice)
+       m = a.valueMice(mm); 
+       allMouseValueFiles = a.valueMouseFiles{mm,1};
+       mouseValueFiles = allMouseValueFiles(a.valueStarts(mm):end);
+       allMouseValues = a.valueMouseValues{mm,1};
+       mouseValues = allMouseValues(a.valueStarts(mm):end);
+       a.mouseValueDays{mm,1} = a.fileDay(mouseValueFiles);
+       a.mouseValueChangeFiles{mm,1}=mouseValueFiles(find(diff(mouseValues)~=0));
+       % NOTE: choosing entire day from file before value changed
+       a.mouseValueChangeDays{mm,1} = a.fileDay(a.mouseValueChangeFiles{mm,1});
+       mouseValueChangeDays = a.mouseValueChangeDays{mm,1};
+       a.mouseValueChangeValues{mm,1} = a.fileValue(a.mouseValueChangeFiles{mm,1},3);
+       mouseValueChangeValues = a.mouseValueChangeValues{mm,1};
+       for vv = 1:numel(a.relValues)
+           v = a.relValues(vv);
+           a.mouseValueFinalDays{mm,vv} = mouseValueChangeDays(mouseValueChangeValues == v);
+       end
+    end
+
+    % Can pull daySummary.percentInfo for all value days (course of value
+    % tradeoffs)
+
+    %% CHOICES ON MOUSE VALUE FINAL DAYS (eventually trials of 2 days per value per mouse)
+
+    for mm = 1:numel(a.valueMice)
+       m = a.valueMice(mm);
+       for vv = 1:numel(a.relValues)
+           v = a.relValues(vv);
+           days = a.mouseValueFinalDays{mm,vv};
+           a.valueChoiceTrials{mm,vv} = a.choice_all(ismember(a.mouseDay,days) & a.mice(:,m) == 1 & a.choiceCorrTrials == 1);
+           a.valChoiceMeanbyMouse(mm,vv) = nanmean(a.valueChoiceTrials{mm,vv});
+           a.valChoiceSEMbyMouse(mm,vv) = sem(a.valueChoiceTrials{mm,vv});
+       end
+    end
+
+    %% OVERALL CHOICES BY AMOUNT
+
+    for vv = 1:numel(a.relValues)
+        v = a.relValues(vv);
+        a.valChoices{vv,1} = vertcat(a.valueChoiceTrials{:,vv});
+        % info vs no info changed
+        a.valChoices{vv,2} = vertcat(a.valueChoiceTrials{a.valInfoMice,vv});
+    %     a.valChoices{vv,3} = vertcat(a.valueChoiceTrials{a.valNoInfoMice,vv});
+        a.choiceByAmtMean(vv,1) = nanmean(a.valChoices{vv,1});
+        a.choiceByAmtMean(vv,2) = nanmean(a.valChoices{vv,2});
+    %     a.choiceByAmtMean(vv,3) = nanmean(a.valChoices{vv,3});
+        a.choiceByAmtSEM(vv,1) = sem(a.valChoices{vv,1});
+        a.choiceByAmtSEM(vv,2) = sem(a.valChoices{vv,2});
+    %     a.choiceByAmtSEM(vv,3) = sem(a.valChoices{vv,3});
+
+        [a.prefByAmt(vv,1),a.prefByAmtCI(vv,1:2)]=binofit(sum(a.valChoices{vv,1}),numel(a.valChoices{vv,1}));
+        [a.prefByAmt(vv,2),a.prefByAmtCI(vv,3:4)]=binofit(sum(a.valChoices{vv,2}),numel(a.valChoices{vv,2}));
+    %     [a.prefByAmt(vv,3),a.prefByAmtCI(vv,4:5)]=binofit(sum(a.valChoices{vv,3}),numel(a.valChoices{vv,3}));
+
+    end
+
+    %% HARDCODED OVERALL BY AMOUNT BY PROB
+
+    for vv = 1:numel(a.relValues)
        v = a.relValues(vv);
-       a.mouseValueFinalDays{mm,vv} = mouseValueChangeDays(mouseValueChangeValues == v);
-   end
+        a.valChoicesProb{vv,1} = vertcat(a.valueChoiceTrials{1:2,vv});
+        a.valChoicesProb{vv,2} = vertcat(a.valueChoiceTrials{3:4,vv});
+    %     a.valChoicesProb{vv,3} = vertcat(a.valueChoiceTrials{5:8,vv});
+        a.choiceByAmtProbMean(vv,1) = nanmean(a.valChoicesProb{vv,1});
+        a.choiceByAmtProbMean(vv,2) = nanmean(a.valChoicesProb{vv,2});
+    %     a.choiceByAmtProbMean(vv,3) = nanmean(a.valChoicesProb{vv,3});
+        a.choiceByAmtProbSEM(vv,1) = sem(a.valChoicesProb{vv,1});
+        a.choiceByAmtProbSEM(vv,2) = sem(a.valChoicesProb{vv,2});
+    %     a.choiceByAmtProbSEM(vv,3) = sem(a.valChoicesProb{vv,3});
+    end
 end
-
-% Can pull daySummary.percentInfo for all value days (course of value
-% tradeoffs)
-
-%% CHOICES ON MOUSE VALUE FINAL DAYS (eventually trials of 2 days per value per mouse)
-
-for mm = 1:numel(a.valueMice)
-   m = a.valueMice(mm);
-   for vv = 1:numel(a.relValues)
-       v = a.relValues(vv);
-       days = a.mouseValueFinalDays{mm,vv};
-       a.valueChoiceTrials{mm,vv} = a.choice_all(ismember(a.mouseDay,days) & a.mice(:,m) == 1 & a.choiceCorrTrials == 1);
-       a.valChoiceMeanbyMouse(mm,vv) = nanmean(a.valueChoiceTrials{mm,vv});
-       a.valChoiceSEMbyMouse(mm,vv) = sem(a.valueChoiceTrials{mm,vv});
-   end
-end
-
-%% OVERALL CHOICES BY AMOUNT
-
-for vv = 1:numel(a.relValues)
-    v = a.relValues(vv);
-    a.valChoices{vv,1} = vertcat(a.valueChoiceTrials{:,vv});
-    % info vs no info changed
-    a.valChoices{vv,2} = vertcat(a.valueChoiceTrials{a.valInfoMice,vv});
-%     a.valChoices{vv,3} = vertcat(a.valueChoiceTrials{a.valNoInfoMice,vv});
-    a.choiceByAmtMean(vv,1) = nanmean(a.valChoices{vv,1});
-    a.choiceByAmtMean(vv,2) = nanmean(a.valChoices{vv,2});
-%     a.choiceByAmtMean(vv,3) = nanmean(a.valChoices{vv,3});
-    a.choiceByAmtSEM(vv,1) = sem(a.valChoices{vv,1});
-    a.choiceByAmtSEM(vv,2) = sem(a.valChoices{vv,2});
-%     a.choiceByAmtSEM(vv,3) = sem(a.valChoices{vv,3});
-
-    [a.prefByAmt(vv,1),a.prefByAmtCI(vv,1:2)]=binofit(sum(a.valChoices{vv,1}),numel(a.valChoices{vv,1}));
-    [a.prefByAmt(vv,2),a.prefByAmtCI(vv,3:4)]=binofit(sum(a.valChoices{vv,2}),numel(a.valChoices{vv,2}));
-%     [a.prefByAmt(vv,3),a.prefByAmtCI(vv,4:5)]=binofit(sum(a.valChoices{vv,3}),numel(a.valChoices{vv,3}));
-    
-end
-
-%% HARDCODED OVERALL BY AMOUNT BY PROB
-
-for vv = 1:numel(a.relValues)
-   v = a.relValues(vv);
-    a.valChoicesProb{vv,1} = vertcat(a.valueChoiceTrials{1:2,vv});
-    a.valChoicesProb{vv,2} = vertcat(a.valueChoiceTrials{3:4,vv});
-%     a.valChoicesProb{vv,3} = vertcat(a.valueChoiceTrials{5:8,vv});
-    a.choiceByAmtProbMean(vv,1) = nanmean(a.valChoicesProb{vv,1});
-    a.choiceByAmtProbMean(vv,2) = nanmean(a.valChoicesProb{vv,2});
-%     a.choiceByAmtProbMean(vv,3) = nanmean(a.valChoicesProb{vv,3});
-    a.choiceByAmtProbSEM(vv,1) = sem(a.valChoicesProb{vv,1});
-    a.choiceByAmtProbSEM(vv,2) = sem(a.valChoicesProb{vv,2});
-%     a.choiceByAmtProbSEM(vv,3) = sem(a.valChoicesProb{vv,3});
-end
-
 
 %%
 %  mean/SEM only the last 100 trials of that value!! no, ALL? What about
@@ -1153,129 +1158,132 @@ end
 
 %% DAYS AROUND REVERSES
 
-a.reversalDays = NaN(numel(a.reverseMice),3);
+if ~isempty(a.reverseMice)
 
-for m = 1:numel(a.reverseMice)
-    mm=a.reverseMice(m);
-    a.reversalDays(m,1) = a.reverseDay{mm,1}-1; % day prior to 1st reversal
-    if ~isempty(a.reverseDay{mm,2})
-        a.reversalDays(m,2) = a.reverseDay{mm,2}-1; % day prior to second reversal
-        
-        % last day of second reversal (either r+3/last day or last day before get
-        % ready for values)
-        if ~ismember(mm,a.valueMice)
-            if a.reverseDay{mm,2}+3 >= a.mouseDayCt(mm)
-                a.reversalDays(m,3) = a.mouseDayCt(mm);
+    a.reversalDays = NaN(numel(a.reverseMice),3);
+
+    for m = 1:numel(a.reverseMice)
+        mm=a.reverseMice(m);
+        a.reversalDays(m,1) = a.reverseDay{mm,1}-1; % day prior to 1st reversal
+        if ~isempty(a.reverseDay{mm,2})
+            a.reversalDays(m,2) = a.reverseDay{mm,2}-1; % day prior to second reversal
+
+            % last day of second reversal (either r+3/last day or last day before get
+            % ready for values)
+            if ~ismember(mm,a.valueMice)
+                if a.reverseDay{mm,2}+3 >= a.mouseDayCt(mm)
+                    a.reversalDays(m,3) = a.mouseDayCt(mm);
+                else
+                    a.reversalDays(m,3) = a.reverseDay{mm,2}+3;
+                end
             else
-                a.reversalDays(m,3) = a.reverseDay{mm,2}+3;
-            end
-        else
-            mmm = find(a.valueMice == mm);
-            mouseValueDays = a.mouseValueDays{mmm,1};
-            if ismember(mmm,a.valueMiceInfo)
-                mouseProbDays = a.infoBigProbs{mm,1};
-            else
-                mouseProbDays = a.randBigProbs{mm,1};
-            end
-            mouseValues = mouseProbDays(mouseValueDays);
-            if sum(mouseValues > 25) > 0
-                a.reversalDays(m,3) = find(mouseProbDays==25,1,'last');
-            else
-                a.reversalDays(m,3) = mouseValueDays(1);
+                mmm = find(a.valueMice == mm);
+                mouseValueDays = a.mouseValueDays{mmm,1};
+                if ismember(mmm,a.valueMiceInfo)
+                    mouseProbDays = a.infoBigProbs{mm,1};
+                else
+                    mouseProbDays = a.randBigProbs{mm,1};
+                end
+                mouseValues = mouseProbDays(mouseValueDays);
+                if sum(mouseValues > 25) > 0
+                    a.reversalDays(m,3) = find(mouseProbDays==25,1,'last');
+                else
+                    a.reversalDays(m,3) = mouseValueDays(1);
+                end
             end
         end
     end
-end
 
-%% CHOICE, RXN SPEED, EARLY LICKS, AND REWARD RATE AROUND REVERSALS
+    %% CHOICE, RXN SPEED, EARLY LICKS, AND REWARD RATE AROUND REVERSALS
 
-a.reversalPrefs = NaN(numel(a.reverseMice),3);
-a.reversalRxn = NaN(numel(a.reverseMice),3);
-a.reversalLicks = NaN(numel(a.reverseMice),3);
-a.reversalMultiPrefs = NaN(numel(a.reverseMice),8);
-for m = 1:numel(a.reverseMice)
-    mm = a.reverseMice(m);
-    for n = 1:3
-        if ~isnan(a.reversalDays(m,n))
-            a.reversalPrefs(m,n) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)};
-            if n == 1
-                for k = 1:4
-                    if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
-                    a.reversalMultiPrefs(m,k) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
+    a.reversalPrefs = NaN(numel(a.reverseMice),3);
+    a.reversalRxn = NaN(numel(a.reverseMice),3);
+    a.reversalLicks = NaN(numel(a.reverseMice),3);
+    a.reversalMultiPrefs = NaN(numel(a.reverseMice),8);
+    for m = 1:numel(a.reverseMice)
+        mm = a.reverseMice(m);
+        for n = 1:3
+            if ~isnan(a.reversalDays(m,n))
+                a.reversalPrefs(m,n) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)};
+                if n == 1
+                    for k = 1:4
+                        if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
+                        a.reversalMultiPrefs(m,k) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
+                        end
+                    end
+                elseif n==2
+                    for k = 1:4
+                        if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
+                        a.reversalMultiPrefs(m,k+4) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
+                        end
                     end
                 end
-            elseif n==2
-                for k = 1:4
-                    if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
-                    a.reversalMultiPrefs(m,k+4) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
-                    end
-                end
+
+    %             if isnan(a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)})
+    %                 a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)-1};
+    %             else
+                    a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{mm,a.reversalDays(m,n)};
+                    a.reversalRxnInfo(m,n) = a.daySummary.rxnInfoForced{mm,a.reversalDays(m,n)};
+                    a.reversalRxnRand(m,n) = a.daySummary.rxnRandForced{mm,a.reversalDays(m,n)};
+    %             end
+    %             if isnan(a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)})
+    %                 a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)-1};
+    %             else
+                    a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{mm,a.reversalDays(m,n)};
+                    a.reversalInfoBigEarlyLicks(m,n) = a.daySummary.infoBigLicksEarly{mm,a.reversalDays(m,n)};
+                    a.reversalInfoSmallEarlyLicks(m,n) = a.daySummary.infoSmallLicksEarly{mm,a.reversalDays(m,n)};
+                    a.reversalRandCEarlyLicks(m,n) = a.daySummary.randCLicksEarly{mm,a.reversalDays(m,n)};
+                    a.reversalRandDEarlyLicks(m,n) = a.daySummary.randDLicksEarly{mm,a.reversalDays(m,n)};
+                    a.reversalInfoBigLicks(m,n) = a.daySummary.infoBigLicks{mm,a.reversalDays(m,n)};
+                    a.reversalInfoSmallLicks(m,n) = a.daySummary.infoSmallLicks{mm,a.reversalDays(m,n)};
+                    a.reversalRandCLicks(m,n) = a.daySummary.randCLicks{mm,a.reversalDays(m,n)};
+                    a.reversalRandDLicks(m,n) = a.daySummary.randDLicks{mm,a.reversalDays(m,n)};
+    %             end
+    %             a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)})/(a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}+a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)});
+                  if n==2
+                    a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateRandForced{mm,a.reversalDays(m,n)}-a.daySummary.rewardRateInfoForced{mm,a.reversalDays(m,n)});
+                    a.reversalRewardRateInfo(m,n) = a.daySummary.rewardRateRand{mm,a.reversalDays(m,n)};
+                    a.reversalRewardRateRand(m,n) = a.daySummary.rewardRateInfo{mm,a.reversalDays(m,n)};
+                  else
+                    a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{mm,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{mm,a.reversalDays(m,n)});   
+                    a.reversalRewardRateInfo(m,n) = a.daySummary.rewardRateInfo{mm,a.reversalDays(m,n)};
+                    a.reversalRewardRateRand(m,n) = a.daySummary.rewardRateRand{mm,a.reversalDays(m,n)};
+                  end
             end
-            
-%             if isnan(a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)})
-%                 a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{m,a.reversalDays(m,n)-1};
-%             else
-                a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{mm,a.reversalDays(m,n)};
-                a.reversalRxnInfo(m,n) = a.daySummary.rxnInfoForced{mm,a.reversalDays(m,n)};
-                a.reversalRxnRand(m,n) = a.daySummary.rxnRandForced{mm,a.reversalDays(m,n)};
-%             end
-%             if isnan(a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)})
-%                 a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)-1};
-%             else
-                a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{mm,a.reversalDays(m,n)};
-                a.reversalInfoBigEarlyLicks(m,n) = a.daySummary.infoBigLicksEarly{mm,a.reversalDays(m,n)};
-                a.reversalInfoSmallEarlyLicks(m,n) = a.daySummary.infoSmallLicksEarly{mm,a.reversalDays(m,n)};
-                a.reversalRandCEarlyLicks(m,n) = a.daySummary.randCLicksEarly{mm,a.reversalDays(m,n)};
-                a.reversalRandDEarlyLicks(m,n) = a.daySummary.randDLicksEarly{mm,a.reversalDays(m,n)};
-                a.reversalInfoBigLicks(m,n) = a.daySummary.infoBigLicks{mm,a.reversalDays(m,n)};
-                a.reversalInfoSmallLicks(m,n) = a.daySummary.infoSmallLicks{mm,a.reversalDays(m,n)};
-                a.reversalRandCLicks(m,n) = a.daySummary.randCLicks{mm,a.reversalDays(m,n)};
-                a.reversalRandDLicks(m,n) = a.daySummary.randDLicks{mm,a.reversalDays(m,n)};
-%             end
-%             a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)})/(a.daySummary.rewardRateInfoForced{m,a.reversalDays(m,n)}+a.daySummary.rewardRateRandForced{m,a.reversalDays(m,n)});
-              if n==2
-                a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateRandForced{mm,a.reversalDays(m,n)}-a.daySummary.rewardRateInfoForced{mm,a.reversalDays(m,n)});
-                a.reversalRewardRateInfo(m,n) = a.daySummary.rewardRateRand{mm,a.reversalDays(m,n)};
-                a.reversalRewardRateRand(m,n) = a.daySummary.rewardRateInfo{mm,a.reversalDays(m,n)};
-              else
-                a.reversalRewardRateIdx(m,n) = (a.daySummary.rewardRateInfoForced{mm,a.reversalDays(m,n)}-a.daySummary.rewardRateRandForced{mm,a.reversalDays(m,n)});   
-                a.reversalRewardRateInfo(m,n) = a.daySummary.rewardRateInfo{mm,a.reversalDays(m,n)};
-                a.reversalRewardRateRand(m,n) = a.daySummary.rewardRateRand{mm,a.reversalDays(m,n)};
-              end
         end
     end
+
+    %%
+    a.meanReversalMultiPrefs = nanmean(a.reversalMultiPrefs);
+    a.SEMReversalMultiPrefs = sem(a.reversalMultiPrefs);
+
+    a.reversalPrefs_stats = a.reversalPrefs*100;
+    a.reversal1P = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,2));
+    a.reversal2P = signrank(a.reversalPrefs_stats(:,2),a.reversalPrefs_stats(:,3));
+    a.reversalP = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,3));
+
+    a.reversalRxnP(1,1) = signrank(a.reversalRxn(:,1),a.reversalRxn(:,2));
+    a.reversalRxnP(1,2) = signrank(a.reversalRxn(:,2),a.reversalRxn(:,3));
+    a.reversalRxnP(1,3) = signrank(a.reversalRxn(:,1),a.reversalRxn(:,3));
+
+    a.reversalLicksP(1,1) = signrank(a.reversalLicks(:,1),a.reversalLicks(:,2));
+    a.reversalLicksP(1,2) = signrank(a.reversalLicks(:,2),a.reversalLicks(:,3));
+    a.reversalLicksP(1,3) = signrank(a.reversalLicks(:,1),a.reversalLicks(:,3));
+
+    a.reversalRewardRateP(1,1) = signrank(a.reversalRewardRateIdx(:,1),a.reversalRewardRateIdx(:,2));
+    a.reversalRewardRateP(1,2) = signrank(a.reversalRewardRateIdx(:,2),a.reversalRewardRateIdx(:,3));
+    a.reversalRewardRateP(1,3) = signrank(a.reversalRewardRateIdx(:,1),a.reversalRewardRateIdx(:,3));
+
+    for p =1:3
+        a.reversalPVals(1,p) = signrank(a.reversalPrefs_stats(:,p)-50);
+        a.reversalRxnPVals(1,p) = signrank(a.reversalRxn(:,p));
+        a.reversalLicksPVals(1,p) = signrank(a.reversalLicks(:,p));
+        a.reversalRewardRatePVals(1,p) = signrank(a.reversalRewardRateIdx(:,p));
+    end
+
+    a.reversalRxnInfoRandP(1,1) = signrank(a.reversalRxnInfo(:,1),a.reversalRxnRand(:,1));
+    a.reversalRewardRateInfoRandP(1,1) = signrank(a.reversalRewardRateInfo(:,1),a.reversalRewardRateRand(:,1));
 end
-
-%%
-a.meanReversalMultiPrefs = nanmean(a.reversalMultiPrefs);
-a.SEMReversalMultiPrefs = sem(a.reversalMultiPrefs);
-
-a.reversalPrefs_stats = a.reversalPrefs*100;
-a.reversal1P = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,2));
-a.reversal2P = signrank(a.reversalPrefs_stats(:,2),a.reversalPrefs_stats(:,3));
-a.reversalP = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,3));
-
-a.reversalRxnP(1,1) = signrank(a.reversalRxn(:,1),a.reversalRxn(:,2));
-a.reversalRxnP(1,2) = signrank(a.reversalRxn(:,2),a.reversalRxn(:,3));
-a.reversalRxnP(1,3) = signrank(a.reversalRxn(:,1),a.reversalRxn(:,3));
-
-a.reversalLicksP(1,1) = signrank(a.reversalLicks(:,1),a.reversalLicks(:,2));
-a.reversalLicksP(1,2) = signrank(a.reversalLicks(:,2),a.reversalLicks(:,3));
-a.reversalLicksP(1,3) = signrank(a.reversalLicks(:,1),a.reversalLicks(:,3));
-
-a.reversalRewardRateP(1,1) = signrank(a.reversalRewardRateIdx(:,1),a.reversalRewardRateIdx(:,2));
-a.reversalRewardRateP(1,2) = signrank(a.reversalRewardRateIdx(:,2),a.reversalRewardRateIdx(:,3));
-a.reversalRewardRateP(1,3) = signrank(a.reversalRewardRateIdx(:,1),a.reversalRewardRateIdx(:,3));
-
-for p =1:3
-    a.reversalPVals(1,p) = signrank(a.reversalPrefs_stats(:,p)-50);
-    a.reversalRxnPVals(1,p) = signrank(a.reversalRxn(:,p));
-    a.reversalLicksPVals(1,p) = signrank(a.reversalLicks(:,p));
-    a.reversalRewardRatePVals(1,p) = signrank(a.reversalRewardRateIdx(:,p));
-end
-
-a.reversalRxnInfoRandP(1,1) = signrank(a.reversalRxnInfo(:,1),a.reversalRxnRand(:,1));
-a.reversalRewardRateInfoRandP(1,1) = signrank(a.reversalRewardRateInfo(:,1),a.reversalRewardRateRand(:,1));
 
 %% OPTO
 
@@ -1284,22 +1292,25 @@ a.optoFlag = cell2mat(a.parameters(:,5)) == 1;
 a.optoMice = unique(a.fileMouse(a.optoFlag));
 a.optoMiceList = a.mouseList(a.optoMice);
 
-for m = 1:length(a.optoMice)
-    mm = a.optoMice(m);
-   a.laserStart(m,1) = find(a.fileMouse' == mm & a.optoFlag == 1,1);
-   laserOnFiles = find(a.fileMouse' == mm & a.optoFlag == 1);
-   laserOffFiles = find(a.fileMouse' == mm & a.optoFlag == 0);
-   laserOffFiles = laserOffFiles(laserOffFiles  >= a.laserStart(m,1));
-   if isempty(laserOffFiles)
-       mouseFiles = find(a.fileMouse' == mm);
-       laserOffFiles = mouseFiles(mouseFiles < a.laserStart(m,1));
-   a.laserDays{m,1} = unique(a.fileDay(laserOnFiles));
-   a.laserDays{m,2} = unique(a.fileDay(laserOffFiles));
-   
-   % choice on laser on vs off days (but reversal and values!! and
-   % training) need to calc time course of training!!
-    a.laserChoice{m,1} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,1})));
-    a.laserChoice{m,2} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,2})));
+if ~isempty(a.optoMice)
+    for m = 1:length(a.optoMice)
+        mm = a.optoMice(m);
+       a.laserStart(m,1) = find(a.fileMouse' == mm & a.optoFlag == 1,1);
+       laserOnFiles = find(a.fileMouse' == mm & a.optoFlag == 1);
+       laserOffFiles = find(a.fileMouse' == mm & a.optoFlag == 0);
+       laserOffFiles = laserOffFiles(laserOffFiles  >= a.laserStart(m,1));
+       if isempty(laserOffFiles)
+           mouseFiles = find(a.fileMouse' == mm);
+           laserOffFiles = mouseFiles(mouseFiles < a.laserStart(m,1));
+       end
+       a.laserDays{m,1} = unique(a.fileDay(laserOnFiles));
+       a.laserDays{m,2} = unique(a.fileDay(laserOffFiles));
+
+       % choice on laser on vs off days (but reversal and values!! and
+       % training) need to calc time course of training!!
+        a.laserChoice{m,1} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,1})));
+        a.laserChoice{m,2} = nanmean(cell2mat(a.daySummary.percentInfo(mm,a.laserDays{m,2})));
+    end
 end
 
 %% OUTCOME/COMPLETE/IN PORT
