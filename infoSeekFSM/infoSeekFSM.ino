@@ -323,7 +323,7 @@ void loop() {
       rxn = 0;
       trialCt = 0;
       trialType = 0;
-      trialNum = 19;
+      trialNum = blockSize-1;
       newTrial = 1;
       currentRewardTime = 0;
       odor = 7;
@@ -550,7 +550,7 @@ void loop() {
             Serial.println("START_TRIAL");
             tone(buzzer,4000,200);
             if (newTrial == 1) {
-              if (trialNum == 19){
+              if (trialNum == blockSize-1){
                 newBlock();
                 trialNum = 0;  
               }
