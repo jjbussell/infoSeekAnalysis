@@ -29,6 +29,8 @@ extern int randWater;
 
 void blockSetup(void);
 
+void newBlock(void);
+
 void pickTrialParams(int);
 
 int randomize(void);
