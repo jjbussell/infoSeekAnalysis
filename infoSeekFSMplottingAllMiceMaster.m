@@ -121,7 +121,8 @@ for m = 1:a.mouseCt
 %     ax.Position = [1 1 5 1];
 
     % if there's choice
-    if sum(isnan(cell2mat(a.daySummary.percentInfo(m,:)))) ~= a.mouseDayCt(m)
+%     if sum(isnan(cell2mat(a.daySummary.percentInfo(m,:)))) ~= a.mouseDayCt(m)
+    if sum(a.mouseTrialTypes{m}>4) > 0
         ax.XTick = [0:5:a.mouseDayCt(m)];    
         ax.YTick = [0 0.25 0.50 0.75 1];
         ax.YLim = [-0.1 1.1];

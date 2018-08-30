@@ -260,6 +260,12 @@ for tfa = 1:length(a.fileAll) % for each trial
    a.mouseDayAll(tfa,1) = a.fileDay(a.fileAll(tfa));
 end
 
+%% MOUSE TRIAL TYPES
+
+for m = 1:a.mouseCt
+   a.mouseTrialTypes{m,1} = a.trialTypes(a.fileMouse == m); 
+end
+
 %% REWARD FLAG (SINCE REWARD IN uL)
 
 a.rewardFlag = zeros(numel(a.rewardCorr),1);
