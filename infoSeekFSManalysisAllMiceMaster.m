@@ -470,6 +470,17 @@ for m = 1:a.mouseCt
 end
 a.FSMmouseIdx = find(a.FSMmice);
 
+% no reward or small reward mice
+a.noneMice = zeros(a.mouseCt,1);
+a.infoSmallRewardTime = [a.files.infoSmallRewardTime];
+a.infoRewardProb = [a.files.infoRewardProb];
+
+for m = 1:a.mouseCt  
+    if sum(a.infoSmallRewardTime(a.fileMouse == m) == 0 & a.infoRewardProb(a.fileMouse == m) < 100)> 0
+        a.noneMice(m,1) = 1;
+    end
+end
+
 %% ALL PRE-REVERSE CHOICES ALIGNED TO START-ONLY FOR ALIGNING BY REVERSE?
 
 % a.choiceByMouse %a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
