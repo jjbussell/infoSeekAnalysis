@@ -196,7 +196,11 @@ for m = 1:a.mouseCt
     end
     ylabel({'Early', 'lick rate'});
 %     xlabel('Day');
-    leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
+    if ismember(m,find(a.noneMice))
+        leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
+    else
+        leg = legend(ax,'Info-Big','Info-Small','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
+    end
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -214,7 +218,11 @@ for m = 1:a.mouseCt
     end     
     ylabel({'Anticipatory', 'lick rate'});
     xlabel('Day');
+    if ismember(m,find(a.noneMice))    
     leg = legend(ax,'Info-Rew','Info-No Rew','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
+    else
+    leg = legend(ax,'Info-Big','Info-Small','No Info - C','No Info - D','Location','southoutside','Orientation','horizontal');
+    end
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -236,7 +244,11 @@ for m = 1:a.mouseCt
     end   
     ylabel({'Post-outcome', 'lick rate'});
 %     xlabel('Day');
+    if ismember(m,find(a.noneMice))
     leg = legend(ax,'Info-Rew','Info-No Rew','No Info - Rew','No Info - No Rew','Location','southoutside','Orientation','horizontal');
+    else
+    leg = legend(ax,'Info-Big','Info-Small','No Info - Big','No Info - Small','Location','southoutside','Orientation','horizontal');        
+    end
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
@@ -256,7 +268,11 @@ for m = 1:a.mouseCt
     end     
     ylabel({'Mean Reward', '(uL)'});
 %     xlabel('Day');
+    if ismember(m,find(a.noneMice))
     leg = legend(ax,['Info' newline '-Rew'],['Info' newline '-No Rew'],['No Info' newline '-C'],['No Info' newline '-D'],['No Info' newline '-Rew'],['No Info' newline '-No Rew'],'Location','southoutside','Orientation','horizontal');
+    else
+    leg = legend(ax,['Info' newline '-Big'],['Info' newline '-Small'],['No Info' newline '-C'],['No Info' newline '-D'],['No Info' newline '-Big'],['No Info' newline '-Small'],'Location','southoutside','Orientation','horizontal');        
+    end
     leg.Box = 'off';
     leg.FontWeight = 'bold';
     hold off;
