@@ -1141,15 +1141,24 @@ for m = 1:a.mouseCt
     end
 end
 
-a.infoCorrCodes = [11 13 14];
-a.infoIncorrCodes = [10 12 15];
-a.randCorrCodes = [17 19];
-a.randIncorrCodes = [16 18 20 21];
-a.choiceCorrCodes = [2 4 5 6 8];
-a.choiceIncorrCodes = [1 3 7 9];
-
 for mm = 1:sum(a.FSMmice)
     m=a.FSMmouseIdx(mm);
+    if ismember(m,find(a.noneMice))
+        a.infoCorrCodes = [11 13 14];
+        a.infoIncorrCodes = [10 12 15];
+        a.randCorrCodes = [17 19];
+        a.randIncorrCodes = [16 18 20 21];
+        a.choiceCorrCodes = [2 4 5 6 8];
+        a.choiceIncorrCodes = [1 3 7 9];        
+    else
+        a.infoCorrCodes = [11 13];
+        a.infoIncorrCodes = [10 12 14 15];
+        a.randCorrCodes = [17 19];
+        a.randIncorrCodes = [16 18 20 21];
+        a.choiceCorrCodes = [2 4 6 8];
+        a.choiceIncorrCodes = [1 3 5 7 9];  
+        a.infoIncorrCodes = [10 12 15]; 
+    end
     for d = 1:a.mouseDayCt(m)
         outcomes = a.daySummary.finalOutcome{m,d};
         a.infoCorr{m,d} = sum(ismember(outcomes,a.infoCorrCodes))/(sum(ismember(outcomes,a.infoCorrCodes))+sum(ismember(outcomes,a.infoIncorrCodes)));
