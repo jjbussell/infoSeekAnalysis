@@ -1190,7 +1190,8 @@ if ~isempty(a.reverseMice)
     for m = 1:numel(a.reverseMice)
         mm=a.reverseMice(m);
         a.reversalDays(m,1) = a.reverseDay{mm,1}-1; % day prior to 1st reversal
-        if ~isempty(a.reverseDay{mm,2})
+        if size(a.reverseDay{mm,:},1) > 1
+            if ~isempty(a.reverseDay{mm,2})
             a.reversalDays(m,2) = a.reverseDay{mm,2}-1; % day prior to second reversal
 
             % last day of second reversal (either r+3/last day or last day before get
@@ -1215,6 +1216,7 @@ if ~isempty(a.reverseMice)
                 else
                     a.reversalDays(m,3) = mouseValueDays(1);
                 end
+              end
             end
         end
     end
@@ -1232,14 +1234,15 @@ if ~isempty(a.reverseMice)
                 a.reversalPrefs(m,n) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)};
                 if n == 1
                     for k = 1:4
-                        if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
-                        a.reversalMultiPrefs(m,k) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
+%                         if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
+                        if a.mouseDayCt(m)>a.reversalDays(m,n)+k-1
+                            a.reversalMultiPrefs(m,k) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
                         end
                     end
                 elseif n==2
                     for k = 1:4
                         if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
-                        a.reversalMultiPrefs(m,k+4) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
+                            a.reversalMultiPrefs(m,k+4) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
                         end
                     end
                 end
@@ -1279,6 +1282,9 @@ if ~isempty(a.reverseMice)
     end
 
     %%
+    
+    if  ~isnan(a.reversalPrefs(:,2))
+    
     a.meanReversalMultiPrefs = nanmean(a.reversalMultiPrefs);
     a.SEMReversalMultiPrefs = sem(a.reversalMultiPrefs);
 
@@ -1308,6 +1314,7 @@ if ~isempty(a.reverseMice)
 
     a.reversalRxnInfoRandP(1,1) = signrank(a.reversalRxnInfo(:,1),a.reversalRxnRand(:,1));
     a.reversalRewardRateInfoRandP(1,1) = signrank(a.reversalRewardRateInfo(:,1),a.reversalRewardRateRand(:,1));
+    end
 end
 
 %% OPTO
