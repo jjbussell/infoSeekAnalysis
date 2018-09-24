@@ -224,7 +224,6 @@ for f = 1:numFiles
         error('bad trial ct');
     end    
 
-    trialStarts = data(data(:,3) == 10,:);
     b.trialStart = data(data(:,3) == 10,:);    
    
     if(size(b.trialStart,1)<trialCt)
