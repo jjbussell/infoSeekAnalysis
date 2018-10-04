@@ -2001,16 +2001,16 @@ if ~isempty(a.reverseMice)
     ax.XLim = [0.5 3.5];
     ax.XTick = [1 2 3];
     
-   plot(nanmean(a.reversalInfoBigEarlyLicks([1:3,5:15],:)),'Color','g','LineWidth',3,'Marker','o','MarkerFaceColor','g','MarkerSize',5); 
+   plot(nanmean(a.reversalInfoBigEarlyLicks(:,:)),'Color','g','LineWidth',3,'Marker','o','MarkerFaceColor','g','MarkerSize',5); 
 %    plot(nanmean(a.reversalInfoBigEarlyLicks([1:3,5:15],:)+sem(a.reversalInfoBigEarlyLicks([1:3,5:15],:))),'Color','g','LineWidth',1);
 %    plot(nanmean(a.reversalInfoBigEarlyLicks([1:3,5:15],:)-sem(a.reversalInfoBigEarlyLicks([1:3,5:15],:))),'Color','g','LineWidth',1);
-   plot(nanmean(a.reversalInfoSmallEarlyLicks([1:3,5:15],:)),'Color','m','LineWidth',3,'Marker','o','MarkerFaceColor','m','MarkerSize',5); 
+   plot(nanmean(a.reversalInfoSmallEarlyLicks(:,:)),'Color','m','LineWidth',3,'Marker','o','MarkerFaceColor','m','MarkerSize',5); 
 %    plot(nanmean(a.reversalInfoSmallEarlyLicks([1:3,5:15],:)+sem(a.reversalInfoSmallEarlyLicks([1:3,5:15],:))),'Color','m','LineWidth',1);
 %    plot(nanmean(a.reversalInfoSmallEarlyLicks([1:3,5:15],:)-sem(a.reversalInfoSmallEarlyLicks([1:3,5:15],:))),'Color','m','LineWidth',1);
-   plot(nanmean(a.reversalRandCEarlyLicks([1:3,5:15],:)),'Color',cornflower,'LineWidth',3,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
+   plot(nanmean(a.reversalRandCEarlyLicks(:,:)),'Color',cornflower,'LineWidth',3,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
 %    plot(nanmean(a.reversalRandCEarlyLicks([1:3,5:15],:)+sem(a.reversalRandCEarlyLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1);
 %    plot(nanmean(a.reversalRandCEarlyLicks([1:3,5:15],:)-sem(a.reversalRandCEarlyLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1);
-   plot(nanmean(a.reversalRandDEarlyLicks([1:3,5:15],:)),'Color',cornflower,'LineWidth',3,'LineStyle','--','Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
+   plot(nanmean(a.reversalRandDEarlyLicks(:,:)),'Color',cornflower,'LineWidth',3,'LineStyle','--','Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
 %    plot(nanmean(a.reversalRandDEarlyLicks([1:3,5:15],:)+sem(a.reversalRandDEarlyLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1,'LineStyle','--');   
 %    plot(nanmean(a.reversalRandDEarlyLicks([1:3,5:15],:)-sem(a.reversalRandDEarlyLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1,'LineStyle','--');   
 
@@ -2026,16 +2026,16 @@ if ~isempty(a.reverseMice)
     ax.XLim = [0.5 3.5];
     ax.XTick = [1 2 3];
 
-   plot(nanmean(a.reversalInfoBigLicks([1:3,5:15],:)),'Color','g','LineWidth',3,'Marker','o','MarkerFaceColor','g','MarkerSize',5); 
+   plot(nanmean(a.reversalInfoBigLicks(:,:)),'Color','g','LineWidth',3,'Marker','o','MarkerFaceColor','g','MarkerSize',5); 
 %    plot(nanmean(a.reversalInfoBigLicks([1:3,5:15],:)+sem(a.reversalInfoBigLicks([1:3,5:15],:))),'Color','g','LineWidth',1);
 %    plot(nanmean(a.reversalInfoBigLicks([1:3,5:15],:)-sem(a.reversalInfoBigLicks([1:3,5:15],:))),'Color','g','LineWidth',1);
-   plot(nanmean(a.reversalInfoSmallLicks([1:3,5:15],:)),'Color','m','LineWidth',3,'Marker','o','MarkerFaceColor','m','MarkerSize',5); 
+   plot(nanmean(a.reversalInfoSmallLicks(:,:)),'Color','m','LineWidth',3,'Marker','o','MarkerFaceColor','m','MarkerSize',5); 
 %    plot(nanmean(a.reversalInfoSmallLicks([1:3,5:15],:)+sem(a.reversalInfoSmallLicks([1:3,5:15],:))),'Color','m','LineWidth',1);
 %    plot(nanmean(a.reversalInfoSmallLicks([1:3,5:15],:)-sem(a.reversalInfoSmallLicks([1:3,5:15],:))),'Color','m','LineWidth',1);
-   plot(nanmean(a.reversalRandCLicks([1:3,5:15],:)),'Color',cornflower,'LineWidth',3,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
+   plot(nanmean(a.reversalRandCLicks(:,:)),'Color',cornflower,'LineWidth',3,'Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
 %    plot(nanmean(a.reversalRandCLicks([1:3,5:15],:)+sem(a.reversalRandCLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1);
 %    plot(nanmean(a.reversalRandCLicks([1:3,5:15],:)-sem(a.reversalRandCLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1);
-   plot(nanmean(a.reversalRandDLicks([1:3,5:15],:)),'Color',cornflower,'LineWidth',3,'LineStyle','--','Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
+   plot(nanmean(a.reversalRandDLicks(:,:)),'Color',cornflower,'LineWidth',3,'LineStyle','--','Marker','o','MarkerFaceColor',cornflower,'MarkerSize',5); 
 %    plot(nanmean(a.reversalRandDLicks([1:3,5:15],:)+sem(a.reversalRandDLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1,'LineStyle','--');   
 %    plot(nanmean(a.reversalRandDLicks([1:3,5:15],:)-sem(a.reversalRandDLicks([1:3,5:15],:))),'Color',cornflower,'LineWidth',1,'LineStyle','--');   
    
