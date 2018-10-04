@@ -1007,7 +1007,7 @@ if ~isempty(a.reverseMice)
     for m = 1:numel(a.reverseMice)
         mm=a.reverseMice(m);
         a.reversalDays(m,1) = a.reverseDay{mm,1}-1; % day prior to 1st reversal
-        if size(a.reverseDay(mm,:),1) > 1
+        if size(a.reverseDay(mm,:),2) > 1
             if ~isempty(a.reverseDay{mm,2})
             a.reversalDays(m,2) = a.reverseDay{mm,2}-1; % day prior to second reversal
 
