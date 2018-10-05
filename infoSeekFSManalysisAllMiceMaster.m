@@ -30,6 +30,9 @@
     if exist('a.deletedFiles')
         a.deletedFiles = a.deletedFiles;
     end
+    
+    a.rewards = [a.bigRewards; a.smallRewards];
+    
 % end
 
 a.paramNames = {'File';'Mouse';'Day';'Session End';'Trials in Session';...
