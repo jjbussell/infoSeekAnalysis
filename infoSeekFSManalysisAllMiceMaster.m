@@ -17,101 +17,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%
-% %% old data in structure "b"
-% 
-% prompt = {'Load old preFSM data file? 1 = yes, 0 = no'};
-% dlg_title = 'Load preFSM data?';
-% num_lines = 1;
-% defaultans = {'1'};
-% loadData = inputdlg(prompt,dlg_title,num_lines,defaultans);
-% 
-% loadData = str2num(cell2mat(loadData));
-% 
-% if loadData == 1
-%     [datafilename,datapathname]=uigetfile('*.mat', 'Choose old data file to load');
-%     fname=fullfile(datapathname,datafilename); 
-%     load(fname); % opens structure "b" with previous data, if available
-%     
-%     c = b;
-%     clear b;
-%     b = a;
-%     clear a;
-%     
-%     b.FSM = ones(numel(b.file),1);
-%     b.FSMall = ones(numel(b.fileAll),1);
-%     c.FSM = zeros(numel(c.file),1);
-%     c.FSMall = zeros(numel(c.fileAll),1);
-%     a.FSM = [b.FSM; c.FSM];
-%     a.FSMall = [b.FSMall; c.FSMall];
-%     
-%     
-%     
-%     c.parameters = [c.allSummary(:,1:23) c.allSummary(:,22:23)...
-%         c.allSummary(:,24:27) cell(size(c.allSummary,1),1)...
-%         c.allSummary(:,28:31)];
-%     a.parameters = [b.parameters; c.parameters];
-%     
-%     a.numFiles = size(a.parameters,1);    
-% 
-%     f1 = struct2cell(b.files); f2 = struct2cell(c.files);    
-%     fileNames = [f1(1,:) f2(1,:)];
-%     infoSides = [f1(10,:) f2(9,:)];
-%     mouseNames = [f1(8,:) f2(7,:)];
-%     daysFromFiles = [f1(7,:) f2(6,:)];
-%     e = [fileNames;infoSides;mouseNames;daysFromFiles];
-%     fn = {'name';'infoSide';'mouseName';'day'};
-%     a.files = cell2struct(e,fn,1);
-% 
-%     a.fileAll = [b.fileAll; c.fileAll + b.numFiles];
-%     a.trialAll = [b.trialNums; c.trialAll];
-%     a.correct = [b.correct; c.correct];
-%     a.choiceType = [b.choiceType; c.trialTypeAll];
-%     a.infoForced = [b.infoForced; c.infoForced];
-%     a.randForced = [b.randForced; c.randForced];
-%     a.choiceTrials = [b.choiceTrials; c.choice];    
-%     a.file = [b.file; c.file + b.numFiles];
-%     a.trial = [b.corrTrials; c.trial];
-%     a.type = [b.type; c.type];
-%     a.mouse = [b.mouse; c.mouse];
-%     a.mouseAll = [b.mouseAll; c.mouseAll];
-%     a.choice = [b.choice(:,4); c.portChoiceAll];
-%     a.choiceCorr = [b.choiceCorr; c.info];
-%     a.choiceTypeCorr = [b.choiceTypeCorr; c.trialType];
-%         c.rxn = c.firstRewardEntry - c.goCue;
-%         c.rxn(c.firstRewardEntry == 0) = NaN;
-%         c.rxnAll = c.firstRewardEntryAll - c.goCueAll;
-%         c.rxnAll(c.firstRewardEntryAll == 0) = NaN;
-%     a.rxnAll = [b.rxn; c.rxnAll];
-%     a.rxn  = [b.rxn(b.correct); c.rxn];
-%     a.odor2 = [b.trialParams(:,6); c.odor2];
-%     a.reward = [b.reward; c.reward];
-%     a.rewardCorr = [b.rewardCorr; c.rewardCorr];
-%     a.rewarded = [b.rewarded; zeros(numel(c.fileAll),1)];
-%     a.trialLength = [b.trialLength(b.correct); c.trialLength];
-%     a.anticipatoryLicks = [b.anticipatoryLicks; c.anticipatoryLicks];
-%     a.betweenLicks = [b.betweenLicks; c.betweenLicks];
-%     a.earlyLicks = [b.earlyLicks; c.earlyLicks];
-%     a.waterLicks = [b.waterLicks; c.waterLicks];
-%     a.outcome = [b.outcome; zeros(numel(c.fileAll),1)]; % outcome only calculated for FSM
-%     a.finalOutcome = [b.finalOutcome; c.finalOutcome]; % outcome only calculated for FSM
-%     a.rewardAssigned = [b.trialParams(:,5); c.rewardSize]; % rewardSize in pre-FSM, need to calc from trialParms in FSM
-%     a.goCue = [b.goCue(:,2); c.goCueAll];
-%     a.firstCenterEntry = [b.firstCenterEntry(:,2); c.firstCenterEntryAll];
-%     a.trialLengthCenterEntryCorr = [b.trialLengthCenterEntry(b.correct); c.trialLengthCenterEntry(c.correctAll==1)];
-%     a.trialLenghtCenterEntry = [b.trialLengthCenterEntry; c.trialLengthCenterEntry];
-% %     a.rewardEntries = [b.rewardEntries; allRewardEntries Stuff
-%     if exist('a.deletedFiles')
-%         a.deletedFiles = b.deletedFiles;
-%     end
-%     
-%     % NEED TO PULL IN CENTER ENTRIES AND REWARD ENTRIES! and GO CUE
-%     
-%     clear b; clear c;
-% 
-%     % only FSM files NEED TO FIX?!?!
-% else 
-
-%%
     a.FSM = ones(numel(a.file),1);
     a.FSMall = ones(numel(a.fileAll),1);
     a.trialAll = a.trialNums;
@@ -573,94 +478,6 @@ if ~isempty(a.choiceMice)
     [a.overallPref,a.overallCI] = binofit(sum(allChoices == 1),numel(allChoices));
     clear allChoices;
 end
-
-%% CHOICE BY DAY - SKIP 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% THIS IS THE SAME AS a.daySummary.percentInfo
-
-% NOT GONNA WORK FOR MICE WITH NO CHOICES??
-
-% need to make pre-reverse?!? rel to initial info side?!?
-
-% for m = 1:a.mouseCt
-%     for d = 1:a.mouseDayCt(m)
-%        ok = a.mice(:,m) & a.mouseDay == d;
-%        a.choicesbyDay{m,d} = a.choiceCorr(ok & a.choiceTypeCorr == 1);
-%        a.meanDayChoice{m,d} = mean(a.choicesbyDay{m,d});
-%     end
-% end
-% 
-% for m = 1:a.mouseCt
-%     choiceDays = find(~isnan(cell2mat(a.meanDayChoice(m,:))));
-%     choiceDayCt(m) = size(choiceDays,2);
-%     a.choiceDays{m,:} = choiceDays;
-%     for dd = 1:size(choiceDays,2)
-%         a.meanDayChoicesOrg{m,dd} = a.meanDayChoice{m,choiceDays(dd)};
-%     end    
-% end
-% 
-% %% ALIGN TO REVERSAL
-% 
-% % FINDS a.revChoiceDays(m,:), the days in a.mouseDay for each mouse to calculate aligned values
-% 
-% for m = 1:a.mouseCt
-%     choiceReverseDay(m) = find(a.choiceDays{m,:} == a.reverseDay(m));
-% end
-% 
-% a.commonReverse = max(choiceReverseDay)-1;
-% postReverseDayCt = choiceDayCt - choiceReverseDay;
-% % maxPostReverse = max(cell2mat(postReverseDays));
-% % DAY TO ALIGN REVERSALS
-% revAlign = a.commonReverse+1;
-% 
-% a.meanDayChoicesRevOrg = cell(a.mouseCt);
-% for m=1:a.mouseCt
-%     preReverseDays{m} = a.choiceDays{m,1}(1):choiceReverseDay(m);
-%     postReverseDays{m} = choiceReverseDay(m)+1:choiceReverseDay(m) + postReverseDayCt(m);
-%     mouseDayswRev{m} = [preReverseDays{m} postReverseDays{m}]; % same as choice days!
-%     for d = 1:choiceReverseDay(m)
-%        a.meanDayChoicesRevOrg(m,revAlign-choiceReverseDay(m)+d) = a.meanDayChoicesOrg(m,d); 
-%     end
-%     for d = 1:choiceDayCt(m)-choiceReverseDay(m)
-%        a.meanDayChoicesRevOrg(m,revAlign+d) = a.meanDayChoicesOrg(m,choiceReverseDay(m)+d); 
-%     end
-%     a.revChoiceDays{m,:} = find(~cellfun(@isempty,a.meanDayChoicesRevOrg(m,:)));
-% end
-% 
-% a.meanDayChoicesRevOrg(cellfun(@isempty,a.meanDayChoicesRevOrg(:,:))) = {NaN};
-% a.dayswRev = size(a.meanDayChoicesRevOrg,2);
-% 
-% a.meanChoicebyRevDay = mean(cell2mat(a.meanDayChoicesRevOrg),1,'omitnan');
-% a.semChoicebyRevDay = sem(cell2mat(a.meanDayChoicesRevOrg));
-% 
-% a.totalChoiceDays = size(a.meanDayChoicesRevOrg,2);
-% 
-% 
-% %% CALCULATE COMMON DAY FOR EACH TRIAL
-% 
-% % a.allDay is the day from 1:totalchoicedays for each trial, aligned to
-% % reversal
-% 
-% a.allDay = zeros(size(a.mouseDay,1),1);
-% for m = 1:a.mouseCt
-%     revChoiceDays = a.revChoiceDays{m,1};
-%     choiceDays = a.choiceDays{m,1};
-%     for d = 1:size(revChoiceDays,2)
-%         corrDay = revChoiceDays(d);
-%         ok = a.mice(:,m) == 1 & a.mouseDay == choiceDays(d);
-%         a.allDay(ok) = corrDay;
-%     end
-% end
-% 
-% % test mean choices
-% 
-% % for d = 1:a.totalChoiceDays
-% %    ok = a.allDay == d & a.trialType == 1;
-% %    overallDayMean(d) = mean(a.info(ok));  
-% % end
-
-
 
 %% SORT BY INFO PREFERENCE
 if ~isempty(a.choiceMice)
@@ -1190,7 +1007,7 @@ if ~isempty(a.reverseMice)
     for m = 1:numel(a.reverseMice)
         mm=a.reverseMice(m);
         a.reversalDays(m,1) = a.reverseDay{mm,1}-1; % day prior to 1st reversal
-        if size(a.reverseDay(mm,:),1) > 1
+        if size(a.reverseDay(mm,:),2) > 1
             if ~isempty(a.reverseDay{mm,2})
             a.reversalDays(m,2) = a.reverseDay{mm,2}-1; % day prior to second reversal
 
