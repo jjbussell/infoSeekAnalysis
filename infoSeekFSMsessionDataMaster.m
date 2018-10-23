@@ -388,8 +388,10 @@ for f = 1:numFiles
                    b.centerExitGo(r,2) = 0;
 
                 else
-                   b.centerEntryGo(r,[2 3]) = b.centerEntries(centerEntryGoIdx,[3 2]);
-                   b.centerExitGo(r,[2 3]) = b.centerEntries(centerEntryGoIdx,[3 7]);
+                   b.centerEntryGo(r,2) = r; 
+                   b.centerExitGo(r,2) = r; 
+                   b.centerEntryGo(r,3) = b.centerEntries(centerEntryGoIdx,2);
+                   b.centerExitGo(r,3) = b.centerEntries(centerEntryGoIdx,7);
                 end
 
                 if isinf(centerOdorVal)
