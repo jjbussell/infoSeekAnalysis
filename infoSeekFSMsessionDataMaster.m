@@ -17,8 +17,8 @@ ports = [1,3]; % port sensor IDs
 % [datafilename,datapathname]=uigetfile('*.mat', 'Choose processed data file to load');
 % fname=fullfile(datapathname,datafilename);
 
-loadData = 1;
-% loadData = 0;
+% loadData = 1;
+loadData = 0;
 
 if loadData == 1
     fname = 'infoSeekFSMData.mat';
@@ -397,7 +397,8 @@ for f = 1:numFiles
                 if isinf(centerOdorVal)
                     b.centerOdorOnGo(r,1) = 0;
                 else
-                    b.centerOdorOnGo(r,[2 3]) = b.centerOdorOn(centerOdorGoIdx, [3 2]);
+                    b.centerOdorOnGo(r,2) = r;
+                    b.centerOdorOnGo(r,3) = b.centerOdorOn(centerOdorGoIdx, 2);
                 end
 
             else
