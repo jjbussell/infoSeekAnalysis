@@ -1819,6 +1819,7 @@ if ~isempty(a.reverseMice)
 
 %% PLOT MEAN CHOICES AROUND REVERSALS
 
+
     fig = figure();
     
     fig = gcf;
