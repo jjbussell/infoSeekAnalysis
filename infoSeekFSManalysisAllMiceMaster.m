@@ -1,4 +1,4 @@
-% WANT DWELL TIME FOR REWARDED PORT ENTRY -- get entries
+    % WANT DWELL TIME FOR REWARDED PORT ENTRY -- get entries
 
 % "checking"/out of trial flow side entries--> GET ENTRIES!!!
 
