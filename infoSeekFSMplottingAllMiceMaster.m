@@ -2214,3 +2214,24 @@ end
 % ylabel('Population Mean Info choice probability');
 % xlabel('Day');
 % hold off;
+
+
+%% CHOICE TRAINING VS INFO PREF / REVERSAL ABILITY?!?
+
+% sum(a.mice(:,3)==1 & a.fileTrialTypes==7)
+
+for m = 1:a.mouseCt
+   a.choiceTraining(m,1) =  sum(a.mice(:,m)==1 & (a.fileTrialTypes==7 | a.fileTrialTypes==8));
+end
+
+% a.incomplete
+%a.reversalprefs
+
+%% INFO RELATIVE VALUE DUE TO LEAVING
+
+a.present = 1-a.incomplete;
+
+for m = 1:a.mouseCt
+   a.infoLeaveVal(m,1) =  (a.present(m,5)*8*0.25+a.present(m,6)*1*0.75)/(a.present(m,7)*8*0.25+a.present(m,8)*1*0.75);
+   a.waterMissed(m,1) = a.incomplete(m,6)*1*0.75/(a.present(m,5)*8*0.25+a.present(m,6)*1*0.75);
+end
