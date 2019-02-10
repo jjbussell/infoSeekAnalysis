@@ -1107,6 +1107,9 @@ if ~isempty(a.reverseMice)
     
     a.meanReversalMultiPrefs = nanmean(a.reversalMultiPrefs);
     a.SEMReversalMultiPrefs = sem(a.reversalMultiPrefs);
+    
+%     a.meanReversalMultiPrefs = nanmean(a.reversalMultiPrefs(a.reversalMultiPrefs(:,1)>0.5,:));
+%     a.SEMReversalMultiPrefs = sem(a.reversalMultiPrefs(a.reversalMultiPrefs(:,1)>0.5,:));
 
     a.reversalPrefs_stats = a.reversalPrefs*100;
     a.reversal1P = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,2));
