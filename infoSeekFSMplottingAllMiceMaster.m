@@ -1873,7 +1873,7 @@ if ~isempty(a.reverseMice)
        plot(n,nanmean(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
        errorbar(n,nanmean(a.reversalPrefs(:,n)),sem(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'CapSize',100);
     end
-    for m = 1:numel(a.reverseMice)-1
+    for m = 1:numel(a.reverseMice)
 %         if ~isnan(a.reversalPrefs(m,3))
             plot(a.reversalPrefs(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
 %         end
@@ -1971,7 +1971,7 @@ if ~isempty(a.reverseMice)
        plot(n,nanmean(a.reversalLicks(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
        errorbar(n,nanmean(a.reversalLicks(:,n)),sem(a.reversalPrefs(:,n)),'Color','k','LineWidth',2,'CapSize',100);
     end
-    for m = 1:numel(a.reverseMice)-1
+    for m = 1:numel(a.reverseMice)
         if ~isnan(a.reversalPrefs(m,3))
             plot(a.reversalLicks(m,:),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
         end

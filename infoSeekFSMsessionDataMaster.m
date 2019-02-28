@@ -17,8 +17,8 @@ ports = [1,3]; % port sensor IDs
 % [datafilename,datapathname]=uigetfile('*.mat', 'Choose processed data file to load');
 % fname=fullfile(datapathname,datafilename);
 
-loadData = 1;
-% loadData = 0;
+% loadData = 1;
+loadData = 0;
 
 if loadData == 1
     fname = 'infoSeekFSMData.mat';
