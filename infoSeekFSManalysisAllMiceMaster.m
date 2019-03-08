@@ -1128,28 +1128,37 @@ if ~isempty(a.reverseMice)
 
     a.reversalPrefs_stats = a.reversalPrefs*100;
     a.reversal1P = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,2));
+    if ~isnan(a.reversalPrefs(:,3))
     a.reversal2P = signrank(a.reversalPrefs_stats(:,2),a.reversalPrefs_stats(:,3));
     a.reversalP = signrank(a.reversalPrefs_stats(:,1),a.reversalPrefs_stats(:,3));
+    end
 
     a.reversalRxnP(1,1) = signrank(a.reversalRxn(:,1),a.reversalRxn(:,2));
+    if ~isnan(a.reversalPrefs(:,3))
     a.reversalRxnP(1,2) = signrank(a.reversalRxn(:,2),a.reversalRxn(:,3));
     a.reversalRxnP(1,3) = signrank(a.reversalRxn(:,1),a.reversalRxn(:,3));
+    end
 
     a.reversalLicksP(1,1) = signrank(a.reversalLicks(:,1),a.reversalLicks(:,2));
+    if ~isnan(a.reversalPrefs(:,3))
     a.reversalLicksP(1,2) = signrank(a.reversalLicks(:,2),a.reversalLicks(:,3));
     a.reversalLicksP(1,3) = signrank(a.reversalLicks(:,1),a.reversalLicks(:,3));
+    end
 
     a.reversalRewardRateP(1,1) = signrank(a.reversalRewardRateIdx(:,1),a.reversalRewardRateIdx(:,2));
+    if ~isnan(a.reversalPrefs(:,3))
     a.reversalRewardRateP(1,2) = signrank(a.reversalRewardRateIdx(:,2),a.reversalRewardRateIdx(:,3));
     a.reversalRewardRateP(1,3) = signrank(a.reversalRewardRateIdx(:,1),a.reversalRewardRateIdx(:,3));
+    end
 
+    if ~isnan(a.reversalPrefs(:,3))
     for p =1:3
         a.reversalPVals(1,p) = signrank(a.reversalPrefs_stats(:,p)-50);
         a.reversalRxnPVals(1,p) = signrank(a.reversalRxn(:,p));
         a.reversalLicksPVals(1,p) = signrank(a.reversalLicks(:,p));
         a.reversalRewardRatePVals(1,p) = signrank(a.reversalRewardRateIdx(:,p));
     end
-
+    end
     a.reversalRxnInfoRandP(1,1) = signrank(a.reversalRxnInfo(:,1),a.reversalRxnRand(:,1));
     a.reversalRewardRateInfoRandP(1,1) = signrank(a.reversalRewardRateInfo(:,1),a.reversalRewardRateRand(:,1));
     end
