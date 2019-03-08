@@ -453,7 +453,9 @@ for f = 1:numFiles
         [rewardExitVal,rewardExitIdx] = min(rewardExitDiff);
         if isinf(rewardExitVal)
             rewardEntries(e,7) = totalTime;
-        else
+        elseif isempty(rewardExitVal)
+            rewardEntries(e,7) = totalTime;
+        else             
             rewardEntries(e,7) = rewardExits(rewardExitIdx,2); % matching reward exit
         end
     end
