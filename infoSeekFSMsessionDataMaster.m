@@ -860,6 +860,7 @@ for f = 1:numFiles
             b.licks(l,9) = b.licks(l,2) - b.rewardEntries(lickIdx,2); % time from entry
             % INDEX OF CORRECT TRIAL MATCHING THAT LICK (should this be
             % by entry??)
+            if ~isempty(b.corrTrials)
             lickTrialIdx = find(b.corrTrials(:,1) == b.licks(l,3));
             if ~isempty(lickTrialIdx)
                 b.licks(l,10) = lickTrialIdx; % index into correct trials
@@ -873,6 +874,7 @@ for f = 1:numFiles
                     b.licks(l,13) = b.licks(l,2) - goCueCorr(lickTrialIdx,2); % time from go cue
                 else b.licks(l,13) = nan;
                 end
+            end
             end
         end                
     end

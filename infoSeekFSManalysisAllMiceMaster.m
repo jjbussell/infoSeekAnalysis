@@ -119,7 +119,7 @@ a.choiceTypeCtsCorr = [sum(a.infoForcedCorr) sum(a.randForcedCorr) sum(a.infoCho
 
 
 %%
-a.mouseList = unique(a.mouse);
+a.mouseList = unique(a.mouseAll);
 a.mouseCt = size(a.mouseList,1);
 
 a.mice = [];
@@ -488,7 +488,7 @@ if ~isempty(a.choiceMice)
     a.sortedMouseList = a.choiceMiceList(a.sortIdx);
     a.sortedCI = a.choiceCI(a.sortIdx,:);
 
-    %% STATS
+    % STATS
 
     a.icp_all = a.sortedChoice(:,1)*100;
     
@@ -1164,6 +1164,76 @@ if ~isempty(a.reverseMice)
     end
 end
 
+%% REVERSIBLE PREFERENCES
+
+% a.prefFlag = zeros(size(a.pref));
+% a.prefFlag(isnan(a.pref))=NaN;
+% a.prefFlag(a.pref>=.5)=1;
+a.prefFlag = zeros(size(a.mouseList,1),1);
+a.prefFlag([1 3 5 6 13])=1;
+a.prefFlag=a.prefFlag==1;
+
+a.reversalPrefFlag = zeros(size(a.reverseMiceList,1),1);
+a.reversalPrefFlag([1 3 5 6 11])=1;
+a.reversalPrefFlag=a.reversalPrefFlag==1;
+a.reversalPrefMice = find(a.reversalPrefFlag);
+
+a.prefMice = find(a.prefFlag);
+[~,a.trialMouse,~] = find(a.mice);
+
+a.meanChoiceReal = NaN(a.choiceMice(a.choiceMouseCt),3);
+a.choiceCIReal = NaN(a.choiceMice(a.choiceMouseCt),2);
+a.prefCIReal = NaN(a.choiceMice(a.choiceMouseCt),2);
+a.prefReal = NaN(a.choiceMice(a.choiceMouseCt),3);
+a.betaReal= NaN(a.choiceMice(a.choiceMouseCt),2);
+
+for mm = 1:sum(a.prefFlag)
+       m = a.prefMice(mm);
+       
+       choicesIIS = a.choiceIISByMouse{m};
+       choices = a.choiceAllbyMouse{m};
+
+       preReverseTrials = find(a.reverseByMouse{m} == 1,trialsToCount,'last');
+       [a.prefReal(m,1),a.prefCIReal(m,1:2)] = binofit(sum(choicesIIS(preReverseTrials)==1),numel(choicesIIS(preReverseTrials)));
+
+         postReverseTrials = find(a.reverseByMouse{m} == -1,trialsToCount,'last');
+         [a.prefReal(m,2),a.prefRevCIReal(m,1:2)] = binofit(sum(choicesIIS(postReverseTrials)==1),numel(choicesIIS(postReverseTrials)));
+         [a.prefReal(m,3),a.prefRevCIReal(m,3:4)] = binofit(sum(choices(postReverseTrials)==1),numel(choices(postReverseTrials)));
+
+       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
+
+       choicePreRev = a.choice_all(ok & a.preReverse == 1);
+
+       [a.meanChoiceReal(m,1),a.choiceCIReal(m,1:2)] = binofit(sum(choicePreRev==1),numel(choicePreRev));
+       
+
+           choicePostRev = a.choice_all(ok & a.reverse==-1);
+           [a.meanChoiceReal(m,2),a.choiceRevCIReal(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
+           x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
+           y = a.choice_all(ok);
+           [~,~,a.statsReal(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
+           a.betaReal(m,:) = a.statsReal(m).beta;
+           a.betaPReal(m,:) = a.statsReal(m).p;
+
+       
+       a.meanChoiceReal(m,3) = m;
+ 
+   end
+
+    a.meanChoiceReal = a.meanChoiceReal(a.meanChoiceReal(:,3)>0,:);
+    a.choiceCIReal = a.choiceCIReal(a.choiceCIReal(:,1)>0,:);
+   
+    allChoices = a.choiceCorr(a.choiceCorrTrials & a.preReverse == 1 & ismember(a.trialMouse,a.prefMice));
+    [a.overallPrefReal,a.overallCIReal] = binofit(sum(allChoices == 1),numel(allChoices));
+    clear allChoices;
+    
+%%
+
+% a.revPrefMice = [2 4 5 10 16];
+a.icp_realpref = a.meanChoiceReal(:,1)*100;
+a.overallPrealpref = signrank(a.icp_realpref-50);
+
+
 %% OPTO
 
 % files with laser on == 1
@@ -1229,4 +1299,4 @@ end
 %%
 save('infoSeekFSMDataAnalyzed.mat','a');
 
-save(['infoSeekFSMDataAnalyzed' datestr(now,'yyyymmdd')],'a');
+save(['infoSeekFSMDataAnalyzed' datestr(now,'yyyymmdd') 'realPref'],'a');
