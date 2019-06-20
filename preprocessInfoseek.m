@@ -8,8 +8,7 @@ f = 1;
 for f = 1:numFiles
     filename = files(f).name;
     fname = fullfile(pathname,filename);
-    data = [];
-    temp = [];
+    clearvars -except filename fname files pathname numFiles f
     
 
     fileID=fopen(fname);
@@ -29,38 +28,40 @@ for f = 1:numFiles
     data = csvread(fname,dataStart,0);
   
     if size(data,2)>5
-    badRows = unique([find(data(:,6));find(data(:,7));find(data(:,8));find(data(:,9))]);
-    
-    if ~isempty(badRows)
-        if numel(find(data(:,6)))>numel(badRows)
-            display('Error');
-            break
-        end
+        badRows = unique([find(data(:,6));find(data(:,7));find(data(:,8));find(data(:,9))]);
 
-        for n = 1:numel(badRows)
-            if n<numel(badRows)
-            if badRows(n+1)==badRows(n)+2
-                n = n+1;
-                row = badRows(n);
+        if ~isempty(badRows)
+            if numel(find(data(:,6)))>numel(badRows)
+                display('Error');
+                break
             end
+
+            for n = 1:numel(badRows)
+                if n<numel(badRows)
+                if badRows(n+1)==badRows(n)+2
+                    n = n+1;
+                    row = badRows(n);
+                end
+                end
+               trial = data(row+1,2);
+
+
+               replaceStart = find(data(row,:)==trial);
+               replace = data(row,replaceStart:replaceStart+3);
+               data(row,2:5)=replace;
+               data(row-1:row,1) = data(row+1,1);
+
+               if find(data(row-2,6))
+                  replace2Start = find(data(row-2,:)==trial);  
+                  data(row-2,2:5) = data(row-2,replace2Start:replace2Start+3);
+                  data(row-2,1) = data(row-3,1);          
+               end       
             end
-           trial = data(row+1,2);
 
-
-           replaceStart = find(data(row,:)==trial);
-           replace = data(row,replaceStart:replaceStart+3);
-           data(row,2:5)=replace;
-           data(row-1:row,1) = data(row+1,1);
-
-           if find(data(row-2,6))
-              replace2Start = find(data(row-2,:)==trial);  
-              data(row-2,2:5) = data(row-2,replace2Start:replace2Start+3);
-              data(row-2,1) = data(row-3,1);          
-           end       
+            data2 = data(:,1:5);
         end
-
-        data2 = data(:,1:5);
-    end
+    else
+        data2 = data;
     end
     
     paramThings = C{1,1};
@@ -72,4 +73,6 @@ for f = 1:numFiles
     
     
     writetable(cell2table(all),[pathname '\Fixed\' filename(1:end-4) '_mod.csv'],'WriteVariableNames',0);
+
+
 end
