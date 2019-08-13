@@ -234,6 +234,7 @@ for m = 1:a.mouseCt
             end
         else a.reverseDay{m,1} = 0;
         end
+    else a.reverseDay{m,1} = 0;
     end   
 end
 
