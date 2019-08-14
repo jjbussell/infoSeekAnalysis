@@ -379,7 +379,7 @@ for m = 1:a.mouseCt
 end
 a.FSMmouseIdx = find(a.FSMmice);
 
-% no reward or small reward mice
+% no reward vs small reward mice
 a.noneMice = zeros(a.mouseCt,1);
 a.infoSmallRewardTime = [a.files.infoSmallRewardTime];
 a.infoRewardProb = [a.files.infoRewardProb];
@@ -775,7 +775,9 @@ a.rxnSpeed = 1./a.rxn;
 
 a.goodRxn = a.rxn<8000 & a.rxn>100;
 
-%%
+%% RXN and LICK INDEX RELATIVE TO INITIAL INFO SIDE
+
+
 % a.initInfoLicks = mean(a.earlyLicks(a.initinfoside_info == 1));
 % a.initNoInfoLicks = mean(a.earlyLicks(a.initinfoside_info == -1));
 % a.earlyLickIdx = (a.initInfoLicks - a.initNoInfoLicks)/(a.initInfoLicks + a.initNoInfoLicks);
@@ -978,7 +980,7 @@ for mm = 1:sum(a.FSMmice)
         a.randIncorrCodes = [16 18 20 21];
         a.choiceCorrCodes = [2 4 6 8];
         a.choiceIncorrCodes = [1 3 5 7 9];  
-        a.infoIncorrCodes = [10 12 15]; 
+%         a.infoIncorrCodes = [10 12 15]; 
     end
     for d = 1:a.mouseDayCt(m)
         outcomes = a.daySummary.finalOutcome{m,d};
