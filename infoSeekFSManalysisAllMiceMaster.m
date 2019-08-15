@@ -825,9 +825,11 @@ for m=1:a.mouseCt
    % pre-reverse, INFO
    a.preRevEarlyLicks(m,1) = mean(a.earlyLicks(okInfoPreRev));
    a.preRevRxnSpeed(m,1) = mean(a.rxnSpeed(okInfoPreRev));
+   a.preRevRxn(m,1) = mean(a.rxn(okInfoPreRev));
    % pre-reverse, NO INFO
    a.preRevEarlyLicks(m,2) = mean(a.earlyLicks(okRandPreRev));
    a.preRevRxnSpeed(m,2) = mean(a.rxnSpeed(okRandPreRev));
+   a.preRevRxn(m,2) = mean(a.rxn(okRandPreRev));
    % pre-reverse diff p-val
    [~,a.preRevEarlyLicks(m,3)] = ttest2(a.earlyLicks(okInfoPreRev),a.earlyLicks(okRandPreRev));
    [~,a.preRevRxnSpeed(m,3)] = ttest2(a.rxnSpeed(okInfoPreRev),a.rxnSpeed(okRandPreRev));
