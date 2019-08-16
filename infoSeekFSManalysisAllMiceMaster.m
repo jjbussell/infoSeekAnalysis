@@ -201,6 +201,8 @@ for m = 1:a.mouseCt
     mouseFileTypes = cell2mat(a.parameters(a.fileMouse == m,7));
     mouseFilesIdx = find(a.fileMouse == m);
     mouseFileDays = a.fileDay(a.fileMouse == m);    
+    [sortedMouseFileDays,mouseDateIdx] = sort(mouseFileDays); % day for each of that mouse's files
+    sortedMouseFiles=mouseFilesIdx(mouseDateIdx);
     
     % initial info side
     a.initinfoside(m,1) =  a.files(find(a.fileMouse == m,1)).infoSide;
@@ -211,7 +213,7 @@ for m = 1:a.mouseCt
       a.firstChoiceDay(m,1) = 0;
       choiceDays =[];
    else
-     choiceFile = mouseFilesIdx(find(mouseFileTypes == 5,1,'first'));
+     choiceFile = sortedMouseFiles(find(mouseFileTypes(mouseDateIdx) == 5,1,'first'));
      a.firstChoice(m,1) = find(a.file == choiceFile,1); % within all that mouse's trials
      a.mouseChoiceDays{m} = unique(mouseFileDays(mouseFileTypes == 5));
      choiceDays = cell2mat(a.mouseChoiceDays(m));
@@ -219,8 +221,7 @@ for m = 1:a.mouseCt
    end    
     
     if mouseFileCt(m,1) > 1
-        [~,mouseDateIdx] = sort(mouseFileDays); % day for each of that mouse's files
-        sortedMouseFiles=mouseFilesIdx(mouseDateIdx);
+
         mouseInfoSides = a.fileInfoSide(a.fileMouse == m);
         mouseInfoSideDiff = diff(mouseInfoSides(mouseDateIdx));
 %         mouseInfoSideDiff = diff(a.fileInfoSide(a.fileMouse == m));
@@ -233,16 +234,16 @@ for m = 1:a.mouseCt
                 a.reverseFile{m,r} = reverses(r)+1; % FILE NUMBER, NOT ITS INDEX IF PULL FROM LIST
 %                 a.reverseDay{m,r} = mouseFileDays(a.reverseFile{m,r});
                 % first day during and first day after
-                a.reverseDay{m,r} = mouseFileDays(reverses(r));
+                a.reverseDay{m,r} = sortedMouseFileDays(a.reverseFileIdx{m,r});
             end
-            a.prereverseFiles(sortedMouseFiles(a.reverseFile{m,1}:end)) = 0;
+            a.prereverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:end)) = 0;
                         % FIX first choice file until reverse (all others
                         % set to zero for not relevant)
-            a.reverseFiles(sortedMouseFiles(find(mouseFileTypes == 5,1,'first'):a.reverseFile{m,1}-1)) = 1;
+            a.reverseFiles(sortedMouseFiles(find(mouseFileTypes == 5,1,'first'):a.reverseFileIdx{m,1}-1)) = 1;
             if numel(reverses)>1 % during reverse
-                a.reverseFiles(sortedMouseFiles(a.reverseFile{m,1}:a.reverseFile{m,2})) = -1;
+                a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:a.reverseFileIdx{m,2}-1)) = -1;
             else
-                a.reverseFiles(sortedMouseFiles(a.reverseFile{m,1}:end)) = -1;
+                a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:end)) = -1;
             end
         else a.reverseDay{m,1} = 0;
         end
@@ -261,12 +262,16 @@ end
 % NO LONGER USED??    
 for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
+    okidx = find(ok);
+    [~,sortidx] = sort(a.mouseDay(ok==1));
+    oksorted = okidx(sortidx);
     mouseReverse = [];
     mousePrereverse = [];
     mouseTypes = [];
-    mouseReverse = a.reverse(ok);
-    mousePrereverse = a.preReverse(ok);
-    mouseTypes = a.choiceTypeCorr(ok);
+    
+    mouseReverse = a.reverse(oksorted); % can be out of order!!
+    mousePrereverse = a.preReverse(oksorted);
+    mouseTypes = a.choiceTypeCorr(oksorted);
     
     if isempty(find(mouseReverse == -1,1))
        a.mouseReverseDays{m} = [];
@@ -459,14 +464,14 @@ if ~isempty(a.choiceMice)
    for mm = 1:a.choiceMouseCt
        m = a.choiceMice(mm);
        
-       choicesIIS = a.choiceIISByMouse{m};
+       choicesIIS = a.choiceIISByMouse{m}; % includes choice training??
        choices = a.choiceAllbyMouse{m};
 
        preReverseTrials = find(a.reverseByMouse{m} == 1,trialsToCount,'last');
        [a.pref(m,1),a.prefCI(m,1:2)] = binofit(sum(choicesIIS(preReverseTrials)==1),numel(choicesIIS(preReverseTrials)));
 
        if ismember(m,a.reverseMice)
-         postReverseTrials = find(a.reverseByMouse{m} == -1,trialsToCount,'last');
+         postReverseTrials = find(a.reverseByMouse{m} == -1,trialsToCount,'last'); % during reverse
          [a.pref(m,2),a.prefRevCI(m,1:2)] = binofit(sum(choicesIIS(postReverseTrials)==1),numel(choicesIIS(postReverseTrials)));
          [a.pref(m,4),a.prefRevCI(m,3:4)] = binofit(sum(choices(postReverseTrials)==1),numel(choices(postReverseTrials)));
        end
