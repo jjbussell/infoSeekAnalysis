@@ -4,8 +4,7 @@
 
 % "checking"/out of trial flow side entries
 
-% outcome plots
-
+% outcome plots 
 % fix lick prob days for histogram
 
 % LICKS NEEDS TO ACCOUNT FOR TIME/ERROR TRIALS!!
