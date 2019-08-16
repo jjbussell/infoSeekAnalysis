@@ -181,6 +181,8 @@ a.rewardFlag(a.rewardCorr>0) = 1;
 
 %% REVERSAL & CHOICES
 
+% ACCOUNT FOR VALUES!!!
+
 % FINDS REVERSE DAY (a.reverseDay(m,1) AND TRIALS (a.preReverse)
 
 a.fileInfoSide = cell2mat({a.files.infoSide});
@@ -190,8 +192,10 @@ a.fileInfoSide = cell2mat({a.files.infoSide});
 a.reverseDay = cell(a.mouseCt,1);
 a.prereverseFiles = ones(a.numFiles,1); %flag 1 = file with choices before reverse, 0 if before choices and after reverse
 a.prereverseFiles(cell2mat(a.parameters(:,7))~=5) = 0;
-a.reverseFiles = zeros(a.numFiles,1); % flag 1 = file before first reverse, -1 = file during first reverse
+a.reverseFiles = zeros(a.numFiles,1); % flag 1 = file before first reverse, -1 = file during first reverse, make 2 after first reverse??
 % a.valueMice = zeros(a.mouseCt,1);
+
+fileparams = cell2mat(a.parameters(:,22:27));
 
 % TO FIX--SORT BY DAYS SO NO FALSE REVERSES!
 
@@ -237,11 +241,15 @@ for m = 1:a.mouseCt
                 a.reverseDay{m,r} = sortedMouseFileDays(a.reverseFileIdx{m,r});
             end
             a.prereverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:end)) = 0;
-                        % FIX first choice file until reverse (all others
-                        % set to zero for not relevant)
+            
+            % FIX!!!!!!!  need to mark re-reverse files before value
+            % changes-->redo this to select all files with same info side
+            % and same value params??
+            sameparams = a.fileMouse' == m & sum(fileparams==fileparams(sortedMouseFiles(a.reverseFileIdx{m,1}),:),2)==size(fileparams,2);
             a.reverseFiles(sortedMouseFiles(find(mouseFileTypes == 5,1,'first'):a.reverseFileIdx{m,1}-1)) = 1;
             if numel(reverses)>1 % during reverse
                 a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:a.reverseFileIdx{m,2}-1)) = -1;
+%                 a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,2}:find(sameparams,1,'last')
             else
                 a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:end)) = -1;
             end
@@ -471,6 +479,19 @@ if ~isempty(a.choiceMice)
     clear allChoices;
 end
 
+%% OVERALL CHOICES BY SIDE
+
+if ~isempty(a.choiceMice)
+    for m = 1:a.mouseCt
+       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
+       a.overallChoice(m,1) = mean(a.choiceCorr(ok & a.infoSide == 0));
+       a.overallChoice(m,2) = mean(a.choiceCorr(ok & a.infoSide == 1));
+    end
+    
+end
+a.overallChoice(:,3) = nanmean(a.overallChoice,2);
+
+
 %% SORT BY INFO PREFERENCE
 if ~isempty(a.choiceMice)
     [a.sortedChoice,a.sortIdx] = sortrows(a.meanChoice(~isnan(a.meanChoice(:,1)),:),1);
@@ -479,8 +500,7 @@ if ~isempty(a.choiceMice)
 
     % STATS
 
-    a.icp_all = a.sortedChoice(:,1)*100;
-    
+    a.icp_all = a.sortedChoice(:,1)*100;    
 %     a.icp_all = a.meanChoice(1:end-1,1)*100;
     
     a.overallP = signrank(a.icp_all-50);
