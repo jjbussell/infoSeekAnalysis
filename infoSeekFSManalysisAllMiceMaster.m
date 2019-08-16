@@ -140,7 +140,7 @@ end
 
 for m = 1:a.mouseCt
    mouseFileIdx = strcmp(a.miceCell,a.mouseList{m});
-   a.mouseDays{m} = unique(a.dayCell(mouseFileIdx));
+   a.mouseDays{m} = unique(a.dayCell(mouseFileIdx)); % sorts
    a.mouseDayCt(m) = size(a.mouseDays{m},1);
 end
 
@@ -193,6 +193,8 @@ a.prereverseFiles(cell2mat(a.parameters(:,7))~=5) = 0;
 a.reverseFiles = zeros(a.numFiles,1); % flag 1 = file before first reverse, -1 = file during first reverse
 % a.valueMice = zeros(a.mouseCt,1);
 
+% TO FIX--SORT BY DAYS SO NO FALSE REVERSES!
+
 for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
     mouseFileCt(m,1) = sum(a.fileMouse == m);
@@ -217,20 +219,30 @@ for m = 1:a.mouseCt
    end    
     
     if mouseFileCt(m,1) > 1
-        mouseInfoSideDiff = diff(a.fileInfoSide(a.fileMouse == m));
+        [~,mouseDateIdx] = sort(mouseFileDays); % day for each of that mouse's files
+        sortedMouseFiles=mouseFilesIdx(mouseDateIdx);
+        mouseInfoSides = a.fileInfoSide(a.fileMouse == m);
+        mouseInfoSideDiff = diff(mouseInfoSides(mouseDateIdx));
+%         mouseInfoSideDiff = diff(a.fileInfoSide(a.fileMouse == m));
         
         if ~isempty(find(mouseInfoSideDiff) ~= 0)
-            reverses = find(mouseInfoSideDiff~=0);
+            reversesIdx = find(mouseInfoSideDiff~=0); %into sorted list
+            reverses = mouseDateIdx(reversesIdx); % into original list
             for r = 1:numel(reverses)
-                a.reverseFile{m,r} = reverses(r) + 1;
-                a.reverseDay{m,r} = mouseFileDays(a.reverseFile{m,r});
+                a.reverseFileIdx{m,r} = reversesIdx(r) + 1; % of mouse files
+                a.reverseFile{m,r} = reverses(r)+1; % FILE NUMBER, NOT ITS INDEX IF PULL FROM LIST
+%                 a.reverseDay{m,r} = mouseFileDays(a.reverseFile{m,r});
+                % first day during and first day after
+                a.reverseDay{m,r} = mouseFileDays(reverses(r));
             end
-            a.prereverseFiles(mouseFilesIdx(a.reverseFile{m,1}:end)) = 0;
-            a.reverseFiles(mouseFilesIdx(find(mouseFileTypes == 5,1,'first'):a.reverseFile{m,1}-1)) = 1;
-            if numel(reverses)>1
-                a.reverseFiles(mouseFilesIdx(a.reverseFile{m,1}:a.reverseFile{m,2}-1)) = -1;
+            a.prereverseFiles(sortedMouseFiles(a.reverseFile{m,1}:end)) = 0;
+                        % FIX first choice file until reverse (all others
+                        % set to zero for not relevant)
+            a.reverseFiles(sortedMouseFiles(find(mouseFileTypes == 5,1,'first'):a.reverseFile{m,1}-1)) = 1;
+            if numel(reverses)>1 % during reverse
+                a.reverseFiles(sortedMouseFiles(a.reverseFile{m,1}:a.reverseFile{m,2})) = -1;
             else
-                a.reverseFiles(mouseFilesIdx(a.reverseFile{m,1}:end)) = -1;
+                a.reverseFiles(sortedMouseFiles(a.reverseFile{m,1}:end)) = -1;
             end
         else a.reverseDay{m,1} = 0;
         end
@@ -246,7 +258,7 @@ for t = 1:size(a.file,1)
     a.reverse(t,1) = a.reverseFiles(a.file(t));
 end
 
-    
+% NO LONGER USED??    
 for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
     mouseReverse = [];
@@ -267,6 +279,7 @@ for m = 1:a.mouseCt
        a.firstReverseInChoiceTrials(m,1) = 0;
     else
        a.mouseReverseDays{m} = unique(a.mouseDay(a.reverse == -1 & ok));
+       % NOT NECESSARILY CORRECT WITHOUT SORTING
        a.firstReverse(m,1) = find(mouseReverse == -1,1,'first'); % within all that mouse's trials
        a.firstReverseChoice(m,1) = find(mouseTypes == 1 & mouseReverse == -1,1);
        a.lastReverse(m,1) = find(mousePrereverse == 0,1,'last');
@@ -392,6 +405,8 @@ end
 
 %% ALL PRE-REVERSE CHOICES ALIGNED TO START-ONLY FOR ALIGNING BY REVERSE?
 
+% NO LONGER USED??
+
 % a.choiceByMouse %a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
 a.maxChoiceTrials = max(a.choiceTrialCt);
 a.choiceTrialsOrg = NaN(a.choiceMouseCt,a.maxChoiceTrials);
@@ -403,6 +418,8 @@ if a.maxChoiceTrials > 0
 end
 
 %% ALL CHOICES ALIGNED TO REVERSE START
+
+% NO LONGER USED??
 
 % find first reverse trial within choicesand then max pre and post, create NaN array
 % will with data for each mouse
