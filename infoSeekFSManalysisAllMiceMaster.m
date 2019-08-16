@@ -188,7 +188,7 @@ a.fileInfoSide = cell2mat({a.files.infoSide});
 % a.reverseFile = zeros(a.mouseCt,1);
 % a.reverseDay = zeros(a.mouseCt,1);
 a.reverseDay = cell(a.mouseCt,1);
-a.prereverseFiles = ones(a.numFiles,1); %flag 1 = file with choices before reverse
+a.prereverseFiles = ones(a.numFiles,1); %flag 1 = file with choices before reverse, 0 if before choices and after reverse
 a.prereverseFiles(cell2mat(a.parameters(:,7))~=5) = 0;
 a.reverseFiles = zeros(a.numFiles,1); % flag 1 = file before first reverse, -1 = file during first reverse
 % a.valueMice = zeros(a.mouseCt,1);
@@ -806,13 +806,13 @@ a.goodRxn = a.rxn<8000 & a.rxn>100;
 %%
 % RELATIVE TO CURRENT INFO SIDE
 for m=1:a.mouseCt
-   ok1 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.preReverse == 1;
+   ok1 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.reverse == 1;
    okInfoPreRev = find(ok1==1,500,'last');
-   ok2 = a.mice(:,m) == 1 & a.randForcedCorr == 1 & a.preReverse == 1;
+   ok2 = a.mice(:,m) == 1 & a.randForcedCorr == 1 & a.reverse == 1;
    okRandPreRev = find(ok2==1,500,'last');
-   ok3 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.preReverse == 0;
+   ok3 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.reverse == -1;
    okInfoPostRev = find(ok3==1,500,'last');
-   ok4 = a.mice(:,m) == 1 & a.randForcedCorr == 1 & a.preReverse == 0;
+   ok4 = a.mice(:,m) == 1 & a.randForcedCorr == 1 & a.reverse == -1;
    okRandPostRev = find(ok4==1,500,'last');
    % pre-reverse, INFO
    a.preRevEarlyLicks(m,1) = mean(a.earlyLicks(okInfoPreRev));
@@ -828,9 +828,11 @@ for m=1:a.mouseCt
    % post-reverse, INFO
    a.postRevEarlyLicks(m,1) = mean(a.earlyLicks(okInfoPostRev));
    a.postRevRxnSpeed(m,1) = mean(a.rxnSpeed(okInfoPostRev));
+   a.postRevRxn(m,1) = mean(a.rxn(okInfoPostRev));
    % post-reverse, NO INFO
    a.postRevEarlyLicks(m,2) = mean(a.earlyLicks(okRandPostRev));
    a.postRevRxnSpeed(m,2) = mean(a.rxnSpeed(okRandPostRev));
+   a.postRevRxn(m,2) = mean(a.rxn(okRandPostRev));
    % post-reverse diff p-val
    [~,a.postRevEarlyLicks(m,3)] = ttest2(a.earlyLicks(okInfoPostRev),a.earlyLicks(okRandPostRev));
    [~,a.postRevRxnSpeed(m,3)] = ttest2(a.rxnSpeed(okInfoPostRev),a.rxnSpeed(okRandPostRev));

@@ -1614,8 +1614,8 @@ if ~isempty(a.reverseMice)
     ax.YLim = [-3 3];
     for mm = 1:numel(a.reverseMice)
         m = a.reverseMice(mm);
-%         plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,1) a.prefRevCI(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
-%         plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,2) a.pref(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+        plot([a.beta(m,1) a.beta(m,1)],[a.beta(m,2) - a.betaSE(m,2) a.beta(m,2) + a.betaSE(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
+        plot([a.beta(m,1)-a.betaSE(m,1) a.beta(m,1)+a.betaSE(m,1)],[a.beta(m,2) a.beta(m,2)],'color',[0.2 0.2 0.2],'linewidth',0.25);
 %         dy = a.beta(m,2) - a.betaCI(m,2) + 0.02;
         text(a.beta(m,1),a.beta(m,2) + 0.1,a.reverseMiceList{mm},'HorizontalAlignment','center');
     end
