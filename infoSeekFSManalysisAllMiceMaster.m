@@ -258,8 +258,7 @@ for t = 1:size(a.file,1)
     a.preReverse(t,1) = a.prereverseFiles(a.file(t));
     a.reverse(t,1) = a.reverseFiles(a.file(t));
 end
-
-% NO LONGER USED??    
+  
 for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
     okidx = find(ok);
@@ -284,7 +283,7 @@ for m = 1:a.mouseCt
        a.firstReverseInChoiceTrials(m,1) = 0;
     else
        a.mouseReverseDays{m} = unique(a.mouseDay(a.reverse == -1 & ok));
-       % NOT NECESSARILY CORRECT WITHOUT SORTING
+       % NOT NECESSARILY CORRECT WITHOUT SORTING (ok now)
        a.firstReverse(m,1) = find(mouseReverse == -1,1,'first'); % within all that mouse's trials
        a.firstReverseChoice(m,1) = find(mouseTypes == 1 & mouseReverse == -1,1);
        a.lastReverse(m,1) = find(mousePrereverse == 0,1,'last');
@@ -295,11 +294,6 @@ for m = 1:a.mouseCt
        a.firstReverseInChoiceTrials(m,1) = find(a.preReverse==0 & ok,1);
     end  
 end
-
-a.trialsPreReverse = a.firstReverse - a.firstChoice;
-a.choiceDaysPreReverse = cell2mat(a.reverseDay(:,1)) - a.firstChoiceDay;
-a.trialsReverseTraining = a.firstReverseChoice - a.firstReverse;
-a.trialsReverseWithChoices = a.lastReverse - a.firstReverseChoice;
 
 %% INFOSIDE
 
@@ -326,7 +320,8 @@ a.choice_all(reverseFlag) = ~a.choice_all(reverseFlag);
 
 
 for m = 1:a.mouseCt
-   ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
+   ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
+%    ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
    a.choiceAllbyMouse{m} = a.choiceCorr(ok);
    a.choiceAllTrialCt(m,1) = numel(a.choiceAllbyMouse{m});
    a.choicebyMouse{m} = a.choiceCorr(ok & a.preReverse == 1); % preReverse
@@ -408,43 +403,6 @@ for m = 1:a.mouseCt
     end
 end
 
-%% ALL PRE-REVERSE CHOICES ALIGNED TO START-ONLY FOR ALIGNING BY REVERSE?
-
-% NO LONGER USED??
-
-% a.choiceByMouse %a.meanChoicebyDay = mean(cell2mat(a.meanDayChoicesOrg),1,'omitnan');
-a.maxChoiceTrials = max(a.choiceTrialCt);
-a.choiceTrialsOrg = NaN(a.choiceMouseCt,a.maxChoiceTrials);
-
-if a.maxChoiceTrials > 0
-    for m = a.choiceMice(1):a.choiceMice(end)   
-       a.choiceTrialsOrg(m,1:a.choiceTrialCt(m)) = a.choicebyMouse{m}; 
-    end
-end
-
-%% ALL CHOICES ALIGNED TO REVERSE START
-
-% NO LONGER USED??
-
-% find first reverse trial within choicesand then max pre and post, create NaN array
-% will with data for each mouse
-
-maxChoiceAllTrials = max(a.firstReverseInChoiceTrials) + max(a.choiceAllTrialCt - a.firstReverseInChoiceTrials)+1;
-a.commonReverse = max(a.firstReverseInChoiceTrials); % first reversed choice trial
-a.choiceTrialsOrgRev = NaN(a.mouseCt,maxChoiceAllTrials);
-
-% if ~isempty(a.choiceMice)
-%     for m = a.choiceMice(1):a.choiceMice(end) 
-%        % relative to reverse start
-%        % postReverse = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));
-%        % preReverse = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
-% 
-%        choices = a.choiceAllbyMouse{m};
-% 
-%        a.choiceTrialsOrgRev(m,a.commonReverse - a.firstReverseInChoiceTrials(m,1)+1 : a.commonReverse-1) = choices(1:a.firstReverseInChoiceTrials(m,1)-1);
-%        a.choiceTrialsOrgRev(m,a.commonReverse : a.commonReverse + a.choiceAllTrialCt(m,1)-a.firstReverseInChoiceTrials(m,1)) = choices(a.firstReverseInChoiceTrials(m,1):a.choiceAllTrialCt(m,1));  
-%     end
-% end
 
 %% MEAN CHOICES / STATS AND CHOICE RANGES - FIX
 
@@ -467,6 +425,7 @@ if ~isempty(a.choiceMice)
        choicesIIS = a.choiceIISByMouse{m}; % includes choice training??
        choices = a.choiceAllbyMouse{m};
 
+       % FIX--not correct, includes choice training and not in order!!
        preReverseTrials = find(a.reverseByMouse{m} == 1,trialsToCount,'last');
        [a.pref(m,1),a.prefCI(m,1:2)] = binofit(sum(choicesIIS(preReverseTrials)==1),numel(choicesIIS(preReverseTrials)));
 
