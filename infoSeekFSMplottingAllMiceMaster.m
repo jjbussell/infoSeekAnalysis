@@ -103,9 +103,9 @@ a.finalOutcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoBigNP',...
 
 %% PLOT DAY SUMMARIES BY MOUSE FOR CURRENT MICE
 
-for mm = 1:numel(a.currentMiceNums)
-    m=a.currentMiceNums(mm);
-% for m = 1:a.mouseCt
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
+for m = 1:a.mouseCt
     figure();
     
     fig = gcf;
@@ -127,7 +127,7 @@ for mm = 1:numel(a.currentMiceNums)
         ax.YTick = [0 0.25 0.50 0.75 1];
         ax.YLim = [-0.1 1.1];
         plot(0,0,'Marker','none');
-        plot(1:a.mouseDayCt(m),[cell2mat(a.daySummary.percentInfo(m,:))],'Color',[.5 .5 .5],'LineWidth',2);
+        plot(1:a.mouseDayCt(m),[cell2mat(a.daySummary.percentInfo(m,:))],'Color',[.5 .5 .5],'LineWidth',2,'Marker','o','MarkerSize',3);
         if ismember(m,a.optoMice)
             om = find(a.optoMice == m);
             plot(a.laserDays{om,1},[cell2mat(a.daySummary.percentInfo(m,a.laserDays{om,1}))],'Color',[0 1 1],'LineStyle','none','Marker','o','MarkerFaceColor',[0 1 1],'MarkerSize',3);
