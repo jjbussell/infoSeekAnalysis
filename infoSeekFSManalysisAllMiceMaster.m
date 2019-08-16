@@ -422,20 +422,30 @@ if ~isempty(a.choiceMice)
    for mm = 1:a.choiceMouseCt
        m = a.choiceMice(mm);
        
+       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
+       okidx = find(ok);
+       [~,sortidx] = sort(a.mouseDay(ok==1));
+       oksorted = okidx(sortidx);
+       % that mouse's choice trials
        choicesIIS = a.choiceIISByMouse{m}; % includes choice training??
+       choicesIIS = choicesIIS(sortidx);
        choices = a.choiceAllbyMouse{m};
+       choices = choices(sortidx);
+       reverses = a.reverseByMouse{m};
+       reverses = reverses(sortidx);
+       
 
        % FIX--not correct, includes choice training and not in order!!
-       preReverseTrials = find(a.reverseByMouse{m} == 1,trialsToCount,'last');
+       preReverseTrials = find(reverses == 1,trialsToCount,'last');
        [a.pref(m,1),a.prefCI(m,1:2)] = binofit(sum(choicesIIS(preReverseTrials)==1),numel(choicesIIS(preReverseTrials)));
 
        if ismember(m,a.reverseMice)
-         postReverseTrials = find(a.reverseByMouse{m} == -1,trialsToCount,'last'); % during reverse
+         postReverseTrials = find(reverses == -1,trialsToCount,'last'); % during reverse
          [a.pref(m,2),a.prefRevCI(m,1:2)] = binofit(sum(choicesIIS(postReverseTrials)==1),numel(choicesIIS(postReverseTrials)));
          [a.pref(m,4),a.prefRevCI(m,3:4)] = binofit(sum(choices(postReverseTrials)==1),numel(choices(postReverseTrials)));
        end
 
-       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
+%        ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
 
        choicePreRev = a.choice_all(ok & a.preReverse == 1);
 
@@ -450,6 +460,7 @@ if ~isempty(a.choiceMice)
            [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
            a.beta(m,:) = a.stats(m).beta;
            a.betaP(m,:) = a.stats(m).p;
+           a.betaSE(m,:) = a.stats(m).se;
        end
        
        a.meanChoice(m,3) = m;
