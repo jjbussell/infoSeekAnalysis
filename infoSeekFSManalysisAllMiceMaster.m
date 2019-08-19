@@ -308,51 +308,6 @@ for m = 1:a.mouseCt
     end  
 end
 
-%% INFOSIDE
-
-for i = 1:size(a.file,1)
-   a.infoSide(i,1) = a.files(a.file(i)).infoSide;
-end
-
-a.initinfoside_info = -ones(a.corrTrialCt,1); % initinfoside_info all trials. 1 if initinfoside, -1 if reversed
-a.initinfoside_side = ones(a.corrTrialCt,1); % initinfoside_side all trials
-
-for m = 1:a.mouseCt
-    ok = a.mice(:,m) == 1;
-    a.initinfoside_info(a.infoSide == a.initinfoside(m) & ok == 1) = 1;
-end
-
-%% CHOICES
-
-% MAKE THESE INCLUDE REVERSE, THEN CAN DO AVERAGES AND LIMIT TO LAST X
-% TRIALS/DAYS
-
-a.choice_all = a.choiceCorr; % choice relative to initial info side, all trials
-reverseFlag = a.initinfoside_info == -1;
-a.choice_all(reverseFlag) = ~a.choice_all(reverseFlag);
-
-
-for m = 1:a.mouseCt
-   ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
-%    ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
-   a.choiceAllbyMouse{m} = a.choiceCorr(ok);
-   a.choiceAllTrialCt(m,1) = numel(a.choiceAllbyMouse{m});
-   a.choicebyMouse{m} = a.choiceCorr(ok & a.preReverse == 1); % preReverse
-   a.choiceTrialCt(m,1) = numel(a.choicebyMouse{m});
-   a.cumChoiceByMouse{m} = cumsum(a.choicebyMouse{m});
-   a.choiceRxnByMouse{m} = a.rxn(ok & a.preReverse == 1);
-   a.choiceEarlyLicksByMouse{m} = a.earlyLicks(ok & a.preReverse == 1); % preReverse
-   a.choiceAnticLicksByMouse{m} = a.betweenLicks(ok & a.preReverse == 1); % preReverse
-   a.choiceRewardByMouse{m} = a.rewardFlag(ok & a.preReverse == 1); % preReverse
-   a.choiceAllRxnByMouse{m} = a.rxn(ok);
-   a.choiceAllEarlyLicksByMouse{m} = a.earlyLicks(ok);
-   a.choiceAllAnticLicksByMouse{m} = a.betweenLicks(ok);
-   a.choiceAllRewardByMouse{m} = a.rewardFlag(ok);
-   a.preReverseByMouse{m} = a.preReverse(ok);
-   a.reverseByMouse{m} = a.reverse(ok);
-   a.choiceIISByMouse{m} = a.choice_all(ok);   
-end
-
 %% CURRENT AND CHOICE AND REVERSED AND FSM MICE
 
 % create list of mice with choices to cycle through and sort names
@@ -417,6 +372,52 @@ for m = 1:a.mouseCt
 end
 
 
+%% INFOSIDE
+
+for i = 1:size(a.file,1)
+   a.infoSide(i,1) = a.files(a.file(i)).infoSide;
+end
+
+a.initinfoside_info = -ones(a.corrTrialCt,1); % initinfoside_info all trials by info-ness. 1 if initinfoside, -1 if reversed
+a.initinfoside_side = ones(a.corrTrialCt,1); % initinfoside_side all trials
+
+for m = 1:a.mouseCt
+    ok = a.mice(:,m) == 1;
+    a.initinfoside_info(a.infoSide == a.initinfoside(m) & ok == 1) = 1;
+end
+
+%% CHOICES
+
+% MAKE THESE INCLUDE REVERSE, THEN CAN DO AVERAGES AND LIMIT TO LAST X
+% TRIALS/DAYS
+
+a.choice_all = a.choiceCorr; % choice relative to initial info side, all trials
+reverseFlag = a.initinfoside_info == -1;
+a.choice_all(reverseFlag) = ~a.choice_all(reverseFlag);
+
+
+for m = 1:a.mouseCt
+   ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
+%    ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1;
+   a.choiceAllbyMouse{m} = a.choiceCorr(ok);
+   a.choiceAllTrialCt(m,1) = numel(a.choiceAllbyMouse{m});
+   a.choicebyMouse{m} = a.choiceCorr(ok & a.preReverse == 1); % preReverse
+   a.choiceTrialCt(m,1) = numel(a.choicebyMouse{m});
+   a.cumChoiceByMouse{m} = cumsum(a.choicebyMouse{m});
+   a.choiceRxnByMouse{m} = a.rxn(ok & a.preReverse == 1);
+   a.choiceEarlyLicksByMouse{m} = a.earlyLicks(ok & a.preReverse == 1); % preReverse
+   a.choiceAnticLicksByMouse{m} = a.betweenLicks(ok & a.preReverse == 1); % preReverse
+   a.choiceRewardByMouse{m} = a.rewardFlag(ok & a.preReverse == 1); % preReverse
+   a.choiceAllRxnByMouse{m} = a.rxn(ok);
+   a.choiceAllEarlyLicksByMouse{m} = a.earlyLicks(ok);
+   a.choiceAllAnticLicksByMouse{m} = a.betweenLicks(ok);
+   a.choiceAllRewardByMouse{m} = a.rewardFlag(ok);
+   a.preReverseByMouse{m} = a.preReverse(ok);
+   a.reverseByMouse{m} = a.reverse(ok);
+   a.choiceIISByMouse{m} = a.choice_all(ok); % includes choice training and value days   
+end
+
+
 %% MEAN CHOICES / STATS AND CHOICE RANGES - FIX
 
 trialsToCount = 300;
@@ -428,9 +429,6 @@ if ~isempty(a.choiceMice)
     a.prefCI = NaN(a.choiceMice(a.choiceMouseCt),2);
     a.pref = NaN(a.choiceMice(a.choiceMouseCt),3);
     a.beta = NaN(a.choiceMice(a.choiceMouseCt),2);
-    
-%     for k = 1:numel(a.reverseMice)
-%        m = a.reverseMice(k);
        
    for mm = 1:a.choiceMouseCt
        m = a.choiceMice(mm);
@@ -454,18 +452,23 @@ if ~isempty(a.choiceMice)
          postReverseTrials = find(reverses == -1,trialsToCount,'last'); % during reverse
          [a.pref(m,2),a.prefRevCI(m,1:2)] = binofit(sum(choicesIIS(postReverseTrials)==1),numel(choicesIIS(postReverseTrials)));
          [a.pref(m,4),a.prefRevCI(m,3:4)] = binofit(sum(choices(postReverseTrials)==1),numel(choices(postReverseTrials)));
+         if sum(reverses == 2) > 0
+         reReverseTrials = find(reverses == 2,trialsToCount,'last'); % during reverse
+         [a.pref(m,5),a.prefReRevCI(m,1:2)] = binofit(sum(choicesIIS(reReverseTrials)==1),numel(choicesIIS(reReverseTrials)));
+         [a.pref(m,6),a.prefReRevCI(m,3:4)] = binofit(sum(choices(reReverseTrials)==1),numel(choices(reReverseTrials)));             
+         end
        end
 
        choicePreRev = a.choice_all(ok & a.preReverse == 1);
-
        [a.meanChoice(m,1),a.choiceCI(m,1:2)] = binofit(sum(choicePreRev==1),numel(choicePreRev));
        
        % FOR FIRST REVERSE
        if ismember(m,a.reverseMice)
            choicePostRev = a.choice_all(ok & a.reverse==-1);
            [a.meanChoice(m,2),a.choiceRevCI(m,1:2)] = binofit(sum(choicePostRev==1),numel(choicePostRev));
-           x = [a.initinfoside_side(ok) a.initinfoside_info(ok)];
-           y = a.choice_all(ok);
+           % NO, FIX, NEED TO MAKE CORRECT
+           x = [a.initinfoside_side(ok & a.reverse~=0) a.initinfoside_info(ok & a.reverse~=0)]; % these don't account for values
+           y = a.choice_all(ok & a.reverse~=0);
            [~,~,a.stats(m)] = glmfit(x,y,'binomial','link','logit','constant','off');
            a.beta(m,:) = a.stats(m).beta;
            a.betaP(m,:) = a.stats(m).p;
@@ -488,7 +491,7 @@ end
 
 if ~isempty(a.choiceMice)
     for m = 1:a.mouseCt
-       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5; % need to match params
+       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5 & a.reverse~= 0; % need to match params
        a.overallChoice(m,1) = mean(a.choiceCorr(ok & a.infoSide == 0));
        a.overallChoice(m,2) = mean(a.choiceCorr(ok & a.infoSide == 1));
     end
