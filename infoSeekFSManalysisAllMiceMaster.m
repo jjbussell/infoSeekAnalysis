@@ -181,8 +181,6 @@ a.rewardFlag(a.rewardCorr>0) = 1;
 
 %% REVERSAL & CHOICES
 
-% ACCOUNT FOR VALUES!!!
-
 % FINDS REVERSE DAY (a.reverseDay(m,1) AND TRIALS (a.preReverse)
 
 a.fileInfoSide = cell2mat({a.files.infoSide});
@@ -195,10 +193,6 @@ a.prereverseFiles(cell2mat(a.parameters(:,7))~=5) = 0;
 a.reverseFiles = zeros(a.numFiles,1); % flag 1 = file before first reverse, -1 = file during first reverse, make 2 after first reverse??
 % a.valueMice = zeros(a.mouseCt,1);
 
-fileparams = cell2mat(a.parameters(:,22:27));
-
-% TO FIX--SORT BY DAYS SO NO FALSE REVERSES!
-
 for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
     mouseFileCt(m,1) = sum(a.fileMouse == m);
@@ -207,6 +201,8 @@ for m = 1:a.mouseCt
     mouseFileDays = a.fileDay(a.fileMouse == m);    
     [sortedMouseFileDays,mouseDateIdx] = sort(mouseFileDays); % day for each of that mouse's files
     sortedMouseFiles=mouseFilesIdx(mouseDateIdx);
+    
+    fileparams = cell2mat(a.parameters(a.fileMouse == m,22:27));
     
     % initial info side
     a.initinfoside(m,1) =  a.files(find(a.fileMouse == m,1)).infoSide;
@@ -217,15 +213,15 @@ for m = 1:a.mouseCt
       a.firstChoiceDay(m,1) = 0;
       choiceDays =[];
    else
-     choiceFile = sortedMouseFiles(find(mouseFileTypes(mouseDateIdx) == 5,1,'first'));
-     a.firstChoice(m,1) = find(a.file == choiceFile,1); % within all that mouse's trials
+     a.firstChoiceFile(m,1) = sortedMouseFiles(find(mouseFileTypes(mouseDateIdx) == 5,1,'first'));
+     a.firstChoiceFileIdx(m,1) = find(mouseFileTypes(mouseDateIdx) == 5,1,'first');
+     a.firstChoice(m,1) = find(a.file == a.firstChoiceFile(m,1),1); % within all that mouse's trials
      a.mouseChoiceDays{m} = unique(mouseFileDays(mouseFileTypes == 5));
      choiceDays = cell2mat(a.mouseChoiceDays(m));
      a.firstChoiceDay(m,1) = choiceDays(1); 
    end    
     
     if mouseFileCt(m,1) > 1
-
         mouseInfoSides = a.fileInfoSide(a.fileMouse == m);
         mouseInfoSideDiff = diff(mouseInfoSides(mouseDateIdx));
 %         mouseInfoSideDiff = diff(a.fileInfoSide(a.fileMouse == m));
@@ -242,16 +238,25 @@ for m = 1:a.mouseCt
             end
             a.prereverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:end)) = 0;
             
-            % FIX!!!!!!!  need to mark re-reverse files before value
-            % changes-->redo this to select all files with same info side
-            % and same value params??
-            sameparams = a.fileMouse' == m & sum(fileparams==fileparams(sortedMouseFiles(a.reverseFileIdx{m,1}),:),2)==size(fileparams,2);
-            a.reverseFiles(sortedMouseFiles(find(mouseFileTypes == 5,1,'first'):a.reverseFileIdx{m,1}-1)) = 1;
-            if numel(reverses)>1 % during reverse
-                a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:a.reverseFileIdx{m,2}-1)) = -1;
-%                 a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,2}:find(sameparams,1,'last')
+            sameparams = ismember(fileparams,fileparams(a.firstChoiceFileIdx(m,1),:),'rows');
+            % find first parameter change after choice start
+            sameIdx = find(~sameparams);
+            sameIdx2 = find(sameIdx>a.firstChoiceFileIdx(m,1),1,'first'); % first file after choices start with different parameters
+            if ~isempty(sameIdx2)
+                lastSameFile = sameIdx(sameIdx2)-1;
             else
-                a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:end)) = -1;
+                lastSameFile = mouseFileCt(m,1);
+            end
+            % from first choice until reverse
+            a.reverseFiles(sortedMouseFiles(find(mouseFileTypes(mouseDateIdx) == 5,1,'first'):a.reverseFileIdx{m,1}-1)) = 1;
+            if numel(reverses)>1 % during reverse
+                % during reverse
+                a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:a.reverseFileIdx{m,2}-1)) = -1;
+                
+                % during re-reverse
+                a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,2}:lastSameFile)) = 2;
+            else
+                a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:lastSameFile)) = -1;
             end
         else a.reverseDay{m,1} = 0;
         end
@@ -483,7 +488,7 @@ end
 
 if ~isempty(a.choiceMice)
     for m = 1:a.mouseCt
-       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
+       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5; % need to match params
        a.overallChoice(m,1) = mean(a.choiceCorr(ok & a.infoSide == 0));
        a.overallChoice(m,2) = mean(a.choiceCorr(ok & a.infoSide == 1));
     end
