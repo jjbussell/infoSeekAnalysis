@@ -1568,38 +1568,117 @@ end
     %     close(fig);
 end
     
-%% 
-%     fig = figure();
-%     fig.PaperUnits = 'inches';
-%     fig.PaperPosition = [0.5 0.5 10 7];
-%     set(fig,'renderer','painters');
-%     set(fig,'PaperOrientation','landscape');
-% 
-%     ax = nsubplot(1,1,1,1);
-%     ax.FontSize = 8;
-%     ax.XLim = [0 1];
-%     ax.YLim = [0 1];
-%     for l = 1:numel(a.reverseMice)
-%         m = a.reverseMice(l);
-%         plot([a.pref(m,1) a.pref(m,1)],[a.prefRevCI(m,3) a.prefRevCI(m,4)],'color',[0.2 0.2 0.2],'linewidth',0.25);
-%         plot([a.prefCI(m,1) a.prefCI(m,2)],[a.pref(m,4) a.pref(m,4)],'color',[0.2 0.2 0.2],'linewidth',0.25);
-%         dy = a.prefRevCI(m,4) - a.pref(m,4) + 0.02;
-%         text(a.pref(m,1),a.pref(m,4) + dy,a.reverseMiceList{l},'HorizontalAlignment','center');
-%     end
-%     scatter(a.pref(:,1),a.pref(:,4),'filled','k')
-%     plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-%     plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
-% %     text(numel(a.reverseMice)+2,a.overallPref,['p = ' num2str(a.overallP)])
-% %     patch([0.5 1 1 0.5],[0 0 0.5 0.5],[0.3 0.3 0.3],'FaceAlpha',0.1,'EdgeColor','none');
-%     ylabel({'% choice of informative side', 'POST-reversal'}); %{'Info choice', 'probability'}
-%     xlabel({'% choice of informative side', 'PRE-reversal'});
-%     title('Raw choice percentages, pre vs post-reversal');
-%     hold off;
-% 
-%     saveas(fig,fullfile(pathname,'PrevsPostNewSide'),'pdf');
-% %     close(fig);
+%% PERCENT INFO CHOICE BY SIDE
 
-    %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
+if ~isempty(a.reverseMice)
+    fig = figure();
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+    ax.XLim = [0 1];
+    ax.YLim = [0 1];
+    for l = 1:numel(a.reverseMice)
+        m = a.reverseMice(l);
+        text(a.overallChoice(m,1),a.overallChoice(m,2) + 0.02,a.reverseMiceList{l},'HorizontalAlignment','center');
+    end
+    scatter(a.overallChoice(:,1),a.overallChoice(:,2),'filled')
+    plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    ylabel({'P(choose info | Info side = 1)'}); %{'Info choice', 'probability'}
+    xlabel({'P(choose info | Info side = 0)'});
+    title('Raw choice percentages, by physical info side');
+    hold off;
+
+    saveas(fig,fullfile(pathname,'Prefbyside'),'pdf');
+%     close(fig);
+end
+
+    if ~isempty(a.reverseMice)
+    fig = figure();
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+    ax.XLim = [0 1];
+    ax.YLim = [0 1];
+    for l = 1:numel(a.reverseMice)
+        m = a.reverseMice(l);
+        text(a.overallChoice(m,3),a.overallChoice(m,4) + 0.02,a.reverseMiceList{l},'HorizontalAlignment','center');
+    end
+    scatter(a.overallChoice(:,3),a.overallChoice(:,4),'filled')
+    plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+    ylabel({'P(choose info | Info side = initially non-informative)'}); %{'Info choice', 'probability'}
+    xlabel({'P(choose info | Info side = initially informative)'});
+    title('Raw choice percentages, by info side');
+    hold off;
+
+    saveas(fig,fullfile(pathname,'Prefbyside'),'pdf');
+%     close(fig);
+    end
+
+
+%% PREFERENCE VS LEAVING
+
+fig = figure();
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0.5 0.5 10 7];
+set(fig,'renderer','painters');
+set(fig,'PaperOrientation','landscape');
+
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 8;
+ax.XLim = [0 1];
+ax.YLim = [0 1];
+for mm = 1:numel(a.reverseMice)
+    m = a.reverseMice(mm);
+    text(1-a.incomplete(m,6),a.overallChoice(m,5) + 0.01,a.reverseMiceList{mm},'HorizontalAlignment','center');
+end
+scatter(1-a.incomplete(a.reverseMice,6),a.overallChoice(a.reverseMice,5),'filled')
+plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+ylabel({'P(choose info)'}); %{'Info choice', 'probability'}
+xlabel({'P(Present in port on info small)'});
+title('Raw choice percentages, by physical info side');
+hold off;
+
+saveas(fig,fullfile(pathname,'Prefbyleaving'),'pdf');
+%     close(fig);
+
+
+
+%% MEAN PREFERENCE
+
+if ~isempty(a.reverseMice)
+    fig = figure();
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+    ax.YLim = [-0.2 0.2];
+    
+    bar(sort(a.overallChoice(a.reverseMice,5)-0.5));
+    
+    
+end
+
+%% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
 
 if ~isempty(a.reverseMice)
     fig = figure();
