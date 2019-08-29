@@ -1673,8 +1673,14 @@ if ~isempty(a.reverseMice)
     ax.FontSize = 8;
     ax.YLim = [-0.2 0.2];
     
-    bar(sort(a.overallChoice(a.reverseMice,5)-0.5));
-    
+%     bar(sort(a.overallChoice(a.reverseMice,5)-0.5));
+    bar(a.overallChoice(a.reverseMice,5)-0.5,'FaceColor',grey);
+    bar(numel(a.reverseMice)+1,mean(a.overallChoice(a.reverseMice,5))-0.5,'FaceColor','k');
+    xticks(1:numel(a.reverseMice)+1);
+    xticklabels([a.mouseList(a.reverseMice); 'Mean']);
+    ylabel('Information preference index: Mean choice of info side across reversals');
+    yticks([-.2 -.1 0 .1 .2]);
+%     yticklabels({'30%','40%','50%','60%','70%'});
 end
 
 %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
