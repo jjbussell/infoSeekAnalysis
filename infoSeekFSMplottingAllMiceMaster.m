@@ -1652,7 +1652,7 @@ plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xli
 plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
 ylabel({'P(choose info)'}); %{'Info choice', 'probability'}
 xlabel({'P(Present in port on info small)'});
-title('Raw choice percentages, by physical info side');
+title('Raw choice percentages, by presence on info small trials (tendency to leave port)');
 hold off;
 
 saveas(fig,fullfile(pathname,'Prefbyleaving'),'pdf');
