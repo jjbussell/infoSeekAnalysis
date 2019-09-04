@@ -1681,6 +1681,8 @@ if ~isempty(a.reverseMice)
     ylabel('Information preference index: Mean choice of info side across reversals');
     yticks([-.2 -.1 0 .1 .2]);
 %     yticklabels({'30%','40%','50%','60%','70%'});
+
+    saveas(fig,fullfile(pathname,'OverallIndex'),'pdf');
 end
 
 %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
