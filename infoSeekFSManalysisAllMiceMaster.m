@@ -935,6 +935,7 @@ for m = 1:a.mouseCt
         a.daySummary.rxnInfoChoice{m,d} = nanmean(a.rxn(a.infoChoiceCorr & ok));
         a.daySummary.rxnRandForced{m,d} = nanmean(a.rxn(a.randForcedCorr & ok));
         a.daySummary.rxnRandChoice{m,d} = nanmean(a.rxn(a.randChoiceCorr & ok));
+        % in choice all, 1 = initial info side
         a.daySummary.rxnSpeedIdx{m,d} = (nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) - nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)))/(nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 1)) + nanmean(a.rxnSpeed(ok & a.forcedCorrTrials == 1 & a.choice_all == 0)));
         a.daySummary.infoBigLicks{m,d} = a.AlicksBetween(m,d)/sum(a.odorAtrials & ok);
         a.daySummary.infoSmallLicks{m,d} = a.BlicksBetween(m,d)/sum(a.odorBtrials & ok);
@@ -1067,7 +1068,7 @@ if ~isempty(a.reverseMice)
         end
     end
 
-    %% CHOICE, RXN SPEED, EARLY LICKS, AND REWARD RATE AROUND REVERSALS
+    %% CHOICE, RXN SPEED, EARLY LICKS, AND REWARD RATE AROUND REVERSALS BY IIS
 
     a.reversalPrefs = NaN(numel(a.reverseMice),3);
     a.reversalRxn = NaN(numel(a.reverseMice),3);

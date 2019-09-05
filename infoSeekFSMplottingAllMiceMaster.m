@@ -102,9 +102,9 @@ a.finalOutcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoBigNP',...
 
 %% PLOT DAY SUMMARIES BY MOUSE FOR CURRENT MICE
 
-% for mm = 1:numel(a.currentMiceNums)
-%     m=a.currentMiceNums(mm);
-for m = 1:a.mouseCt
+for mm = 1:numel(a.currentMiceNums)
+    m=a.currentMiceNums(mm);
+% for m = 1:a.mouseCt
     figure();
     
     fig = gcf;
@@ -1643,15 +1643,15 @@ ax.XLim = [0 1];
 ax.YLim = [0 1];
 for mm = 1:numel(a.reverseMice)
     m = a.reverseMice(mm);
-    text(1-a.incomplete(m,6),a.overallChoice(m,5) + 0.01,a.reverseMiceList{mm},'HorizontalAlignment','center');
+    text(a.incomplete(m,6),a.overallChoice(m,5) + 0.01,a.reverseMiceList{mm},'HorizontalAlignment','center');
 end
-scatter(1-a.incomplete(a.reverseMice,6),a.overallChoice(a.reverseMice,5),'filled')
+scatter(a.incomplete(a.reverseMice,6),a.overallChoice(a.reverseMice,5),'filled')
 plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
 plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
 plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
 plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
 ylabel({'P(choose info)'}); %{'Info choice', 'probability'}
-xlabel({'P(Present in port on info small)'});
+xlabel({'P(NOT present in port on info small)'});
 title('Choice of information vs. probability of leaving on low-value info trials');
 hold off;
 
@@ -1673,19 +1673,15 @@ if ~isempty(a.reverseMice)
     ax.FontSize = 8;
     ax.YLim = [-0.2 0.2];
     
-%     bar(sort(a.overallChoice(a.reverseMice,5)-0.5));
-    bar(a.overallChoice(a.reverseMice,5)-0.5,'FaceColor',grey,'EdgeColor','none');
-    bar(numel(a.reverseMice)+1,nanmean(a.overallChoice(:,5))-0.5,'FaceColor','k','EdgeColor','none');
-    xticks([1:numel(a.reverseMice)+1]);
-    xticklabels([a.reverseMiceList' 'Mean']);
-    xlim([0.5 numel(a.reverseMice)+1.5]);
-    yticks(-0.2:0.1:0.2);
-    yticklabels({'-0.3','-0.4','0.5','0.6','0.7'});
-    ylabel('Mean of P(choose info) on each side');
-    hold off;
-    
-    saveas(fig,fullfile(pathname,'Meanpref'),'pdf');
-    
+    bar(a.overallChoice(a.reverseMice,5)-0.5,'FaceColor',grey);
+    bar(numel(a.reverseMice)+1,mean(a.overallChoice(a.reverseMice,5))-0.5,'FaceColor','k');
+    xticks(1:numel(a.reverseMice)+1);
+    xticklabels([a.mouseList(a.reverseMice); 'Mean']);
+    ylabel('Information preference index: Mean choice of info side across reversals');
+    yticks([-.2 -.1 0 .1 .2]);
+%     yticklabels({'30%','40%','50%','60%','70%'});
+
+    saveas(fig,fullfile(pathname,'OverallIndex'),'pdf');
 end
 
 %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
@@ -1907,7 +1903,6 @@ if ~isempty(a.reverseMice)
 
 %% PLOT MEAN CHOICES AROUND REVERSALS
 
-
     fig = figure();
     
     fig = gcf;
@@ -2058,7 +2053,7 @@ if ~isempty(a.reverseMice)
     ax = nsubplot(1,1,1,1);
     ax.FontSize = 8;
 %     ax.YTick = [0 500 1000 1500];
-    ax.YLim = [300 1300];
+%     ax.YLim = [300 1300];
     ax.XLim = [0.5 3.5];
 %     ax.XTick = [1 2 3];
     
@@ -2070,8 +2065,10 @@ if ~isempty(a.reverseMice)
     errorbar(1,nanmean(a.reversalRxnInfo(:,1)),sem(a.reversalRxnInfo(:,1)),'Color','k','LineWidth',2,'CapSize',100);
     plot(3,nanmean(a.reversalRxnRand(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
     errorbar(3,nanmean(a.reversalRxnRand(:,1)),sem(a.reversalRxnInfo(:,1)),'Color','k','LineWidth',2,'CapSize',100);
-    
-
+    xticks([1 3]);
+    xticklabels({'Info','No Info'});
+    ylabel('Reaction time on last session before reversal');
+    saveas(fig,fullfile(pathname,'ReactionTime'),'pdf');
 
 
 %% PLOT EARLY LICK IDX AROUND REVERSALS
@@ -2211,22 +2208,24 @@ if ~isempty(a.reverseMice)
 %% REWARD RATE PLOT
 
     fig = figure();
-    
+
     fig = gcf;
     fig.PaperUnits = 'inches';
     fig.PaperPosition = [0.5 0.5 10 7];
     set(fig,'renderer','painters');
     set(fig,'PaperOrientation','landscape');
-    
+
     ax = nsubplot(1,1,1,1);
     ax.FontSize = 8;
-%     ax.YTick = [0 0.25 0.50 0.75 1];
-%     ax.YLim = [0 20];
+    %     ax.YTick = [0 0.25 0.50 0.75 1];
+    %     ax.YLim = [0 20];
     ax.XLim = [0 4];
     ax.XTick = [1 3];
+    xticklabels({'Info','No Info'});
+    ylabel('Reward rate on last day before reverse');
 
-%     plot(1,nanmean(a.reversalRewardRateIdx(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
-%     errorbar(1,nanmean(a.reversalRewardRateIdx(:,1)),sem(a.reversalRewardRateIdx(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+    %     plot(1,nanmean(a.reversalRewardRateIdx(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    %     errorbar(1,nanmean(a.reversalRewardRateIdx(:,1)),sem(a.reversalRewardRateIdx(:,1)),'Color','k','LineWidth',2,'CapSize',100);
 
     plot(1,nanmean(a.reversalRewardRateInfo(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
     errorbar(1,nanmean(a.reversalRewardRateInfo(:,1)),sem(a.reversalRewardRateInfo(:,1)),'Color','k','LineWidth',2,'CapSize',100);
@@ -2234,17 +2233,23 @@ if ~isempty(a.reverseMice)
     errorbar(3,nanmean(a.reversalRewardRateRand(:,1)),sem(a.reversalRewardRateRand(:,1)),'Color','k','LineWidth',2,'CapSize',100);
 
 
-for m = 1:numel(a.reverseMice)
-%         plot(a.reversalRewardRateIdx(m,1),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
-%         plot(a.reversalPrefs(m,1),a.reversalRewardRateIdx(m,1),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+    for m = 1:numel(a.reverseMice)
+    %         plot(a.reversalRewardRateIdx(m,1),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+    %         plot(a.reversalPrefs(m,1),a.reversalRewardRateIdx(m,1),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
         plot([1 3],[a.reversalRewardRateInfo(m,1),a.reversalRewardRateRand(m,1)],'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
-%         plot(2,a.reversalRewardRateRand(m,1),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+    %         plot(2,a.reversalRewardRateRand(m,1),'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
     end
+
+
+
+    % plot(a.reversalRewardRateIdx(:,1),a.reversalMultiPrefs(:,1),'Color','k','LineStyle','none','Marker','o','MarkerFaceColor','k','MarkerSize',10);
+
+    saveas(fig,fullfile(pathname,'RewardRate'),'pdf');
+
 %%
+end
 
-plot(a.reversalRewardRateIdx(:,1),a.reversalMultiPrefs(:,1),'Color','k','LineStyle','none','Marker','o','MarkerFaceColor','k','MarkerSize',10);
 
-end    
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
