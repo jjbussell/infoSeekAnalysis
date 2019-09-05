@@ -1624,7 +1624,7 @@ end
     title('Raw choice percentages, by info side');
     hold off;
 
-    saveas(fig,fullfile(pathname,'Prefbyside'),'pdf');
+    saveas(fig,fullfile(pathname,'Prefbyinitside'),'pdf');
 %     close(fig);
     end
 
@@ -1652,7 +1652,7 @@ plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xli
 plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
 ylabel({'P(choose info)'}); %{'Info choice', 'probability'}
 xlabel({'P(Present in port on info small)'});
-title('Raw choice percentages, by physical info side');
+title('Choice of information vs. probability of leaving on low-value info trials');
 hold off;
 
 saveas(fig,fullfile(pathname,'Prefbyleaving'),'pdf');
@@ -1673,8 +1673,18 @@ if ~isempty(a.reverseMice)
     ax.FontSize = 8;
     ax.YLim = [-0.2 0.2];
     
-    bar(sort(a.overallChoice(a.reverseMice,5)-0.5));
+%     bar(sort(a.overallChoice(a.reverseMice,5)-0.5));
+    bar(a.overallChoice(a.reverseMice,5)-0.5,'FaceColor',grey,'EdgeColor','none');
+    bar(numel(a.reverseMice)+1,nanmean(a.overallChoice(:,5))-0.5,'FaceColor','k','EdgeColor','none');
+    xticks([1:numel(a.reverseMice)+1]);
+    xticklabels([a.reverseMiceList' 'Mean']);
+    xlim([0.5 numel(a.reverseMice)+1.5]);
+    yticks(-0.2:0.1:0.2);
+    yticklabels({'-0.3','-0.4','0.5','0.6','0.7'});
+    ylabel('Mean of P(choose info) on each side');
+    hold off;
     
+    saveas(fig,fullfile(pathname,'Meanpref'),'pdf');
     
 end
 
