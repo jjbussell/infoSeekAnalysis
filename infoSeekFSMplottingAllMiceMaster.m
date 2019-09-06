@@ -1624,7 +1624,7 @@ end
     title('Raw choice percentages, by info side');
     hold off;
 
-    saveas(fig,fullfile(pathname,'Prefbyside'),'pdf');
+    saveas(fig,fullfile(pathname,'Prefbyinitside'),'pdf');
 %     close(fig);
     end
 
@@ -1673,7 +1673,6 @@ if ~isempty(a.reverseMice)
     ax.FontSize = 8;
     ax.YLim = [-0.2 0.2];
     
-%     bar(sort(a.overallChoice(a.reverseMice,5)-0.5));
     bar(a.overallChoice(a.reverseMice,5)-0.5,'FaceColor',grey);
     imagingMicetoPlot = 
     imagingchoice = a.overallChoice(a.imagingMice==1,5)-0.5;

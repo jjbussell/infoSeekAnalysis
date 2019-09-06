@@ -508,7 +508,7 @@ if ~isempty(a.choiceMice)
     end
     
 end
-a.overallChoice(:,5) = nanmean(a.overallChoice,2);
+a.overallChoice(:,5) = nanmean(a.overallChoice(:,[1 2]),2);
 
 
 %% SORT BY INFO PREFERENCE
