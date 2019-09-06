@@ -1675,6 +1675,11 @@ if ~isempty(a.reverseMice)
     
 %     bar(sort(a.overallChoice(a.reverseMice,5)-0.5));
     bar(a.overallChoice(a.reverseMice,5)-0.5,'FaceColor',grey);
+    imagingMicetoPlot = 
+    imagingchoice = a.overallChoice(a.imagingMice==1,5)-0.5;
+    imagingchoice(isnan(im  agingchoice))=0;
+    imagingMicetoPlot = find(ismember(a.reverseMice,find(a.imagingMice)));
+    bar(imagingMicetoPlot,imagingchoice,'FaceColor','r');
     bar(numel(a.reverseMice)+1,mean(a.overallChoice(a.reverseMice,5))-0.5,'FaceColor','k');
     xticks(1:numel(a.reverseMice)+1);
     xticklabels([a.mouseList(a.reverseMice); 'Mean']);

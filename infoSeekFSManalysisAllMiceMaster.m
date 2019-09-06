@@ -168,11 +168,19 @@ for tfa = 1:length(a.fileAll) % for each trial
    a.mouseDayAll(tfa,1) = a.fileDay(a.fileAll(tfa));
 end
 
-%% MOUSE TRIAL TYPES
+%% MOUSE TRIAL TYPES AND IMAGING MICE
+
+a.imagingMice = zeros(a.mouseCt,1);
 
 for m = 1:a.mouseCt
-   a.mouseTrialTypes{m,1} = a.trialTypes(a.fileMouse == m); 
+   a.mouseTrialTypes{m,1} = a.trialTypes(a.fileMouse == m);
+   if any(cell2mat(a.parameters(a.fileMouse==m,6)))
+       a.imagingMice(m,1)=1;
+   end
 end
+
+%% IMAGING MICE
+
 
 %% REWARD FLAG (SINCE REWARD IN uL)
 
