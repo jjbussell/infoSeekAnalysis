@@ -1176,7 +1176,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% PLOT ALL-TIME SORTED PREFERENCE BARS WITH CONFIDENCE INTERVAL (overall.pdf)
+%% PLOT PRE-REVERSE SORTED PREFERENCE BARS WITH CONFIDENCE INTERVAL (overall.pdf)
 
 if a.choiceMouseCt > 1
     fig = figure();
@@ -1696,33 +1696,69 @@ end
 %% MOVING AVERAGE
 
 if ~isempty(a.reverseMice)
-    fig = figure();
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0.5 0.5 10 7];
-    set(fig,'renderer','painters');
-    set(fig,'PaperOrientation','landscape');
+    for mm = 1:numel(a.reverseMice)
+        m = a.reverseMice(mm);
+        
+        ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
+        okidx = find(ok);
+        [~,sortidx] = sort(a.mouseDay(ok==1));
+        oksorted = okidx(sortidx);
+        % that mouse's choice trials
+        choicesIIS = a.choiceIISByMouse{m}; % includes choice training??
+        choicesIIS = choicesIIS(sortidx);
+        choices = a.choiceAllbyMouse{m};
+        choices = choices(sortidx);
+        reverses = a.reverseByMouse{m};
+        reverses = reverses(sortidx);
+        reversePts = find(diff(reverses));        
 
-    ax = nsubplot(1,1,1,1);
-    ax.FontSize = 6;
-    ax.YLim = [-0.2 0.2];
-    
-    micetoplot = unique([a.reverseMice;find(a.imagingMice)]);
-    imagemice = find(a.imagingMice);
-    choicetoplot = a.overallChoice;
-    choicetoplot(isnan(choicetoplot))=0.5;
-    [sharedvals,idx] = intersect(micetoplot,imagemice);
-    bar(choicetoplot(micetoplot,5)-0.5,'FaceColor',grey);
-    imagingchoice = choicetoplot(sharedvals,5)-0.5;
-    bar(idx,imagingchoice,'FaceColor','r');
-    bar(numel(micetoplot)+1,nanmean(a.overallChoice(micetoplot,5))-0.5,'FaceColor','k');
-    xticks(1:numel(micetoplot)+1);
-    xticklabels([a.mouseList(micetoplot); 'Mean']);
-    xlim([0.5 numel(micetoplot)+1.5]);
-    ylabel('Mean choice of info side across reversals');
-    yticks([-.2 -.1 0 .1 .2]);
-    yticklabels({'30%','40%','50%','60%','70%'});
+        fig = figure();
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [0.5 0.5 10 7];
+        set(fig,'renderer','painters');
+        set(fig,'PaperOrientation','landscape');
 
-    saveas(fig,fullfile(pathname,'OverallIndex'),'pdf');
+        ax = nsubplot(1,1,1,1);
+        ax.FontSize = 8;
+        ax.YLim = [0 1];
+        title(a.mouseList(m));        
+        
+        toPlot = movmean(choicesIIS,20);
+        hold on;
+        plot([-10000 10000],[0.5 0.5],'xliminclude','off','Color',grey,'linewidth',2);
+        for i = 1:numel(reversePts)
+           plot([reversePts(i) reversePts(i)],[0 1],'Color','k','linewidth',2); 
+        end
+        plot(toPlot,'Color','r','linewidth',2);
+        ylabel('Preference for original INFO side, 20-trial avg');
+        xlabel('Trial');
+        
+        saveas(fig,fullfile(pathname,['movingavgIIS' a.mouseList{m}]),'pdf');
+        
+        fig = figure();
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [0.5 0.5 10 7];
+        set(fig,'renderer','painters');
+        set(fig,'PaperOrientation','landscape');
+
+        ax = nsubplot(1,1,1,1);
+        ax.FontSize = 8;
+        ax.YLim = [0 1];
+        title(a.mouseList(m));        
+        
+        toPlot = movmean(choices,20);
+        hold on;
+        plot([-10000 10000],[0.5 0.5],'xliminclude','off','Color',grey,'linewidth',2);
+        for i = 1:numel(reversePts)
+           plot([reversePts(i) reversePts(i)],[0 1],'Color','k','linewidth',2); 
+        end
+        plot(toPlot,'Color','b','linewidth',2);
+        ylabel('Preference for current INFO side, 20-trial avg');
+        xlabel('Trial');
+        
+        saveas(fig,fullfile(pathname,['movingavg' a.mouseList{m}]),'pdf');        
+        
+    end
 end
 
 %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
