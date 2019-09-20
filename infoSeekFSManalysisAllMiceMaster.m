@@ -246,6 +246,7 @@ for m = 1:a.mouseCt
             end
             a.prereverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:end)) = 0;
             
+            % to deal with values/probs?
             sameparams = ismember(fileparams,fileparams(a.firstChoiceFileIdx(m,1),:),'rows');
             % find first parameter change after choice start
             sameIdx = find(~sameparams);
@@ -261,8 +262,13 @@ for m = 1:a.mouseCt
                 % during reverse
                 a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:a.reverseFileIdx{m,2}-1)) = -1;
                 
-                % during re-reverse
-                a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,2}:lastSameFile)) = 2;
+                if numel(reverses)>2
+                    a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,2}:a.reverseFileIdx{m,3}-1)) = 2;
+                    a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,3}:lastSameFile)) = -2;
+                else
+                    % during re-reverse
+                    a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,2}:lastSameFile)) = 2;
+                end
             else
                 a.reverseFiles(sortedMouseFiles(a.reverseFileIdx{m,1}:lastSameFile)) = -1;
             end
@@ -462,9 +468,14 @@ if ~isempty(a.choiceMice)
          [a.pref(m,2),a.prefRevCI(m,1:2)] = binofit(sum(choicesIIS(postReverseTrials)==1),numel(choicesIIS(postReverseTrials)));
          [a.pref(m,4),a.prefRevCI(m,3:4)] = binofit(sum(choices(postReverseTrials)==1),numel(choices(postReverseTrials)));
          if sum(reverses == 2) > 0
-         reReverseTrials = find(reverses == 2,trialsToCount,'last'); % during reverse
-         [a.pref(m,5),a.prefReRevCI(m,1:2)] = binofit(sum(choicesIIS(reReverseTrials)==1),numel(choicesIIS(reReverseTrials)));
-         [a.pref(m,6),a.prefReRevCI(m,3:4)] = binofit(sum(choices(reReverseTrials)==1),numel(choices(reReverseTrials)));             
+             reReverseTrials = find(reverses == 2,trialsToCount,'last'); % during reverse
+             [a.pref(m,5),a.prefReRevCI(m,1:2)] = binofit(sum(choicesIIS(reReverseTrials)==1),numel(choicesIIS(reReverseTrials)));
+             [a.pref(m,6),a.prefReRevCI(m,3:4)] = binofit(sum(choices(reReverseTrials)==1),numel(choices(reReverseTrials)));             
+         end
+         if sum(reverses == -2) > 0
+             reverse2Trials = find(reverses == -2,trialsToCount,'last'); % during reverse
+             [a.pref(m,7),a.pref2RevCI(m,1:2)] = binofit(sum(choicesIIS(reverse2Trials)==1),numel(choicesIIS(reverse2Trials)));
+             [a.pref(m,8),a.pref2RevCI(m,3:4)] = binofit(sum(choices(reverse2Trials)==1),numel(choices(reverse2Trials)));
          end
        end
 
@@ -506,9 +517,9 @@ if ~isempty(a.choiceMice)
        a.overallChoice(m,3) = mean(a.choiceCorr(ok & a.infoSide == a.initinfoside(m,1)));
        a.overallChoice(m,4) = mean(a.choiceCorr(ok & a.infoSide ~= a.initinfoside(m,1)));
     end
-    
+ a.overallChoice(:,5) = nanmean(a.overallChoice(:,[1 2]),2);   
 end
-a.overallChoice(:,5) = nanmean(a.overallChoice(:,[1 2]),2);
+
 
 
 %% SORT BY INFO PREFERENCE
