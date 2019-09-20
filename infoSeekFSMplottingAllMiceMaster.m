@@ -1673,15 +1673,16 @@ if ~isempty(a.reverseMice)
     ax.FontSize = 8;
     ax.YLim = [-0.2 0.2];
     
-    bar(a.overallChoice(a.reverseMice,5)-0.5,'FaceColor',grey);
-    imagingMicetoPlot = 
-    imagingchoice = a.overallChoice(a.imagingMice==1,5)-0.5;
-    imagingchoice(isnan(im  agingchoice))=0;
-    imagingMicetoPlot = find(ismember(a.reverseMice,find(a.imagingMice)));
-    bar(imagingMicetoPlot,imagingchoice,'FaceColor','r');
-    bar(numel(a.reverseMice)+1,mean(a.overallChoice(a.reverseMice,5))-0.5,'FaceColor','k');
-    xticks(1:numel(a.reverseMice)+1);
-    xticklabels([a.mouseList(a.reverseMice); 'Mean']);
+    micetoplot = unique([a.reverseMice;find(a.imagingMice)]);
+    choicetoplot = a.overallChoice;
+    choicetoplot(isnan(choicetoplot))=0.5;
+    [sharedvals,idx] = intersect(micetoplot,imagemice)
+    bar(choicetoplot(micetoplot,5)-0.5,'FaceColor',grey);
+    imagingchoice = choicetoplot(sharedvals,5)-0.5;
+    bar(idx,imagingchoice,'FaceColor','r');
+    bar(numel(micetoplot)+1,nanmean(a.overallChoice(micetoplot,5))-0.5,'FaceColor','k');
+    xticks(1:numel(micetoplot)+1);
+    xticklabels([a.mouseList(micetoplot); 'Mean']);
     ylabel('Information preference index: Mean choice of info side across reversals');
     yticks([-.2 -.1 0 .1 .2]);
 %     yticklabels({'30%','40%','50%','60%','70%'});
