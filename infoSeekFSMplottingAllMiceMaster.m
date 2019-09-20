@@ -1688,6 +1688,9 @@ if ~isempty(a.reverseMice)
     ylabel('Mean choice of info side across reversals');
     yticks([-.2 -.1 0 .1 .2]);
     yticklabels({'30%','40%','50%','60%','70%'});
+    text(numel(micetoplot)+1,nanmean(a.overallChoice(micetoplot,5))-0.45,['Mean = ' num2str(round(nanmean(a.overallChoice(micetoplot,5)),4))],'HorizontalAlignment','center');
+    text(numel(micetoplot)+1,nanmean(a.overallChoice(micetoplot,5))-0.46,['p = ' num2str(round(a.overallChoiceP,4))],'HorizontalAlignment','center');
+    
 
     saveas(fig,fullfile(pathname,'OverallIndex'),'pdf');
 end

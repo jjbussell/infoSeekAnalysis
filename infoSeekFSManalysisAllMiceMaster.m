@@ -517,7 +517,9 @@ if ~isempty(a.choiceMice)
        a.overallChoice(m,3) = mean(a.choiceCorr(ok & a.infoSide == a.initinfoside(m,1)));
        a.overallChoice(m,4) = mean(a.choiceCorr(ok & a.infoSide ~= a.initinfoside(m,1)));
     end
- a.overallChoice(:,5) = nanmean(a.overallChoice(:,[1 2]),2);   
+ a.overallChoice(:,5) = nanmean(a.overallChoice(:,[1 2]),2);
+ a.overallChoicePercent = a.overallChoice(:,5)*100;
+ a.overallChoiceP = signrank(a.overallChoicePercent-50);
 end
 
 
