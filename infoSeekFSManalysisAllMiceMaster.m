@@ -1213,8 +1213,12 @@ if ~isempty(a.reverseMice)
 end
 
 
-
-
+%% INFO vs RAND STATS OVERALL (not by day)
+for m=1:a.mouseCt
+    ok = a.mice(:,m)==1 & a.fileTrialTypes == 5 & a.reverse~= 0& a.forcedCorrTrials == 1;
+    a.rxnMean(m,1) = nanmean(a.rxn(ok & a.choiceCorr==1));
+    a.rxnMean(m,2) = nanmean(a.rxn(ok & a.choiceCorr==0));
+end
 %% REVERSIBLE PREFERENCES - HARDCODED ANIMALS
 % 
 % % a.prefFlag = zeros(size(a.pref));
