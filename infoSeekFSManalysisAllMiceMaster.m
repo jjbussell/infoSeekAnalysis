@@ -1089,7 +1089,7 @@ if ~isempty(a.reverseMice)
         end
     end
 
-    %% CHOICE, RXN SPEED, EARLY LICKS, AND REWARD RATE AROUND REVERSALS BY IIS
+%% CHOICE, RXN SPEED, EARLY LICKS, AND REWARD RATE AROUND REVERSALS BY IIS
 
     a.reversalPrefs = NaN(numel(a.reverseMice),3);
     a.reversalRxn = NaN(numel(a.reverseMice),3);
@@ -1212,7 +1212,10 @@ if ~isempty(a.reverseMice)
     end
 end
 
-% %% REVERSIBLE PREFERENCES - HARDCODED ANIMALS
+
+
+
+%% REVERSIBLE PREFERENCES - HARDCODED ANIMALS
 % 
 % % a.prefFlag = zeros(size(a.pref));
 % % a.prefFlag(isnan(a.pref))=NaN;
