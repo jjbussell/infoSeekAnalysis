@@ -1671,7 +1671,8 @@ if ~isempty(a.reverseMice)
 
     ax = nsubplot(1,1,1,1);
     ax.FontSize = 6;
-    ax.YLim = [-0.2 0.2];
+%     ax.YLim = [-0.2 0.2];
+    ax.YLim = [-0.4 0.4];
     
     micetoplot = unique([a.reverseMice;find(a.imagingMice)]);
     imagemice = find(a.imagingMice);
