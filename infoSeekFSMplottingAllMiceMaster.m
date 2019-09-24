@@ -2153,6 +2153,37 @@ if ~isempty(a.reverseMice)
     xticklabels({'Info','No Info'});
     ylabel('Reaction time on last session before reversal');
     saveas(fig,fullfile(pathname,'ReactionTime'),'pdf');
+    
+    
+    %% REACTION SPEED PLOT ALL DAYS
+
+    fig = figure();
+    
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 8;
+%     ax.YTick = [0 500 1000 1500];
+    ax.YLim = [300 1300];
+    ax.XLim = [0.5 3.5];
+%     ax.XTick = [1 2 3];
+    
+%     bar(1,nanmean(a.reversalRxn(:,1)));
+    for m = 1:a.mouseCt
+        plot([1 3],[a.rxnMean(m,1) a.rxnMean(m,2)],'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+    end
+    plot(1,nanmean(a.rxnMean(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(1,nanmean(a.rxnMean(:,1)),sem(a.rxnMean(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+    plot(3,nanmean(a.rxnMean(:,2)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(3,nanmean(a.rxnMean(:,2)),sem(a.rxnMean(:,2)),'Color','k','LineWidth',2,'CapSize',100);
+    xticks([1 3]);
+    xticklabels({'Info','No Info'});
+    ylabel('Reaction time');
+    saveas(fig,fullfile(pathname,'ReactionTimeAllDays'),'pdf');
 
 
 %% PLOT EARLY LICK IDX AROUND REVERSALS
