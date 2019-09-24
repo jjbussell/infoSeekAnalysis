@@ -511,7 +511,7 @@ end
 
 if ~isempty(a.choiceMice)
     for m = 1:a.mouseCt
-       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5 & a.reverse~= 0; % need to match params
+       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 a.preRevRxnSpeed& a.fileTrialTypes == 5 & a.reverse~= 0; % need to match params
        a.overallChoice(m,1) = mean(a.choiceCorr(ok & a.infoSide == 0)); % info side = 0
        a.overallChoice(m,2) = mean(a.choiceCorr(ok & a.infoSide == 1)); % info side = 1
        a.overallChoice(m,3) = mean(a.choiceCorr(ok & a.infoSide == a.initinfoside(m,1)));
@@ -853,6 +853,9 @@ a.goodRxn = a.rxn<8000 & a.rxn>100;
 
 %%
 % RELATIVE TO CURRENT INFO SIDE
+
+% DOESN'T SORT!!! not actually getting last 300!!!
+
 for m=1:a.mouseCt
    ok1 = a.mice(:,m) == 1 & a.infoForcedCorr == 1 & a.reverse == 1;
    okInfoPreRev = find(ok1==1,300,'last');
