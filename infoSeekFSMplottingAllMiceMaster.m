@@ -1702,64 +1702,67 @@ if ~isempty(a.reverseMice)
     for mm = 1:numel(a.reverseMice)
         m = a.reverseMice(mm);
         
-        ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
-        okidx = find(ok);
-        [~,sortidx] = sort(a.mouseDay(ok==1));
-        oksorted = okidx(sortidx);
-        % that mouse's choice trials
-        choicesIIS = a.choiceIISByMouse{m}; % includes choice training??
-        choicesIIS = choicesIIS(sortidx);
-        choices = a.choiceAllbyMouse{m};
-        choices = choices(sortidx);
-        reverses = a.reverseByMouse{m};
-        reverses = reverses(sortidx);
-        reversePts = find(diff(reverses));        
-
-        fig = figure();
-        fig.PaperUnits = 'inches';
-        fig.PaperPosition = [0.5 0.5 10 7];
-        set(fig,'renderer','painters');
-        set(fig,'PaperOrientation','landscape');
-
-        ax = nsubplot(1,1,1,1);
-        ax.FontSize = 8;
-        ax.YLim = [0 1];
-        title(a.mouseList(m));        
+        if ismember(m,a.currentMiceNums)
         
-        toPlot = movmean(choicesIIS,20);
-        hold on;
-        plot([-10000 10000],[0.5 0.5],'xliminclude','off','Color',grey,'linewidth',2);
-        for i = 1:numel(reversePts)
-           plot([reversePts(i) reversePts(i)],[0 1],'Color','k','linewidth',2); 
+            ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
+            okidx = find(ok);
+            [~,sortidx] = sort(a.mouseDay(ok==1));
+            oksorted = okidx(sortidx);
+            % that mouse's choice trials
+            choicesIIS = a.choiceIISByMouse{m}; % includes choice training??
+            choicesIIS = choicesIIS(sortidx);
+            choices = a.choiceAllbyMouse{m};
+            choices = choices(sortidx);
+            reverses = a.reverseByMouse{m};
+            reverses = reverses(sortidx);
+            reversePts = find(diff(reverses));        
+
+            fig = figure();
+            fig.PaperUnits = 'inches';
+            fig.PaperPosition = [0.5 0.5 10 7];
+            set(fig,'renderer','painters');
+            set(fig,'PaperOrientation','landscape');
+
+            ax = nsubplot(1,1,1,1);
+            ax.FontSize = 8;
+            ax.YLim = [0 1];
+            title(a.mouseList(m));        
+
+            toPlot = movmean(choicesIIS,20);
+            hold on;
+            plot([-10000 10000],[0.5 0.5],'xliminclude','off','Color',grey,'linewidth',2);
+            for i = 1:numel(reversePts)
+               plot([reversePts(i) reversePts(i)],[0 1],'Color','k','linewidth',2); 
+            end
+            plot(toPlot,'Color','r','linewidth',2);
+            ylabel('Preference for original INFO side, 20-trial avg');
+            xlabel('Trial');
+
+            saveas(fig,fullfile(pathname,['movingavgIIS' a.mouseList{m}]),'pdf');
+
+            fig = figure();
+            fig.PaperUnits = 'inches';
+            fig.PaperPosition = [0.5 0.5 10 7];
+            set(fig,'renderer','painters');
+            set(fig,'PaperOrientation','landscape');
+
+            ax = nsubplot(1,1,1,1);
+            ax.FontSize = 8;
+            ax.YLim = [0 1];
+            title(a.mouseList(m));        
+
+            toPlot = movmean(choices,20);
+            hold on;
+            plot([-10000 10000],[0.5 0.5],'xliminclude','off','Color',grey,'linewidth',2);
+            for i = 1:numel(reversePts)
+               plot([reversePts(i) reversePts(i)],[0 1],'Color','k','linewidth',2); 
+            end
+            plot(toPlot,'Color','b','linewidth',2);
+            ylabel('Preference for current INFO side, 20-trial avg');
+            xlabel('Trial');
+
+            saveas(fig,fullfile(pathname,['movingavg' a.mouseList{m}]),'pdf');
         end
-        plot(toPlot,'Color','r','linewidth',2);
-        ylabel('Preference for original INFO side, 20-trial avg');
-        xlabel('Trial');
-        
-        saveas(fig,fullfile(pathname,['movingavgIIS' a.mouseList{m}]),'pdf');
-        
-        fig = figure();
-        fig.PaperUnits = 'inches';
-        fig.PaperPosition = [0.5 0.5 10 7];
-        set(fig,'renderer','painters');
-        set(fig,'PaperOrientation','landscape');
-
-        ax = nsubplot(1,1,1,1);
-        ax.FontSize = 8;
-        ax.YLim = [0 1];
-        title(a.mouseList(m));        
-        
-        toPlot = movmean(choices,20);
-        hold on;
-        plot([-10000 10000],[0.5 0.5],'xliminclude','off','Color',grey,'linewidth',2);
-        for i = 1:numel(reversePts)
-           plot([reversePts(i) reversePts(i)],[0 1],'Color','k','linewidth',2); 
-        end
-        plot(toPlot,'Color','b','linewidth',2);
-        ylabel('Preference for current INFO side, 20-trial avg');
-        xlabel('Trial');
-        
-        saveas(fig,fullfile(pathname,['movingavg' a.mouseList{m}]),'pdf');        
         
     end
 end
