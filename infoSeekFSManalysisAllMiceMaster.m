@@ -439,11 +439,11 @@ trialsToCount = 300;
 
 if ~isempty(a.choiceMice)
     
-    a.meanChoice = NaN(a.choiceMice(a.choiceMouseCt),3);
-    a.choiceCI = NaN(a.choiceMice(a.choiceMouseCt),2);
-    a.prefCI = NaN(a.choiceMice(a.choiceMouseCt),2);
-    a.pref = NaN(a.choiceMice(a.choiceMouseCt),3);
-    a.beta = NaN(a.choiceMice(a.choiceMouseCt),2);
+    a.meanChoice = NaN(a.mouseCt,3);
+    a.choiceCI = NaN(a.mouseCt,2);
+    a.prefCI = NaN(a.mouseCt,2);
+    a.pref = NaN(a.mouseCt,3);
+    a.beta = NaN(a.mouseCt,2);
        
    for mm = 1:a.choiceMouseCt
        m = a.choiceMice(mm);
@@ -1056,7 +1056,7 @@ end
 
 if ~isempty(a.reverseMice)
 
-    a.reversalDays = NaN(numel(a.reverseMice),3);
+    a.reversalDays = NaN(numel(a.reverseMice),4);
 
     for m = 1:numel(a.reverseMice)
         mm=a.reverseMice(m);
@@ -1068,10 +1068,17 @@ if ~isempty(a.reverseMice)
             % last day of second reversal (either r+3/last day or last day before get
             % ready for values)
             if ~ismember(mm,a.valueMice)
-                if a.reverseDay{mm,2}+3 >= a.mouseDayCt(mm)
-                    a.reversalDays(m,3) = a.mouseDayCt(mm);
+                if ~isempty(a.reverseDay{mm,3})
+                    a.reversalDays(m,3) = a.reverseDay{mm,3}-1; % day prior to third reversal
+                    a.reversalDays(m,4) = a.mouseDayCt(mm);
+                
                 else
-                    a.reversalDays(m,3) = a.reverseDay{mm,2}+3;
+                
+                    if a.reverseDay{mm,2}+3 >= a.mouseDayCt(mm)
+                        a.reversalDays(m,3) = a.mouseDayCt(mm);
+                    else
+                        a.reversalDays(m,3) = a.reverseDay{mm,2}+3;
+                    end
                 end
             else
                 mmm = find(a.valueMice == mm);
@@ -1223,7 +1230,8 @@ for m=1:a.mouseCt
     a.rxnMean(m,2) = nanmean(a.rxn(ok & a.choiceCorr==0));
     for i = 1:numel(a.reverseTypes)
        r = a.reverseTypes(i);
-       a.rxnInfoRev(m,r) = nanmean(a.rxn(ok & a.reverse==r & a.choiceCorr == 1));
+       a.rxnInfoRev(m,i) = nanmean(a.rxn(ok & a.reverse==r & a.choiceCorr == 1));
+       a.rxnRandRev(m,i) = nanmean(a.rxn(ok & a.reverse==r & a.choiceCorr == 0));
     end
 end
 
@@ -1330,9 +1338,12 @@ end
 
 %% OUTCOME/COMPLETE/IN PORT
 
+a.finalOutcomeCorr = a.finalOutcome(a.correct == 1);
+
 for m = 1:a.mouseCt
     ok = a.miceAll(:,m) == 1;
     mouseOutcomes = a.finalOutcome(ok);
+    mouseInitialOutcomes = a.finalOutcomeCorr(a.mice(:,m)==1 & a.reverse==1);
     % info choice big
     a.incomplete(m,1) =  sum(mouseOutcomes == 3)/sum(ismember(mouseOutcomes,[2 3]));
     % info choice small
@@ -1345,6 +1356,7 @@ for m = 1:a.mouseCt
     a.incomplete(m,5) =  sum(mouseOutcomes == 12)/sum(ismember(mouseOutcomes,[11 12]));    
     % info small
     a.incomplete(m,6) =  sum(mouseOutcomes == 14)/sum(ismember(mouseOutcomes,[13 14]));
+    a.initialIncomplete(m,1) = sum(mouseInitialOutcomes == 14)/sum(ismember(mouseInitialOutcomes,[13 14]));
     % rand big
     a.incomplete(m,7) =  sum(mouseOutcomes == 18)/sum(ismember(mouseOutcomes,[17 18]));
     % rand small
