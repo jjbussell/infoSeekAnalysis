@@ -278,7 +278,7 @@ for m = 1:a.mouseCt
     end   
 end
 
-    
+a.reverseTypes = [1 -1 2 -2];    
 a.preReverse = ones(size(a.file,1),1);
 a.reverse = zeros(size(a.file,1),1);
 for t = 1:size(a.file,1)
@@ -511,7 +511,7 @@ end
 
 if ~isempty(a.choiceMice)
     for m = 1:a.mouseCt
-       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 a.preRevRxnSpeed& a.fileTrialTypes == 5 & a.reverse~= 0; % need to match params
+       ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5 & a.reverse~= 0; % need to match params
        a.overallChoice(m,1) = mean(a.choiceCorr(ok & a.infoSide == 0)); % info side = 0
        a.overallChoice(m,2) = mean(a.choiceCorr(ok & a.infoSide == 1)); % info side = 1
        a.overallChoice(m,3) = mean(a.choiceCorr(ok & a.infoSide == a.initinfoside(m,1)));
@@ -1221,7 +1221,15 @@ for m=1:a.mouseCt
     ok = a.mice(:,m)==1 & a.fileTrialTypes == 5 & a.reverse~= 0& a.forcedCorrTrials == 1;
     a.rxnMean(m,1) = nanmean(a.rxn(ok & a.choiceCorr==1));
     a.rxnMean(m,2) = nanmean(a.rxn(ok & a.choiceCorr==0));
+    for i = 1:numel(a.reverseTypes)
+       r = a.reverseTypes(i);
+       a.rxnInfoRev(m,r) = nanmean(a.rxn(ok & a.reverse==r & a.choiceCorr == 1));
+    end
 end
+
+
+
+
 %% REVERSIBLE PREFERENCES - HARDCODED ANIMALS
 % 
 % % a.prefFlag = zeros(size(a.pref));

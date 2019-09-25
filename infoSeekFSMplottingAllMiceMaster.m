@@ -2182,7 +2182,7 @@ if ~isempty(a.reverseMice)
     errorbar(3,nanmean(a.rxnMean(:,2)),sem(a.rxnMean(:,2)),'Color','k','LineWidth',2,'CapSize',100);
     xticks([1 3]);
     xticklabels({'Info','No Info'});
-    ylabel('Reaction time');
+    ylabel('Reaction time across all preference days');
     saveas(fig,fullfile(pathname,'ReactionTimeAllDays'),'pdf');
 
 
