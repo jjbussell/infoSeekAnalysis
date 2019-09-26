@@ -1,3 +1,16 @@
+%% 
+
+% currently: pre vs post analyses are last 300 trials around first reversal
+% (right?!?)
+% "overall" pref is last 300 pre-reversal
+% logistic regression / reversal choices / reversal multi choices??
+
+% to calc/plot: reward rate vs pref both initial and across all
+% reward rate and reaction time across all reversals
+% --> need to sort and pull last 300 trials (forced??) for each reversal
+% period
+% or all trials within reversal? 
+
 %% TO CALC/FIX
 
 % TRIAL LENGTHS / LICKING TIME IN PORT-->how long does ITI need to be?
