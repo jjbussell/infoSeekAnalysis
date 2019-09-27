@@ -285,6 +285,11 @@ for t = 1:size(a.file,1)
     a.preReverse(t,1) = a.prereverseFiles(a.file(t));
     a.reverse(t,1) = a.reverseFiles(a.file(t));
 end
+
+a.reverseAll = zeros(size(a.fileAll,1),1);
+for t = 1:size(a.fileAll,1)
+    a.reverseAll(t,1) = a.reverseFiles(a.fileAll(t));
+end
   
 for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
@@ -999,9 +1004,9 @@ for m = 1:a.mouseCt
 %         a.daySummary.rewardInfoChoice{m,d} = sum(a.rewardCorr(a.infoChoiceCorr == 1 & ok == 1))/sum(a.infoChoiceCorr(ok));
 %         a.daySummary.rewardRandForced{m,d} = sum(a.rewardCorr(a.randForcedCorr == 1 & ok == 1))/sum(a.randForcedCorr(ok));
 %         a.daySummary.rewardRandChoice{m,d} = sum(a.rewardCorr(a.randChoiceCorr == 1 & ok == 1))/sum(a.randChoiceCorr(ok));
-        a.daySummary.rewardRateInfoForced{m,d} = sum(a.reward(a.infoForced == 1 & okAll == 1)) / nansum(a.trialLengthCenterEntry(a.infoForced == 1 & okAll == 1))*1000;
-        a.daySummary.rewardRateRandForced{m,d} = sum(a.reward(a.randForced == 1 & okAll == 1)) / nansum(a.trialLengthCenterEntry(a.randForced == 1 & okAll == 1))*1000;
-        a.daySummary.rewardRateChoice{m,d} = sum(a.reward(a.choiceTrials == 1 & okAll == 1)) / nansum(a.trialLengthCenterEntry(a.choiceTrials == 1 & okAll == 1))*1000;
+        a.daySummary.rewardRateInfoForced{m,d} = sum(a.reward(a.infoForced == 1 & okAll == 1)) / (nansum(a.trialLengthCenterEntry(a.infoForced == 1 & okAll == 1))/1000/60);
+        a.daySummary.rewardRateRandForced{m,d} = sum(a.reward(a.randForced == 1 & okAll == 1)) / (nansum(a.trialLengthCenterEntry(a.randForced == 1 & okAll == 1))/1000/60);
+        a.daySummary.rewardRateChoice{m,d} = sum(a.reward(a.choiceTrials == 1 & okAll == 1)) / (nansum(a.trialLengthCenterEntry(a.choiceTrials == 1 & okAll == 1))/1000/60);
         a.daySummary.rewardRateInfo{m,d} = sum(a.reward(a.choice(:,4) == 1 & okAll == 1)) / (nansum(a.trialLengthCenterEntry(a.choice(:,4) == 1 & okAll == 1))/1000/60);
         a.daySummary.rewardRateRand{m,d} = sum(a.reward(a.choice(:,4) == 0 & okAll == 1)) / (nansum(a.trialLengthCenterEntry(a.choice(:,4) == 0 & okAll == 1))/1000/60);
 %         a.daySummary.rewardRateInfoForced{m,d} = sum(a.rewardCorr(a.infoForcedCorr == 1 & ok == 1)) / nansum(a.trialLengthCenterEntryCorr(a.infoForcedCorr == 1 & ok == 1))*1000;
@@ -1233,6 +1238,11 @@ for m=1:a.mouseCt
        a.rxnInfoRev(m,i) = nanmean(a.rxn(ok & a.reverse==r & a.choiceCorr == 1));
        a.rxnRandRev(m,i) = nanmean(a.rxn(ok & a.reverse==r & a.choiceCorr == 0));
     end
+    
+    okAll = a.miceAll(:,m)==1 & a.reverseAll~= 0;
+    a.rewardRate(m,1) = nansum(a.reward(a.choice(:,4) == 1 & okAll == 1)) / (nansum(a.trialLengthCenterEntry(a.choice(:,4) == 1 & okAll == 1))/1000/60);
+    a.rewardRate(m,2) = nansum(a.reward(a.choice(:,4) == 0 & okAll == 1)) / (nansum(a.trialLengthCenterEntry(a.choice(:,4) == 0 & okAll == 1))/1000/60);
+    a.rewardDiff(m,1) = a.rewardRate(m,1) - a.rewardRate(m,2);
 end
 
 
