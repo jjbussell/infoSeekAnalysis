@@ -1,9 +1,14 @@
 %% 
 
 % currently: pre vs post analyses are last 300 trials around first reversal
-% (right?!?)
+% (right?!?) YES a.rxnSpeedIdx from a.preRevRxnSpeed (not sorted), whereas
+% a.pref (PrevsPostIIS is sorted! --> add rxn speed and licks there?)
 % "overall" pref is last 300 pre-reversal
+% a.overallChoice includes all choice trials on each side!
 % logistic regression / reversal choices / reversal multi choices??
+% logistic regression includes all choice trials on each side
+% reversalChoices, reversalRxn simply pulls days
+
 
 % to calc/plot: reward rate vs pref both initial and across all
 % reward rate and reaction time across all reversals
@@ -2181,10 +2186,10 @@ if ~isempty(a.reverseMice)
     ax.FontSize = 8;
 %     ax.YTick = [0 0.25 0.50 0.75 1];
 %     ax.YLim = [0 1];
-%     ax.XLim = [0.5 3.5];
-%     ax.XTick = [1 2 3];
+    ax.XLim = [0.5 3.5];
+    ax.XTick = [1 2 3];
     
-    for n=1:4
+    for n=1:3
        plot(n,nanmean(a.reversalRxn(:,n)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10); 
        errorbar(n,nanmean(a.reversalRxn(:,n)),sem(a.reversalRxn(:,n)),'Color','k','LineWidth',2,'CapSize',100);
     end
