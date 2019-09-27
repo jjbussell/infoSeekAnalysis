@@ -447,7 +447,7 @@ if ~isempty(a.choiceMice)
     a.meanChoice = NaN(a.mouseCt,3);
     a.choiceCI = NaN(a.mouseCt,2);
     a.prefCI = NaN(a.mouseCt,2);
-    a.pref = NaN(a.mouseCt,3);
+    a.pref = NaN(a.mouseCt,8);
     a.beta = NaN(a.mouseCt,2);
        
    for mm = 1:a.choiceMouseCt
@@ -504,6 +504,7 @@ if ~isempty(a.choiceMice)
  
    end
 
+   % pref(:,1) for up to 300 trials, mean choice for all
     a.meanChoice = a.meanChoice(a.meanChoice(:,3)>0,:);
     a.choiceCI = a.choiceCI(a.choiceCI(:,1)>0,:);
    

@@ -1,15 +1,16 @@
 %% 
 
+% 300 trials arbitrary. in new version, average ~110 trials per session
 % currently: pre vs post analyses are last 300 trials around first reversal
 % (right?!?) YES a.rxnSpeedIdx from a.preRevRxnSpeed (not sorted), whereas
-% a.pref (PrevsPostIIS is sorted! --> add rxn speed and licks there?)
-% "overall" pref is last 300 pre-reversal
+% a.pref (PrevsPostIIS is sorted! but also only 300 trials --> add rxn speed and licks there?)
+% "overall.pdf" pref/meanchoice is *all* prereverse trials 
 % a.overallChoice includes all choice trials on each side!
-% logistic regression / reversal choices / reversal multi choices??
-% logistic regression includes all choice trials on each side
-% reversalChoices, reversalRxn simply pulls days
-
+% logistic regression betas include all choice trials on sides (rel IIS)
+% reversalChoices, reversalRxn simply pulls days-->include last reversal?
+% all days present, rxn, reward rate includes all trials
 % all current reward rates pull days from daysummary.rewardRateRand etc
+% for reversal multipref, include all reversals/average timecourse?
 
 % to calc/plot: reward rate vs pref both initial and across all
 % reward rate and reaction time across all reversals (reversalRxn)
