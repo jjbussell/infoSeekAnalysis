@@ -1,4 +1,4 @@
-%% 
+d %% 
 
 % 300 trials arbitrary. in new version, average ~110 trials per session
 % currently: pre vs post analyses are last 300 trials around first reversal
