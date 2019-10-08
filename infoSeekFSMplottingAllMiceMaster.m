@@ -720,9 +720,9 @@ for mm = 1:numel(a.currentMiceNums)
         figure();
         fig = gcf;
         fig.PaperUnits = 'inches';
-        fig.PaperPosition = [1 1 8 10];
+        fig.PaperPosition = [1 1 10 8];
         set(fig,'renderer','painters')
-        set(fig,'PaperOrientation','portrait');
+        set(fig,'PaperOrientation','landscape');
         
         ax = nsubplot(1,1,1,1);
         title(a.mouseList(m));
