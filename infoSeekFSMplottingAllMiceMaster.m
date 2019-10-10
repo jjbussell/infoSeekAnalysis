@@ -731,8 +731,8 @@ for mm = 1:numel(a.currentMiceNums)
         xlabel('Day');
         ax.YLim = [0 1];
         ax.YTick = [0:0.25:1];
-%         ax.XLim = [0 a.mouseDayCt(m)];
-        ax.XTick = [1:a.mouseDayCt(m)];
+        ax.XLim = [0 a.mouseDayCt(m)+1];
+        ax.XTick = [1:10:a.mouseDayCt(m)];
         ax.XTickLabel = [1:10:a.mouseDayCt(m)];
         colormap(fig,CCfinal);
         bar(outcomeCounts,'stacked');
