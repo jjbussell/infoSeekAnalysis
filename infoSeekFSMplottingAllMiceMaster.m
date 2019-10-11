@@ -1775,7 +1775,7 @@ hold off;
 saveas(fig,fullfile(pathname,'InitPrefbyrxn'),'pdf');
 %     close(fig);
 
-%% MEAN PREFERENCE
+%% MEAN PREFERENCE (INDEX)
 
 if ~isempty(a.reverseMice)
     fig = figure();
@@ -1809,6 +1809,45 @@ if ~isempty(a.reverseMice)
     
 
     saveas(fig,fullfile(pathname,'OverallIndex'),'pdf');
+end
+
+
+%% MEAN PREFERENCE (INDEX) NO IMAGING, only big/small mice
+
+if ~isempty(a.reverseMice)
+    fig = figure();
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+    ax = nsubplot(1,1,1,1);
+    ax.FontSize = 6;
+%     ax.YLim = [-0.2 0.2];
+    ax.YLim = [-0.4 0.4];
+    
+%     micetoplot = a.reverseMice;
+    imagemice = find(a.imagingMice);
+    micetoplot = a.reverseMice(~ismember(a.reverseMice,imagemice));
+    noneMice = find(a.noneMice);
+    micetoplot = micetoplot(~ismember(micetoplot,noneMice))
+    choicetoplot = a.overallChoice;
+    choicetoplot(isnan(choicetoplot))=0.5;
+    bar(choicetoplot(micetoplot,5)-0.5,'FaceColor',grey);
+    bar(numel(micetoplot)+1,nanmean(a.overallChoice(micetoplot,5))-0.5,'FaceColor','k');
+    xticks(1:numel(micetoplot)+1);
+    xticklabels([a.mouseList(micetoplot); 'Mean']);
+    xlim([0.5 numel(micetoplot)+1.5]);
+    ylabel('Mean choice of info side across reversals for all non-imaging mice');
+    yticks([-.2 -.1 0 .1 .2]);
+    yticklabels({'30%','40%','50%','60%','70%'});
+    text(numel(micetoplot)+1,nanmean(a.overallChoice(micetoplot,5))-0.45,['Mean = ' num2str(round(nanmean(a.overallChoice(micetoplot,5)),4))],'HorizontalAlignment','center');
+    overallChoicePercent = a.overallChoice(micetoplot,5)*100;
+    overallChoiceP = signrank(overallChoicePercent-50);    
+    text(numel(micetoplot)+1,nanmean(a.overallChoice(micetoplot,5))-0.46,['p = ' num2str(round(overallChoiceP,4))],'HorizontalAlignment','center');
+    
+
+    saveas(fig,fullfile(pathname,'OverallIndexNoImage'),'pdf');
 end
 
 
