@@ -809,34 +809,34 @@ end
 
 % for m = a.FSMmouseIdx(1):a.FSMmouseIdx(end)
 %     
-for mm = 1:numel(a.currentMiceNums)
-    m=a.currentMiceNums(mm); 
-    figure();
-    fig = gcf;
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [1 1 10 7];
-    set(fig,'PaperOrientation','landscape');
-    set(fig,'renderer','painters')
-    for d = a.mouseDayCt(m)
-        ax = nsubplot(1,1,1,1);
-        title([a.mouseList(m) a.dayCell{find(a.fileMouse == m & a.fileDay == a.mouseDayCt(m),1,'first')}]);       
-        ax.FontSize = 10;
-        [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
-        bar([1:17],outcomeCounts);
-        plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
-        plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
-        if d == ceil(a.mouseDayCt(m)/2)
-        ylabel('Trial Outcomes (% of trials)');
-        end
-        if d == a.mouseDayCt(m)
-            ax.XTick = [1:17];
-        set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
-        end
-    end
-    
-    saveas(fig,fullfile(pathname,['outcomesMostRecentDay' a.mouseList{m}]),'pdf');
-%     close(fig);
-end
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm); 
+%     figure();
+%     fig = gcf;
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [1 1 10 7];
+%     set(fig,'PaperOrientation','landscape');
+%     set(fig,'renderer','painters')
+%     for d = a.mouseDayCt(m)
+%         ax = nsubplot(1,1,1,1);
+%         title([a.mouseList(m) a.dayCell{find(a.fileMouse == m & a.fileDay == a.mouseDayCt(m),1,'first')}]);       
+%         ax.FontSize = 10;
+%         [outcomeCounts,outcomeBins] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
+%         bar([1:17],outcomeCounts);
+%         plot([7.5 7.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);
+%         plot([12.5 12.5],[-10000000 1000000],'k','yliminclude','off','color',[0.6 0.6 0.6],'LineWidth',2);    
+%         if d == ceil(a.mouseDayCt(m)/2)
+%         ylabel('Trial Outcomes (% of trials)');
+%         end
+%         if d == a.mouseDayCt(m)
+%             ax.XTick = [1:17];
+%         set(gca,'XTickLabel',a.outcomeLabels,'XTickLabelRotation',35)
+%         end
+%     end
+%     
+%     saveas(fig,fullfile(pathname,['outcomesMostRecentDay' a.mouseList{m}]),'pdf');
+% %     close(fig);
+% end
 
 %% FINAL OUTCOME (error plots) ACROSS DAYS
 
@@ -1654,7 +1654,7 @@ end
 
 
 %% PREFERENCE VS LEAVING
-
+if ~isempty(a.reverseMice)
 fig = figure();
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0.5 0.5 10 7];
@@ -1681,8 +1681,10 @@ hold off;
 
 saveas(fig,fullfile(pathname,'Prefbyleaving'),'pdf');
 %     close(fig);
+end
 
 %% initial pref vs initial leaving
+if ~isempty(a.reverseMice)
 fig = figure();
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0.5 0.5 10 7];
@@ -1709,9 +1711,10 @@ hold off;
 
 saveas(fig,fullfile(pathname,'InitPrefbyleaving'),'pdf');
 %     close(fig);
-
+end
 
 %% initial pref vs days of training
+if ~isempty(a.reverseMice)
 fig = figure();
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0.5 0.5 10 7];
@@ -1744,9 +1747,10 @@ hold off;
 
 saveas(fig,fullfile(pathname,'InitPrefbytraining'),'pdf');
 %     close(fig);
+end
 
 %% initial pref vs initial rxn
-
+if ~isempty(a.reverseMice)
 fig = figure();
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0.5 0.5 10 7];
@@ -1774,6 +1778,7 @@ hold off;
 
 saveas(fig,fullfile(pathname,'InitPrefbyrxn'),'pdf');
 %     close(fig);
+end
 
 %% MEAN PREFERENCE (INDEX)
 
@@ -1988,9 +1993,10 @@ if ~isempty(a.reverseMice)
 
     saveas(fig,fullfile(pathname,'Regression'),'pdf');
 %     close(fig);
+end
 
     %% EARLY LICKS REGRESSION
-
+if ~isempty(a.reverseMice)
     bothSig = a.preRevEarlyLicks(:,3)<0.05 & a.postRevEarlyLicks(:,3)<0.05;
 
     for m = 1:a.mouseCt
@@ -2314,6 +2320,7 @@ if ~isempty(a.reverseMice)
     
     saveas(fig,fullfile(pathname,'ReversalRxn'),'pdf');
 % end
+
 
 %% REACTION SPEED PLOT
 

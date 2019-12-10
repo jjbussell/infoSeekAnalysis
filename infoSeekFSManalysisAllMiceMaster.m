@@ -515,7 +515,7 @@ end
 
 %% OVERALL CHOICES BY SIDE
 
-if ~isempty(a.choiceMice)
+if ~isempty(a.reverseMice)
     for m = 1:a.mouseCt
        ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5 & a.reverse~= 0; % need to match params
        a.overallChoice(m,1) = mean(a.choiceCorr(ok & a.infoSide == 0)); % info side = 0
