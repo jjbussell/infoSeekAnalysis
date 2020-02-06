@@ -79,14 +79,14 @@ cornflower = [100 149 237] ./ 255;
 grey = [.8 .8 .8];
 
 CCfinal = [0.2,0.2,0.2; %choice no choice
-    0.984313725490196,0.545098039215686,0.0235294117647059; %choice info big
-    245/255,222/255,179/255; % choice info big NP
-    1, 0.8, 0.0; %choice info small
-    244/255, 164/255, 96/255; %choice info small NP
-    0.474509803921569,0.125490196078431,0.768627450980392; %choice rand big
-    171/255,130/255,1; % choice rand big NP
-    0.9490, 0.8, 1.0; %choicerandsmall
-    238/255,224/255,229/255; %choicerandNPsmall
+    0.474509803921569,0.125490196078431,0.768627450980392; %choice info big
+    171/255,130/255,1; % choice info big NP
+    0.9490, 0.8, 1.0; %choiceinfosmall
+    238/255,224/255,229/255; %choiceinfoNPsmall    
+    0.984313725490196,0.545098039215686,0.0235294117647059; %choice rand big
+    245/255,222/255,179/255; % choice rand big NP
+    1, 0.8, 0.0; %choice rand small
+    244/255, 164/255, 96/255; %choice rand small NP
     0.6,0.6,0.6; %info no choice
     0,1,0; %info big
     152/255,251/255,152/255;% info big NP
@@ -120,7 +120,8 @@ a.finalOutcomeLabels = {'ChoiceNoChoice','ChoiceInfoBig','ChoiceInfoBigNP',...
 
 %%
 
- pathname=uigetdir('','Choose save directory');
+%  pathname=uigetdir('','Choose save directory');
+ pathname = 'D:\Dropbox\Data\Infoseek\Graphs';
 
 %% PLOT DAY SUMMARIES BY MOUSE FOR CURRENT MICE
 

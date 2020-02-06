@@ -195,7 +195,7 @@ a.fileInfoSide = cell2mat({a.files.infoSide});
 
 % a.reverseFile = zeros(a.mouseCt,1);
 % a.reverseDay = zeros(a.mouseCt,1);
-a.reverseDay = cell(a.mouseCt,1);
+a.reverseDay = cell(a.mouseCt,3);
 a.prereverseFiles = ones(a.numFiles,1); %flag 1 = file with choices before reverse, 0 if before choices and after reverse
 a.prereverseFiles(cell2mat(a.parameters(:,7))~=5) = 0;
 a.reverseFiles = zeros(a.numFiles,1); % flag 1 = file before first reverse, -1 = file during first reverse, make 2 after first reverse??
