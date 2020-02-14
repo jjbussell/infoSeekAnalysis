@@ -128,9 +128,9 @@ end
 
 %% PLOT DAY SUMMARIES BY MOUSE FOR CURRENT MICE
 
-for mm = 1:numel(a.currentMiceNums)
-    m=a.currentMiceNums(mm);
-% for m = 1:a.mouseCt
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
+for m = 1:a.mouseCt
     figure();
     
     fig = gcf;
@@ -710,10 +710,10 @@ end
 
     %% STACKED BARS
 
-% for m = 1:a.mouseCt   
+for m = 1:a.mouseCt   
     
-for mm = 1:numel(a.currentMiceNums)
-    m=a.currentMiceNums(mm);
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
     outcomeCounts = [];
     outcomeBins = [];
     
@@ -1046,9 +1046,9 @@ end
 
 %% NOT PRESENT IN PORT OVERALL
 
-for mm = 1:numel(a.currentMiceNums)
-    m=a.currentMiceNums(mm);
-% for m = 1:a.mouseCt
+% for mm = 1:numel(a.currentMiceNums)
+%     m=a.currentMiceNums(mm);
+for m = 1:a.mouseCt
     figure();
     fig = gcf;
     fig.PaperUnits = 'inches';
@@ -1975,7 +1975,7 @@ cmap = [orange; purple; grey; 1, 0.8, 0.0; 0.9490, 0.8, 1.0;1 1 0; purple; orang
 clabel = {'NoInfo','Info','NoChoice','NoInfoWRONG','InfoWRONG','Choice','Info','NoInfo'};
 
 for m = 1:a.mouseCt
-    if ismember(m,a.currentChoiceMice)
+    if ismember(m,a.choiceMice)
         days = a.mouseChoiceDays{m};
         dayCount = numel(days);    
         fig = figure();
