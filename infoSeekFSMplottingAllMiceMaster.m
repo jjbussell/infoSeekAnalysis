@@ -1964,6 +1964,101 @@ if ~isempty(a.reverseMice)
     end
 end
 
+%% ALL CHOICES BY DAY
+
+% choiceColorMap = [ orange; purple; grey; 0.9490, 0.8, 1.0; 1, 0.8, 0.0];
+% typeColorMap = [1 1 0; purple; orange];
+cmap = [orange; purple; grey; 1, 0.8, 0.0; 0.9490, 0.8, 1.0;1 1 0; purple; orange];
+clabel = {'NoInfo','Info','NoChoice','NoInfoWRONG','InfoWRONG','Choice','Info','NoInfo'};
+
+for m = 1:a.mouseCt
+    if ismember(m,a.currentChoiceMice)
+        days = a.mouseChoiceDays{m};
+        dayCount = numel(days);    
+        fig = figure();
+        fig.PaperUnits = 'inches';
+        fig.PaperPosition = [0.5 0.5 7 10];
+        set(fig,'renderer','painters');
+        set(fig,'PaperOrientation','portrait');    
+             
+        for dd = 1:dayCount
+            d = days(dd);
+            choices = [a.daySummary.wentInfo{m,d}' 0:7];
+            ok = a.miceAll(:,m)==1 & a.mouseDayAll == d;
+            choiceTypes = a.choiceType(ok)';
+            choiceTypes=[choiceTypes+4 0:7];
+%             choices = [a.choice(ok,4)' 0:7];
+           
+            ax1 = nsubplot(dayCount*2,1,dd*2-1,1);
+            ax1.FontSize = 8;
+            ax1.YLim = [0 1];
+            imagesc(ax1,choiceTypes);colormap(ax1,cmap);
+            ylabel([a.mouseDays{m}{d} ' ' num2str(d) ' ChoiceTypes']);
+            axis tight;
+            set(gca,'ytick',[]);
+            set(gca,'yticklabel',[]); 
+            
+            ax2 = nsubplot(dayCount*2,1,dd*2,1);
+            ax2.FontSize = 8;
+            ax2.YLim = [0 1];
+            imagesc(ax2,choices);colormap(ax2,cmap);
+            axis tight;
+            
+            set(gca,'ytick',[]);
+            set(gca,'yticklabel',[]);           
+        end
+        ha = axes('Position',[0 0 1 1],'Xlim',[0 1],'Ylim',[0  1],'Box','off','Visible','off','Units','normalized', 'clipping' , 'off');
+        h_for_legend=[];
+        hold on;
+        for i = 1:7
+            h_for_legend(end+1) = plot(ha,0,0, 'color',cmap(i,:),'linewidth',2);
+        end
+        hold off;
+            
+        leg = legend(h_for_legend,clabel,'Location','south','Orientation','horizontal');
+        legend('boxoff');
+        text(0.51,0.98,[a.mouseList{m} ' Choice of Side'],'FontSize',14,'FontWeight','bold','HorizontalAlignment','center');        
+    end
+    saveas(fig,fullfile(pathname,[a.mouseList{m},'_FullChoices']),'pdf');
+end
+
+%% TRIAL TYPES BY DAY
+% 
+% choiceColorMap = [1 1 0; purple; orange];
+% 
+% for m = 1:a.mouseCt
+%     if ismember(m,a.currentChoiceMice)
+%         days = a.mouseChoiceDays{m};
+%         dayCount = numel(days);  
+%         fig = figure();
+%         fig.PaperUnits = 'inches';
+%         fig.PaperPosition = [0.5 0.5 10 7];
+%         set(fig,'renderer','painters');
+%         set(fig,'PaperOrientation','landscape');    
+%              
+%         for dd = 1: dayCount
+%             d = days(dd);    
+%             
+%             ok = a.miceAll(:,m)==1 & a.mouseDayAll == d;
+%             
+%             ax = nsubplot(dayCount,1,dd,1);
+%             ax.FontSize = 8;
+%             ax.YLim = [0 1];
+%                         
+%             choices = [a.choiceType(ok)' 1:3];
+%             
+%             imagesc(choices);colormap(choiceColorMap);
+%             ylabel([a.mouseDays{m}{d} ' ' num2str(d)]);
+%             axis tight;
+%             set(gca,'ytick',[]);
+%             set(gca,'yticklabel',[]);            
+%         end
+%         ha = axes('Position',[0 0 1 1],'Xlim',[0 1],'Ylim',[0  1],'Box','off','Visible','off','Units','normalized', 'clipping' , 'off');
+%         text(0.51,0.98,[a.mouseList{m} ' Trial Type'],'FontSize',14,'FontWeight','bold','HorizontalAlignment','center');        
+%     end
+% end
+
+
 %% LOGISTIC REGRESSION ON TRIALS TO COUNT (regression.pdf) 
 
 if ~isempty(a.reverseMice)

@@ -334,6 +334,10 @@ for i = 1:size(a.file,1)
    a.infoSide(i,1) = a.files(a.file(i)).infoSide;
 end
 
+for i = 1:size(a.fileAll,1)
+    a.infoSideAll(i,1) = a.files(a.fileAll(i)).infoSide;
+end
+
 a.initinfoside_info = -ones(a.corrTrialCt,1); % initinfoside_info all trials by info-ness. 1 if initinfoside, -1 if reversed
 a.initinfoside_side = ones(a.corrTrialCt,1); % initinfoside_side all trials
 
@@ -341,6 +345,21 @@ for m = 1:a.mouseCt
     ok = a.mice(:,m) == 1;
     a.initinfoside_info(a.infoSide == a.initinfoside(m) & ok == 1) = 1;
 end
+
+%% SIDE CHOICE
+
+% choiceType + infoSideAll + choice
+
+a.left = zeros(size(a.fileAll,1),1);
+
+
+a.wentInfo = a.choice(:,4); % 1 = info, 0 = rand, 2 = no choice, 3 = incorrect
+a.wentInfo(a.choice(:,4)==3 & a.choiceType == 3) = 4;
+a.wentInfo(a.choice(:,4)==3 & a.choiceType == 2) = 3;
+
+a.left = a.wentInfo;
+a.left(a.infoSideAll == 1) = ~a.wentInfo(a.infoSideAll == 1);
+
 
 %% CHOICES
 
@@ -961,6 +980,7 @@ for m = 1:a.mouseCt
         a.daySummary.totalTrials{m,d} = sum([a.daySummary.infoBig{m,d},a.daySummary.infoSmall{m,d},a.daySummary.randBig{m,d},a.daySummary.randSmall{m,d}]);
         a.daySummary.percentInfo{m,d} = nanmean(a.infoCorrTrials(ok & a.choiceCorrTrials == 1 & a.fileTrialTypes == 5));
         a.daySummary.percentIIS{m,d} = nanmean(a.choice_all(ok & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5));
+        a.daySummary.wentInfo{m,d} = a.wentInfo(okAll);
         a.daySummary.rxnInfoForced{m,d} = nanmean(a.rxn(a.infoForcedCorr & ok));
         a.daySummary.rxnInfoChoice{m,d} = nanmean(a.rxn(a.infoChoiceCorr & ok));
         a.daySummary.rxnRandForced{m,d} = nanmean(a.rxn(a.randForcedCorr & ok));
@@ -1388,4 +1408,4 @@ end
 %%
 save('infoSeekFSMDataAnalyzed.mat','a');
 
-save(['infoSeekFSMDataAnalyzed' datestr(now,'yyyymmdd') 'realPref'],'a');
+save(['infoSeekFSMDataAnalyzed' datestr(now,'yyyymmdd')],'a');
