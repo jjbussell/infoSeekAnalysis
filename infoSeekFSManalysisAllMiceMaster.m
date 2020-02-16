@@ -1155,7 +1155,8 @@ if ~isempty(a.reverseMice)
                     end
                 elseif n==2
                     for k = 1:4
-                        if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
+%                         if ~isempty(a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1})
+                        if a.mouseDayCt(mm)>(day+k-1)
                             a.reversalMultiPrefs(m,k+4) = a.daySummary.percentIIS{mm,a.reversalDays(m,n)+k-1};
                         end
                     end
