@@ -1902,7 +1902,7 @@ if ~isempty(a.reverseMice)
     for mm = 1:numel(a.reverseMice)
         m = a.reverseMice(mm);
         
-        if ismember(m,a.currentMiceNums)
+%         if ismember(m,a.currentMiceNums)
         
             ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
             okidx = find(ok);
@@ -1962,7 +1962,7 @@ if ~isempty(a.reverseMice)
             xlabel('Trial');
 
             saveas(fig,fullfile(pathname,['movingavg' a.mouseList{m}]),'pdf');
-        end
+%         end
         
     end
 end
