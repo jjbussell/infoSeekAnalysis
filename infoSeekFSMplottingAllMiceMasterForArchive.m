@@ -1071,6 +1071,30 @@ for m = 1:a.mouseCt
 end
 
 
+%%
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    title('Not Present in Port at Outcome');
+    ax.FontSize = 8;
+    ylabel('% trials not present in reward port at outcome');
+    
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [-0.1 1.1];
+    
+    bar(mean(a.incomplete),'FaceColor','none','EdgeColor','k');
+    hold on;
+    plot(a.incomplete','Linestyle','none','Marker','o');
+    set(gca,'XTickLabel',a.choiceLabels,'XTick',[1:8]);
+    
+    saveas(fig,fullfile(pathname,'notPresentMean'),'pdf');
+
+
     %% OVERALL
 % for m=1:a.mouseCt 
 %     [outcomeCounts(m,:),outcomeBins(m,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
