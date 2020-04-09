@@ -1270,8 +1270,9 @@ for m=1:a.mouseCt
     a.rewardDiff(m,1) = a.rewardRate(m,1) - a.rewardRate(m,2);
 end
 
+%% PRE-REVERSAL DAY LICKS
 
-
+a.reversalLickDiff = (a.reversalInfoBigLicks + a.reversalInfoSmallLicks) - (a.reversalRandCLicks + a.reversalRandDLicks);
 
 %% REVERSIBLE PREFERENCES - HARDCODED ANIMALS
 % 

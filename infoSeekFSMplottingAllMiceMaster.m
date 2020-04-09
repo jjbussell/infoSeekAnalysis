@@ -1717,6 +1717,8 @@ saveas(fig,fullfile(pathname,'InitPrefbyleaving'),'pdf');
 %     close(fig);
 end
 
+
+
 %% initial pref vs days of training
 if ~isempty(a.reverseMice)
 fig = figure();
