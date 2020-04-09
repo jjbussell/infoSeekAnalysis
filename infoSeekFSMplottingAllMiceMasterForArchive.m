@@ -2463,19 +2463,23 @@ if ~isempty(a.reverseMice)
     ax.FontSize = 8;
 %     ax.YTick = [0 500 1000 1500];
 %     ax.YLim = [300 1300];
-    ax.XLim = [0.5 3.5];
+    ax.XLim = [0.5 4.5];
 %     ax.XTick = [1 2 3];
     
 %     bar(1,nanmean(a.reversalRxn(:,1)));
     for m = 1:numel(a.reverseMice)
-        plot([1 3],[a.reversalRxnInfo(m,1) a.reversalRxnRand(m,1)],'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        plot([1 2 3 4],[a.reversalRxnInfo(m,1) a.reversalRxnRand(m,1) a.reversalRxnInfoChoice(m,1) a.reversalRxnRandChoice(m,1)],'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
     end
     plot(1,nanmean(a.reversalRxnInfo(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
     errorbar(1,nanmean(a.reversalRxnInfo(:,1)),sem(a.reversalRxnInfo(:,1)),'Color','k','LineWidth',2,'CapSize',100);
-    plot(3,nanmean(a.reversalRxnRand(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
-    errorbar(3,nanmean(a.reversalRxnRand(:,1)),sem(a.reversalRxnRand(:,1)),'Color','k','LineWidth',2,'CapSize',100);
-    xticks([1 3]);
-    xticklabels({'Info','No Info'});
+    plot(2,nanmean(a.reversalRxnRand(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(2,nanmean(a.reversalRxnRand(:,1)),sem(a.reversalRxnRand(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+    plot(3,nanmean(a.reversalRxnInfoChoice(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(3,nanmean(a.reversalRxnInfoChoice(:,1)),sem(a.reversalRxnInfoChoice(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+    plot(4,nanmean(a.reversalRxnRandChoice(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(4,nanmean(a.reversalRxnRandChoice(:,1)),sem(a.reversalRxnRandChoice(:,1)),'Color','k','LineWidth',2,'CapSize',100);    
+    xticks([1 2 3 4]);
+    xticklabels({'Info Forced','No Info Forced','Info Choice','No Info Choice'});
     ylabel('Reaction time on last session before reversal');
     saveas(fig,fullfile(pathname,'ReactionTime'),'pdf');
     

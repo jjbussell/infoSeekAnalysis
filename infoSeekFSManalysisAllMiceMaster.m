@@ -1173,6 +1173,8 @@ if ~isempty(a.reverseMice)
                     a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{mm,day};
                     a.reversalRxnInfo(m,n) = a.daySummary.rxnInfoForced{mm,day};
                     a.reversalRxnRand(m,n) = a.daySummary.rxnRandForced{mm,day};
+                    a.reversalRxnInfoChoice(m,n) = a.daySummary.rxnInfoChoice{mm,day};
+                    a.reversalRxnRandChoice(m,n) = a.daySummary.rxnRandChoice{mm,day};                    
     %             end
     %             if isnan(a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)})
     %                 a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)-1};
@@ -1393,6 +1395,11 @@ for m = 1:a.mouseCt
     a.incomplete(m,7) =  sum(mouseOutcomes == 18)/sum(ismember(mouseOutcomes,[17 18]));
     % rand small
     a.incomplete(m,8) =  sum(mouseOutcomes == 20)/sum(ismember(mouseOutcomes,[19 20]));
+    
+    
+    a.incompleteInfoRand(m,1) = sum(ismember(mouseOutcomes,[3 5 12 14])) / sum(ismember(mouseOutcomes,[2 3 4 5 11 12 13 14]));
+    a.incompleteInfoRand(m,2) = sum(ismember(mouseOutcomes,[7 9 18 20])) / sum(ismember(mouseOutcomes,[6 7 8 9 17 18 19 20]));
+    
     for d = 1:a.mouseDayCt(m)
         mouseOutcomes = a.daySummary.finalOutcome{m,d};
         a.dayIncomplete(m,d,1) = sum(mouseOutcomes == 3)/sum(ismember(mouseOutcomes,[2 3]));
@@ -1405,6 +1412,8 @@ for m = 1:a.mouseCt
         a.dayIncomplete(m,d,8) = sum(mouseOutcomes == 20)/sum(ismember(mouseOutcomes,[19 20]));
     end
 end
+
+a.incompleteDifference = a.incompleteInfoRand(:,1) - a.incompleteInfoRand(:,2);
 
 %%
 save('infoSeekFSMDataAnalyzed.mat','a');
