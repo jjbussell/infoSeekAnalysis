@@ -1711,6 +1711,38 @@ saveas(fig,fullfile(pathname,'Prefbyleaving'),'pdf');
 %     close(fig);
 end
 
+
+%% PREFERENCE VS LEAVING DIFFERENCE
+if ~isempty(a.reverseMice)
+fig = figure();
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0.5 0.5 10 7];
+set(fig,'renderer','painters');
+set(fig,'PaperOrientation','landscape');
+
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 8;
+% ax.XLim = [0 1];
+ax.YLim = [0 1];
+for mm = 1:numel(a.reverseMice)
+    m = a.reverseMice(mm);
+    text(a.incompleteDifference(m)*100,a.overallChoice(m,5) + 0.01,a.reverseMiceList{mm},'HorizontalAlignment','center');
+end
+scatter(a.incompleteDifference(a.reverseMice)*100,a.overallChoice(a.reverseMice,5),'filled')
+plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+ylabel({'P(choose info)'}); %{'Info choice', 'probability'}
+xlabel({'Difference in % trials not in port at outcome, info - no info'});
+title('Overall mean choice of information vs. probability of leaving on low-value info trials');
+hold off;
+
+saveas(fig,fullfile(pathname,'Prefbyleavingdifference'),'pdf');
+%     close(fig);
+end
+
+
 %% initial pref vs initial leaving
 if ~isempty(a.reverseMice)
 fig = figure();
@@ -1738,6 +1770,37 @@ title('Initial choice of information vs. probability of leaving on low-value inf
 hold off;
 
 saveas(fig,fullfile(pathname,'InitPrefbyleaving'),'pdf');
+%     close(fig);
+end
+
+
+%% PREFERENCE VS REACTION DIFFERENCE
+if ~isempty(a.reverseMice)
+fig = figure();
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0.5 0.5 10 7];
+set(fig,'renderer','painters');
+set(fig,'PaperOrientation','landscape');
+
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 8;
+% ax.XLim = [0 1];
+ax.YLim = [0 1];
+for mm = 1:numel(a.reverseMice)
+    m = a.reverseMice(mm);
+    text(a.rxnDiff(m),a.overallChoice(m,5) + 0.01,a.reverseMiceList{mm},'HorizontalAlignment','center');
+end
+scatter(a.rxnDiff(a.reverseMice),a.overallChoice(a.reverseMice,5),'filled')
+plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+ylabel({'P(choose info)'}); %{'Info choice', 'probability'}
+xlabel({'Difference in forced trial reaction time, info - no info'});
+title('Overall mean choice of information vs. forced trial reaction time');
+hold off;
+
+saveas(fig,fullfile(pathname,'PrefbyRTdifference'),'pdf');
 %     close(fig);
 end
 

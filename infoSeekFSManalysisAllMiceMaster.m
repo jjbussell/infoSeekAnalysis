@@ -1257,6 +1257,7 @@ for m=1:a.mouseCt
     ok = a.mice(:,m)==1 & a.fileTrialTypes == 5 & a.reverse~= 0& a.forcedCorrTrials == 1;
     a.rxnMean(m,1) = nanmean(a.rxn(ok & a.choiceCorr==1));
     a.rxnMean(m,2) = nanmean(a.rxn(ok & a.choiceCorr==0));
+    a.rxnDiff(m,1) = a.rxnMean(m,1) - a.rxnMean(m,2);
     for i = 1:numel(a.reverseTypes)
        r = a.reverseTypes(i);
        a.rxnInfoRev(m,i) = nanmean(a.rxn(ok & a.reverse==r & a.choiceCorr == 1));
