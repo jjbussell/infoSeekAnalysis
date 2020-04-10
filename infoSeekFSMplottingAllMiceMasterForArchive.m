@@ -1899,6 +1899,37 @@ saveas(fig,fullfile(pathname,'InitPrefbyrxn'),'pdf');
 %     close(fig);
 end
 
+%% initial pref vs initial licking
+if ~isempty(a.reverseMice)
+fig = figure();
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0.5 0.5 10 7];
+set(fig,'renderer','painters');
+set(fig,'PaperOrientation','landscape');
+
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 8;
+% ax.XLim = [0 1];
+ax.YLim = [0 1];
+for mm = 1:numel(a.reverseMice)
+    m = a.reverseMice(mm);
+    text(a.reversalLickDiff(mm,1),a.pref(m,1) + 0.01,a.reverseMiceList{mm},'HorizontalAlignment','center');
+end
+scatter(a.reversalLickDiff(:,1),a.pref(a.reverseMice,1),'filled');
+% scatter(imagingReverseDays,a.pref(find(a.imagingMice),1),'filled','MarkerFaceColor','r');
+plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+ylabel({'P(choose info)'}); %{'Info choice', 'probability'}
+xlabel({'Info - No Info anticipatory licks'});
+title('Initial choice of information vs. anticipatory licking');
+hold off;
+
+saveas(fig,fullfile(pathname,'InitPrefbylicking'),'pdf');
+%     close(fig);
+end
+
 %% MEAN PREFERENCE (INDEX)
 
 if ~isempty(a.reverseMice)
