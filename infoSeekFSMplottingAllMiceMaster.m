@@ -2439,8 +2439,8 @@ if ~isempty(a.reverseMice)
     
     ax = nsubplot(1,1,1,1);
     ax.FontSize = 8;
-%     ax.YTick = [0 500 1000 1500];
-%     ax.YLim = [300 1300];
+    ax.YTick = [0 500 1000 1500];
+    ax.YLim = [0 1500];
     ax.XLim = [0.5 3.5];
 %     ax.XTick = [1 2 3];
     
