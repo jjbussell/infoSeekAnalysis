@@ -192,7 +192,10 @@ for f = 1:numFiles
     b.txn11_12 = transitions(transitions(:,5) == 11 & transitions(:,6) == 12,[1 2 3 5 6]);
     b.txn12_13 = transitions(transitions(:,5) == 12 & transitions(:,6) == 13,[1 2 3 5 6]);
     b.txn13_14 = transitions(transitions(:,5) == 13 & transitions(:,6) == 14,[1 2 3 5 6]);
-    b.txn14_15 = transitions(transitions(:,5) == 14 & transitions(:,6) == 15,[1 2 3 5 6]);
+    b.txn14_17 = transitions(transitions(:,5) == 14 & transitions(:,6) == 17,[1 2 3 5 6]);
+    b.txn17_14 = transitions(transitions(:,5) == 17 & transitions(:,6) == 14,[1 2 3 5 6]);
+    b.txn14_18 = transitions(transitions(:,5) == 14 & transitions(:,6) == 18,[1 2 3 5 6]);
+    b.txn18_15 = transitions(transitions(:,5) == 18 & transitions(:,6) == 15,[1 2 3 5 6]);
     b.txn15_0 = transitions(transitions(:,5) == 15 & transitions(:,6) == 0,[1 2 3 5 6]);
     b.txn4_3 = transitions(transitions(:,5) == 4 & transitions(:,6) == 3,[1 2 3 5 6]);
     b.txn5_3 = transitions(transitions(:,5) == 5 & transitions(:,6) == 3,[1 2 3 5 6]);

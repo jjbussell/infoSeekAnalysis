@@ -1249,6 +1249,12 @@ if ~isempty(a.reverseMice)
     a.reversalRxnInfoRandP(1,1) = signrank(a.reversalRxnInfo(:,1),a.reversalRxnRand(:,1));
     a.reversalRewardRateInfoRandP(1,1) = signrank(a.reversalRewardRateInfo(:,1),a.reversalRewardRateRand(:,1));
     end
+    
+    
+    %% PRE-REVERSAL DAY LICKS
+
+    a.reversalLickDiff = (a.reversalInfoBigLicks + a.reversalInfoSmallLicks) - (a.reversalRandCLicks + a.reversalRandDLicks);    
+    
 end
 
 
@@ -1270,9 +1276,7 @@ for m=1:a.mouseCt
     a.rewardDiff(m,1) = a.rewardRate(m,1) - a.rewardRate(m,2);
 end
 
-%% PRE-REVERSAL DAY LICKS
 
-a.reversalLickDiff = (a.reversalInfoBigLicks + a.reversalInfoSmallLicks) - (a.reversalRandCLicks + a.reversalRandDLicks);
 
 %% REVERSIBLE PREFERENCES - HARDCODED ANIMALS
 % 
