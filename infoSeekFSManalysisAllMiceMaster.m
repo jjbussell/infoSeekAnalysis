@@ -1173,6 +1173,8 @@ if ~isempty(a.reverseMice)
                     a.reversalRxn(m,n) = a.daySummary.rxnSpeedIdx{mm,day};
                     a.reversalRxnInfo(m,n) = a.daySummary.rxnInfoForced{mm,day};
                     a.reversalRxnRand(m,n) = a.daySummary.rxnRandForced{mm,day};
+                    a.reversalRxnInfoChoice(m,n) = a.daySummary.rxnInfoChoice{mm,day};
+                    a.reversalRxnRandChoice(m,n) = a.daySummary.rxnRandChoice{mm,day};                    
     %             end
     %             if isnan(a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)})
     %                 a.reversalLicks(m,n) = a.daySummary.earlyLickIdx{m,a.reversalDays(m,n)-1};
@@ -1247,6 +1249,12 @@ if ~isempty(a.reverseMice)
     a.reversalRxnInfoRandP(1,1) = signrank(a.reversalRxnInfo(:,1),a.reversalRxnRand(:,1));
     a.reversalRewardRateInfoRandP(1,1) = signrank(a.reversalRewardRateInfo(:,1),a.reversalRewardRateRand(:,1));
     end
+    
+    
+    %% PRE-REVERSAL DAY LICKS
+
+    a.reversalLickDiff = (a.reversalInfoBigLicks + a.reversalInfoSmallLicks) - (a.reversalRandCLicks + a.reversalRandDLicks);    
+    
 end
 
 
@@ -1255,6 +1263,7 @@ for m=1:a.mouseCt
     ok = a.mice(:,m)==1 & a.fileTrialTypes == 5 & a.reverse~= 0& a.forcedCorrTrials == 1;
     a.rxnMean(m,1) = nanmean(a.rxn(ok & a.choiceCorr==1));
     a.rxnMean(m,2) = nanmean(a.rxn(ok & a.choiceCorr==0));
+    a.rxnDiff(m,1) = a.rxnMean(m,1) - a.rxnMean(m,2);
     for i = 1:numel(a.reverseTypes)
        r = a.reverseTypes(i);
        a.rxnInfoRev(m,i) = nanmean(a.rxn(ok & a.reverse==r & a.choiceCorr == 1));
@@ -1266,7 +1275,6 @@ for m=1:a.mouseCt
     a.rewardRate(m,2) = nansum(a.reward(a.choice(:,4) == 0 & okAll == 1)) / (nansum(a.trialLengthCenterEntry(a.choice(:,4) == 0 & okAll == 1))/1000/60);
     a.rewardDiff(m,1) = a.rewardRate(m,1) - a.rewardRate(m,2);
 end
-
 
 
 
@@ -1393,6 +1401,11 @@ for m = 1:a.mouseCt
     a.incomplete(m,7) =  sum(mouseOutcomes == 18)/sum(ismember(mouseOutcomes,[17 18]));
     % rand small
     a.incomplete(m,8) =  sum(mouseOutcomes == 20)/sum(ismember(mouseOutcomes,[19 20]));
+    
+    
+    a.incompleteInfoRand(m,1) = sum(ismember(mouseOutcomes,[3 5 12 14])) / sum(ismember(mouseOutcomes,[2 3 4 5 11 12 13 14]));
+    a.incompleteInfoRand(m,2) = sum(ismember(mouseOutcomes,[7 9 18 20])) / sum(ismember(mouseOutcomes,[6 7 8 9 17 18 19 20]));
+    
     for d = 1:a.mouseDayCt(m)
         mouseOutcomes = a.daySummary.finalOutcome{m,d};
         a.dayIncomplete(m,d,1) = sum(mouseOutcomes == 3)/sum(ismember(mouseOutcomes,[2 3]));
@@ -1405,6 +1418,8 @@ for m = 1:a.mouseCt
         a.dayIncomplete(m,d,8) = sum(mouseOutcomes == 20)/sum(ismember(mouseOutcomes,[19 20]));
     end
 end
+
+a.incompleteDifference = a.incompleteInfoRand(:,1) - a.incompleteInfoRand(:,2);
 
 %%
 save('infoSeekFSMDataAnalyzed.mat','a');

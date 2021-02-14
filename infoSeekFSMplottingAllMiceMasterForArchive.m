@@ -1071,6 +1071,30 @@ for m = 1:a.mouseCt
 
 end
 
+%%
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+    
+    ax = nsubplot(1,1,1,1);
+    title('Not Present in Port at Outcome');
+    ax.FontSize = 8;
+    ylabel('% trials not present in reward port at outcome');
+    
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [-0.1 1.1];
+    
+    bar(mean(a.incomplete),'FaceColor','none','EdgeColor','k');
+    hold on;
+    plot(a.incomplete','Linestyle','none','Marker','o');
+    set(gca,'XTickLabel',a.choiceLabels,'XTick',[1:8]);
+    
+    saveas(fig,fullfile(pathname,'notPresentMean'),'pdf');
+
+
     %% OVERALL
 % for m=1:a.mouseCt 
 %     [outcomeCounts(m,:),outcomeBins(m,:)] = histcounts(a.daySummary.outcome{m,d},[0.5:1:17.5],'Normalization','probability');
@@ -1688,6 +1712,66 @@ saveas(fig,fullfile(pathname,'Prefbyleaving'),'pdf');
 %     close(fig);
 end
 
+
+%% PREFERENCE VS LEAVING DIFFERENCE
+if ~isempty(a.reverseMice)
+fig = figure();
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0.5 0.5 10 7];
+set(fig,'renderer','painters');
+set(fig,'PaperOrientation','landscape');
+
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 8;
+% ax.XLim = [0 1];
+ax.YLim = [0 1];
+for mm = 1:numel(a.reverseMice)
+    m = a.reverseMice(mm);
+    text(a.incompleteDifference(m)*100,a.overallChoice(m,5) + 0.01,a.reverseMiceList{mm},'HorizontalAlignment','center');
+end
+scatter(a.incompleteDifference(a.reverseMice)*100,a.overallChoice(a.reverseMice,5),'filled')
+plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+ylabel({'P(choose info)'}); %{'Info choice', 'probability'}
+xlabel({'Difference in % trials not in port at outcome, info - no info'});
+title('Overall mean choice of information vs. probability of leaving');
+hold off;
+
+saveas(fig,fullfile(pathname,'Prefbyleavingdifference'),'pdf');
+%     close(fig);
+end
+
+%% leaving vs reward rate
+fig = figure();
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0.5 0.5 10 7];
+set(fig,'renderer','painters');
+set(fig,'PaperOrientation','landscape');
+
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 8;
+% ax.XLim = [0 1];
+% ax.YLim = [0 1];
+for mm = 1:numel(a.reverseMice)
+    m = a.reverseMice(mm);
+    text(a.incompleteDifference(m)*100,a.rewardDiff(m,1)+ 0.01,a.reverseMiceList{mm},'HorizontalAlignment','center');
+end
+scatter(a.incompleteDifference(a.reverseMice)*100,a.rewardDiff(:,1),'filled')
+plot([-10000000 1000000],[0 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+plot([0 0],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+ylabel({'Info reward rate - no info reward rate (uL per minute)'}); %{'Info choice', 'probability'}
+xlabel({'Difference in % trials not in port at outcome, info - no info'});
+title('Trials not in port vs. reward rate difference');
+hold off;
+
+saveas(fig,fullfile(pathname,'Rewardbynotpresent'),'pdf');
+%     close(fig);
+
+
 %% initial pref vs initial leaving
 if ~isempty(a.reverseMice)
 fig = figure();
@@ -1715,6 +1799,37 @@ title('Initial choice of information vs. probability of leaving on low-value inf
 hold off;
 
 saveas(fig,fullfile(pathname,'InitPrefbyleaving'),'pdf');
+%     close(fig);
+end
+
+
+%% PREFERENCE VS REACTION DIFFERENCE
+if ~isempty(a.reverseMice)
+fig = figure();
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0.5 0.5 10 7];
+set(fig,'renderer','painters');
+set(fig,'PaperOrientation','landscape');
+
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 8;
+% ax.XLim = [0 1];
+ax.YLim = [0 1];
+for mm = 1:numel(a.reverseMice)
+    m = a.reverseMice(mm);
+    text(a.rxnDiff(m),a.overallChoice(m,5) + 0.01,a.reverseMiceList{mm},'HorizontalAlignment','center');
+end
+scatter(a.rxnDiff(a.reverseMice),a.overallChoice(a.reverseMice,5),'filled')
+plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+ylabel({'P(choose info)'}); %{'Info choice', 'probability'}
+xlabel({'Difference in forced trial reaction time, info - no info'});
+title('Overall mean choice of information vs. forced trial reaction time');
+hold off;
+
+saveas(fig,fullfile(pathname,'PrefbyRTdifference'),'pdf');
 %     close(fig);
 end
 
@@ -1785,6 +1900,37 @@ saveas(fig,fullfile(pathname,'InitPrefbyrxn'),'pdf');
 %     close(fig);
 end
 
+%% initial pref vs initial licking
+if ~isempty(a.reverseMice)
+fig = figure();
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0.5 0.5 10 7];
+set(fig,'renderer','painters');
+set(fig,'PaperOrientation','landscape');
+
+ax = nsubplot(1,1,1,1);
+ax.FontSize = 8;
+% ax.XLim = [0 1];
+ax.YLim = [0 1];
+for mm = 1:numel(a.reverseMice)
+    m = a.reverseMice(mm);
+    text(a.reversalLickDiff(mm,1),a.pref(m,1) + 0.01,a.reverseMiceList{mm},'HorizontalAlignment','center');
+end
+scatter(a.reversalLickDiff(:,1),a.pref(a.reverseMice,1),'filled');
+% scatter(imagingReverseDays,a.pref(find(a.imagingMice),1),'filled','MarkerFaceColor','r');
+plot([-10000000 1000000],[0.5 0.5],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+plot([0.5 0.5],[-10000000 1000000],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[0 1],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+% plot([0 1],[1 0],'color',[0.2 0.2 0.2],'linewidth',0.25,'yliminclude','off','xliminclude','off');
+ylabel({'P(choose info)'}); %{'Info choice', 'probability'}
+xlabel({'Info - No Info anticipatory licks'});
+title('Initial choice of information vs. anticipatory licking');
+hold off;
+
+saveas(fig,fullfile(pathname,'InitPrefbylicking'),'pdf');
+%     close(fig);
+end
+
 %% MEAN PREFERENCE (INDEX)
 
 if ~isempty(a.reverseMice)
@@ -1840,6 +1986,7 @@ if ~isempty(a.reverseMice)
     imagemice = find(a.imagingMice);
     micetoplot = a.reverseMice(~ismember(a.reverseMice,imagemice));
     noneMice = find(a.noneMice);
+    noneMice = 0;
     micetoplot = micetoplot(~ismember(micetoplot,noneMice));
     choicetoplot = a.overallChoice;
     choicetoplot(isnan(choicetoplot))=0.5;
@@ -1874,6 +2021,7 @@ if ~isempty(a.reverseMice)
     imagemice = find(a.imagingMice);
     micetoplot = a.reverseMice(~ismember(a.reverseMice,imagemice));
     noneMice = find(a.noneMice);
+    noneMice = 0;
     micetoplot = micetoplot(~ismember(micetoplot,noneMice));
     choicetoplot = a.overallChoice(micetoplot,5);
 %     choicetoplot(isnan(choicetoplot(:,5)),5)=0;
@@ -1903,7 +2051,7 @@ if ~isempty(a.reverseMice)
     for mm = 1:numel(a.reverseMice)
         m = a.reverseMice(mm);
         
-        if ismember(m,a.currentMiceNums)
+%         if ismember(m,a.currentMiceNums)
         
             ok = a.mice(:,m) == 1 & a.choiceTypeCorr == 1 & a.fileTrialTypes == 5;
             okidx = find(ok);
@@ -1963,7 +2111,7 @@ if ~isempty(a.reverseMice)
             xlabel('Trial');
 
             saveas(fig,fullfile(pathname,['movingavg' a.mouseList{m}]),'pdf');
-        end
+%         end
         
     end
 end
@@ -2355,8 +2503,6 @@ if ~isempty(a.reverseMice)
 
 %% PLOT MEAN CHOICES AROUND REVERSALS (single days) for mice with real pref
 % 
-% 
-% 
 % % if a.choiceMouseCt > 1
 %     fig = figure();
 %     
@@ -2440,19 +2586,23 @@ if ~isempty(a.reverseMice)
     ax.FontSize = 8;
 %     ax.YTick = [0 500 1000 1500];
 %     ax.YLim = [300 1300];
-    ax.XLim = [0.5 3.5];
+    ax.XLim = [0.5 4.5];
 %     ax.XTick = [1 2 3];
     
 %     bar(1,nanmean(a.reversalRxn(:,1)));
     for m = 1:numel(a.reverseMice)
-        plot([1 3],[a.reversalRxnInfo(m,1) a.reversalRxnRand(m,1)],'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
+        plot([1 2 3 4],[a.reversalRxnInfo(m,1) a.reversalRxnRand(m,1) a.reversalRxnInfoChoice(m,1) a.reversalRxnRandChoice(m,1)],'Color',grey,'LineStyle',':','LineWidth',2,'Marker','o','MarkerFaceColor',grey);
     end
     plot(1,nanmean(a.reversalRxnInfo(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
     errorbar(1,nanmean(a.reversalRxnInfo(:,1)),sem(a.reversalRxnInfo(:,1)),'Color','k','LineWidth',2,'CapSize',100);
-    plot(3,nanmean(a.reversalRxnRand(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
-    errorbar(3,nanmean(a.reversalRxnRand(:,1)),sem(a.reversalRxnRand(:,1)),'Color','k','LineWidth',2,'CapSize',100);
-    xticks([1 3]);
-    xticklabels({'Info','No Info'});
+    plot(2,nanmean(a.reversalRxnRand(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(2,nanmean(a.reversalRxnRand(:,1)),sem(a.reversalRxnRand(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+    plot(3,nanmean(a.reversalRxnInfoChoice(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(3,nanmean(a.reversalRxnInfoChoice(:,1)),sem(a.reversalRxnInfoChoice(:,1)),'Color','k','LineWidth',2,'CapSize',100);
+    plot(4,nanmean(a.reversalRxnRandChoice(:,1)),'Color','k','LineWidth',2,'Marker','o','MarkerFaceColor','k','MarkerSize',10);
+    errorbar(4,nanmean(a.reversalRxnRandChoice(:,1)),sem(a.reversalRxnRandChoice(:,1)),'Color','k','LineWidth',2,'CapSize',100);    
+    xticks([1 2 3 4]);
+    xticklabels({'Info Forced','No Info Forced','Info Choice','No Info Choice'});
     ylabel('Reaction time on last session before reversal');
     saveas(fig,fullfile(pathname,'ReactionTime'),'pdf');
     
@@ -2723,7 +2873,7 @@ title('Choice of information vs. reward rate difference');
 hold off;
 
 saveas(fig,fullfile(pathname,'Prefbyreward'),'pdf');
-%     close(fig);   
+%     close(fig);
     
     
     %% initial pref vs initial reward rate
