@@ -1068,7 +1068,31 @@ for m = 1:a.mouseCt
     set(gca,'XTickLabel',a.choiceLabels,'XTick',[1:8]);
     
     saveas(fig,fullfile(pathname,['notPresent' a.mouseList{m}]),'pdf');
+
 end
+
+%%
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0.5 0.5 10 7];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','landscape');
+
+    ax = nsubplot(1,1,1,1);
+    title('Not Present in Port at Outcome - timeout mice');
+    ax.FontSize = 8;
+    ylabel('% trials not present in reward port at outcome');
+
+    ax.YTick = [0 0.25 0.50 0.75 1];
+    ax.YLim = [-0.1 1.1];
+
+    bar(nanmean(a.incomplete(a.timeoutMice,:)),'FaceColor','none','EdgeColor','k');
+    hold on;
+    plot(a.incomplete(a.timeoutMice,:)','Linestyle','none','Marker','o');
+    set(gca,'XTickLabel',a.choiceLabels,'XTick',[1:8]);
+
+    saveas(fig,fullfile(pathname,'notPresentMeanTimeoutMice'),'pdf');
 
 
     %% OVERALL
@@ -1658,6 +1682,7 @@ end
 
 
 %% PREFERENCE VS LEAVING
+
 if ~isempty(a.reverseMice)
 fig = figure();
 fig.PaperUnits = 'inches';
