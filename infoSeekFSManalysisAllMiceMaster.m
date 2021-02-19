@@ -1270,10 +1270,20 @@ for m=1:a.mouseCt
        a.rxnRandRev(m,i) = nanmean(a.rxn(ok & a.reverse==r & a.choiceCorr == 0));
     end
     
-    okAll = a.miceAll(:,m)==1 & a.reverseAll~= 0;
+    okAll = a.miceAll(:,m)==1;
     a.rewardRate(m,1) = nansum(a.reward(a.choice(:,4) == 1 & okAll == 1)) / (nansum(a.trialLengthCenterEntry(a.choice(:,4) == 1 & okAll == 1))/1000/60);
     a.rewardRate(m,2) = nansum(a.reward(a.choice(:,4) == 0 & okAll == 1)) / (nansum(a.trialLengthCenterEntry(a.choice(:,4) == 0 & okAll == 1))/1000/60);
     a.rewardDiff(m,1) = a.rewardRate(m,1) - a.rewardRate(m,2);
+    a.rewardIdx(m,1) = a.rewardRate(m,1)/a.rewardRate(m,2);
+    
+    if ismember(m,a.reverseMice)
+        mm=find(a.reverseMice==m);
+        okPref = a.mice(:,m)==1 & a.reverse~= 0;
+        a.rewardRatePrefDays(mm,1) = nansum(a.rewardCorr(a.choiceCorr == 1 & okPref == 1)) / (nansum(a.trialLengthCenterEntryCorr(a.choiceCorr == 1 & okPref == 1))/1000/60);
+        a.rewardRatePrefDays(mm,2) = nansum(a.rewardCorr(a.choiceCorr == 0 & okPref == 1)) / (nansum(a.trialLengthCenterEntryCorr(a.choiceCorr == 0 & okPref == 1))/1000/60);
+        a.rewardDiffPrefDays(mm,1) = a.rewardRatePrefDays(mm,1) - a.rewardRatePrefDays(mm,2);
+        a.rewardIdxPrefDays(mm,1) = a.rewardRatePrefDays(mm,1) / a.rewardRatePrefDays(mm,2);
+    end    
 end
 
 
