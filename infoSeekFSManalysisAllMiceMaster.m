@@ -1093,34 +1093,51 @@ if ~isempty(a.reverseMice)
 
             % last day of second reversal (either r+3/last day or last day before get
             % ready for values)
-            if ~ismember(mm,a.valueMice)
-                if ~isempty(a.reverseDay{mm,3})
-                    a.reversalDays(m,3) = a.reverseDay{mm,3}-1; % day prior to third reversal
-                    a.reversalDays(m,4) = a.mouseDayCt(mm);
-                
+                if ~ismember(mm,a.valueMice)
+                    if ~isempty(a.reverseDay{mm,3})
+                        a.reversalDays(m,3) = a.reverseDay{mm,3}-1; % day prior to third reversal
+                        a.reversalDays(m,4) = a.mouseDayCt(mm);
+
+                    else                
+                        if a.reverseDay{mm,2}+3 >= a.mouseDayCt(mm)
+                            a.reversalDays(m,3) = a.mouseDayCt(mm);
+                        else
+                            a.reversalDays(m,3) = a.reverseDay{mm,2}+3;
+                        end
+                    end
                 else
-                
-                    if a.reverseDay{mm,2}+3 >= a.mouseDayCt(mm)
-                        a.reversalDays(m,3) = a.mouseDayCt(mm);
+                    mmm = find(a.valueMice == mm);
+                    mouseValueDays = a.mouseValueDays{mmm,1};
+                    if ismember(mmm,a.valueMiceInfo)
+                        mouseProbDays = a.infoBigProbs{mm,1};
                     else
-                        a.reversalDays(m,3) = a.reverseDay{mm,2}+3;
+                        mouseProbDays = a.randBigProbs{mm,1};
+                    end
+                    mouseValues = mouseProbDays(mouseValueDays);
+                    if sum(mouseValues > 25) > 0
+                        a.reversalDays(m,3) = find(mouseProbDays==25,1,'last');
+                    else
+                        a.reversalDays(m,3) = mouseValueDays(1);
                     end
                 end
             else
-                mmm = find(a.valueMice == mm);
-                mouseValueDays = a.mouseValueDays{mmm,1};
-                if ismember(mmm,a.valueMiceInfo)
-                    mouseProbDays = a.infoBigProbs{mm,1};
+                if ~ismember(mm,a.valueMice)
+                    a.reversalDays(m,2) = a.mouseDayCt(mm);
                 else
-                    mouseProbDays = a.randBigProbs{mm,1};
+                    mmm = find(a.valueMice == mm);
+                    mouseValueDays = a.mouseValueDays{mmm,1};
+                    if ismember(mmm,a.valueMiceInfo)
+                        mouseProbDays = a.infoBigProbs{mm,1};
+                    else
+                        mouseProbDays = a.randBigProbs{mm,1};
+                    end
+                    mouseValues = mouseProbDays(mouseValueDays);
+                    if sum(mouseValues > 25) > 0
+                        a.reversalDays(m,2) = find(mouseProbDays==25,1,'last');
+                    else
+                        a.reversalDays(m,2) = mouseValueDays(1);
+                    end 
                 end
-                mouseValues = mouseProbDays(mouseValueDays);
-                if sum(mouseValues > 25) > 0
-                    a.reversalDays(m,3) = find(mouseProbDays==25,1,'last');
-                else
-                    a.reversalDays(m,3) = mouseValueDays(1);
-                end
-              end
             end
         end
     end
@@ -1431,6 +1448,23 @@ end
 
 a.incompleteDifference = a.incompleteInfoRand(:,1) - a.incompleteInfoRand(:,2);
 
+%%
+if ~isempty(a.reverseMice)
+    for m = 1:numel(a.reverseMice)
+        mm=a.reverseMice(m);
+        a.choiceDays{1,:,m} = a.firstChoiceDay(mm):a.reversalDays(m,1);
+        a.choiceDays{2,:,m} = a.reversalDays(m,1)+1:a.reversalDays(m,2);
+        a.choiceDays{3,:,m} = a.reversalDays(m,2)+1:a.reversalDays(m,3);
+        a.choiceDays{4,:,m} = a.reversalDays(m,3)+1:a.reversalDays(m,4);
+        
+        choiceDays = a.choiceDays(:,:,m);
+        a.allChoiceDays{m,:} = [choiceDays{:}];
+        
+        days = a.allChoiceDays{m,:};
+        days=days(~isnan(days));
+        a.choiceDayPref{m,:} = [a.daySummary.percentInfo{mm,days}];
+    end
+end
 %%
 save('infoSeekFSMDataAnalyzed.mat','a');
 

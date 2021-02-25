@@ -2992,3 +2992,36 @@ for m = 1:a.mouseCt
    a.infoLeaveVal(m,1) =  (a.present(m,5)*8*0.25+a.present(m,6)*1*0.75)/(a.present(m,7)*8*0.25+a.present(m,8)*1*0.75);
    a.waterMissed(m,1) = a.incomplete(m,6)*1*0.75/(a.present(m,5)*8*0.25+a.present(m,6)*1*0.75);
 end
+
+       
+%%
+
+m=6;
+
+if ~isempty(a.reverseMice)
+    figure();
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 11 8.5];
+    set(fig,'renderer','painters');
+    set(fig,'PaperOrientation','portrait');
+    for m = 1:numel(a.reverseMice)
+    ax = nsubplot(numel(a.reverseMice),2,m,1);
+%     title(a.mouseList(m));
+    ax.FontSize = 8;    
+%         ax.XTick = [0:5:a.mouseDayCt(m)];    
+        ax.YTick = [0 0.25 0.50 0.75 1];
+        ax.YLim = [-0.1 1.1];
+        plot(0,0,'Marker','none');
+        days = a.allChoiceDays{m,:};
+        plot(days(~isnan(days)),a.choiceDayPref{m,:},'Color',[.5 .5 .5],'LineWidth',2,'Marker','o','MarkerSize',3);    
+        plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.8 0.8 0.8],'LineWidth',1);
+        for r = 1:numel(cell2mat(a.reverseDay(m,:)))
+            plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
+        end
+        ax.XLim = [min(days) max(days)];
+        ylabel({'P(choose current INFO side)'}); %ylabel({'line1', 'line2','line3'},)
+    %     xlabel('Day');
+        hold off;            
+    end
+end
