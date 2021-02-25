@@ -193,6 +193,10 @@ a.rewardFlag(a.rewardCorr>0) = 1;
 
 a.fileInfoSide = cell2mat({a.files.infoSide});
 
+if sum(ismember(a.mouseList,'JB226'))>0
+    a.fileInfoSide(1,1050)=0;
+end
+
 % a.reverseFile = zeros(a.mouseCt,1);
 % a.reverseDay = zeros(a.mouseCt,1);
 a.reverseDay = cell(a.mouseCt,3);
@@ -1463,6 +1467,7 @@ if ~isempty(a.reverseMice)
         days = a.allChoiceDays{m,:};
         days=days(~isnan(days));
         a.choiceDayPref{m,:} = [a.daySummary.percentInfo{mm,days}];
+        a.choiceDayIISPref{m,:} = [a.daySummary.percentIIS{mm,days}];
     end
 end
 %%

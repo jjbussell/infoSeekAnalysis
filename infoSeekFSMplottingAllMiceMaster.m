@@ -2994,34 +2994,79 @@ for m = 1:a.mouseCt
 end
 
        
-%%
+%% ALL PREFERENCE DAys
 
 m=6;
 
+[sortVals,sortList] = sort(a.overallChoice(:,5),'descend');
 if ~isempty(a.reverseMice)
     figure();
     fig = gcf;
     fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0 0 11 8.5];
+    fig.PaperPosition = [0 0 8.5 11];
     set(fig,'renderer','painters');
     set(fig,'PaperOrientation','portrait');
-    for m = 1:numel(a.reverseMice)
-    ax = nsubplot(numel(a.reverseMice),2,m,1);
-%     title(a.mouseList(m));
-    ax.FontSize = 8;    
-%         ax.XTick = [0:5:a.mouseDayCt(m)];    
+    for mm = 1:numel(a.reverseMice)
+        m = sortList(mm);
+        ax = nsubplot(numel(a.reverseMice),2,mm,1);
+        title(a.mouseList(m));
+        ax.FontSize = 8;    
+%       ax.XTick = [0:5:a.mouseDayCt(m)];
         ax.YTick = [0 0.25 0.50 0.75 1];
         ax.YLim = [-0.1 1.1];
         plot(0,0,'Marker','none');
         days = a.allChoiceDays{m,:};
         plot(days(~isnan(days)),a.choiceDayPref{m,:},'Color',[.5 .5 .5],'LineWidth',2,'Marker','o','MarkerSize',3);    
         plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.8 0.8 0.8],'LineWidth',1);
+        plot([-10000000 1000000],[a.overallChoice(m,5) a.overallChoice(m,5)],'xliminclude','off','color',purple,'LineWidth',2);
         for r = 1:numel(cell2mat(a.reverseDay(m,:)))
             plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
         end
         ax.XLim = [min(days) max(days)];
-        ylabel({'P(choose current INFO side)'}); %ylabel({'line1', 'line2','line3'},)
-    %     xlabel('Day');
-        hold off;            
+        ax.XAxis.Visible = 'off';
+%       ylabel({'P(choose current INFO side)'}); %ylabel({'line1', 'line2','line3'},)
+%       xlabel('Day');
+            
+        ax = nsubplot(numel(a.reverseMice),2,mm,2);
+        title(a.mouseList(m));
+        ax.FontSize = 8;    
+%       ax.XTick = [0:5:a.mouseDayCt(m)];
+        ax.YTick = [0 0.25 0.50 0.75 1];
+        ax.YLim = [-0.1 1.1];
+        plot(0,0,'Marker','none');
+        days = a.allChoiceDays{m,:};
+        plot(days(~isnan(days)),a.choiceDayIISPref{m,:},'Color',[.5 .5 .5],'LineWidth',2,'Marker','o','MarkerSize',3);    
+        plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.8 0.8 0.8],'LineWidth',1);
+        for r = 1:numel(cell2mat(a.reverseDay(m,:)))
+            plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
+        end
+        ax.XLim = [min(days) max(days)];
+        ax.XAxis.Visible = 'off';
+%       ylabel({'P(choose current INFO side)'}); %ylabel({'line1', 'line2','line3'},)
+%       xlabel('Day');
+% 
+%         ax = nsubplot(numel(a.reverseMice),4,m,3);
+%         title(a.mouseList(m));
+%         ax.FontSize = 8;    
+%         ax.XLim = [0 2];
+%         ax.YTick = [0 0.25 0.50 0.75 1];
+%         ax.YLim = [-0.1 1.1];
+%         bar(a.meanChoice(m,1))
+% %       ylabel({'P(choose current INFO side)'}); %ylabel({'line1', 'line2','line3'},)
+% %       xlabel('Day');
+% 
+%         ax = nsubplot(numel(a.reverseMice),4,m,4);
+%         title(a.mouseList(m));
+%         ax.FontSize = 8;    
+%         ax.XLim = [0 2];
+%         ax.YTick = [0 0.25 0.50 0.75 1];
+%         ax.YLim = [-0.1 1.1];
+%         bar(a.overallChoice(m,5))
+% %       ylabel({'P(choose current INFO side)'}); %ylabel({'line1', 'line2','line3'},)
+% %       xlabel('Day');
+
+    
     end
+    hold off;
+    saveas(fig,fullfile(pathname,'Prefbydaybymouse'),'pdf');
 end
