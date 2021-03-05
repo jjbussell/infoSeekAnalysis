@@ -1907,7 +1907,7 @@ if ~isempty(a.reverseMice)
     micetoplot = micetoplot(~ismember(micetoplot,noneMice));
     choicetoplot = a.overallChoice(micetoplot,5);
 %     choicetoplot(isnan(choicetoplot(:,5)),5)=0;
-    [sortChoice,idx] = sort(choicetoplot);
+    [sortChoice,idx] = sort(choicetoplot,'descend');
     bar(sortChoice,'FaceColor',grey);
     bar(numel(micetoplot)+1,nanmean(a.overallChoice(micetoplot,5)),'FaceColor','k');
     xticks(1:numel(micetoplot)+1);
@@ -3017,8 +3017,9 @@ if ~isempty(a.reverseMice)
         plot(0,0,'Marker','none');
         days = a.allChoiceDays{m,:};
         plot(days(~isnan(days)),a.choiceDayPref{m,:},'Color',[.5 .5 .5],'LineWidth',2,'Marker','o','MarkerSize',3);    
-        plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.8 0.8 0.8],'LineWidth',1);
-        plot([-10000000 1000000],[a.overallChoice(m,5) a.overallChoice(m,5)],'xliminclude','off','color',purple,'LineWidth',2);
+        plot([-10000000 1000000],[0.5 0.5],'k','xliminclude','off','color',[0.8 0.8 0.8],'LineWidth',0.5);
+        plot([-10000000 1000000],[0.75 0.75],'k','xliminclude','off','color',[0.8 0.8 0.8],'LineWidth',0.5);
+        plot([-10000000 1000000],[sortVals(mm) sortVals(mm)],'xliminclude','off','color',purple,'LineWidth',1);
         for r = 1:numel(cell2mat(a.reverseDay(m,:)))
             plot([a.reverseDay{m,r}-0.5 a.reverseDay{m,r}-0.5],[-10000000 1000000],'k','yliminclude','off','xliminclude','off','LineWidth',2);
         end
